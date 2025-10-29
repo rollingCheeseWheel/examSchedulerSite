@@ -4,6 +4,7 @@ import { useLocalStorage } from "@mantine/hooks";
 import { Routes } from "react-router-dom";
 import type { LinkGroupProps } from "./link/LinkGroup";
 import { NestedNavbar } from "./link/NestedNavbar";
+import { NavbarDataProvider, useNavbar } from "./providers/NavbarProvider";
 
 export interface DefaultAppShellProps {
 	children?: ReactNode;
@@ -20,180 +21,39 @@ export default function DefaultAppShell({ children }: DefaultAppShellProps) {
 		return <Navigate to="/login" />;
 	} */
 
-	const navbarData: LinkGroupProps[] = [
+	const navbar: LinkGroupProps[] = [
 		{
 			label: "test",
-			defaultLink: "/bobber",
-		},
-		{
-			label: "test2",
-			initiallyOpened: true,
 			links: [
-				{
-					label: "bobber1",
-					link: "/bobber1",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
-				{
-					label: "bobber2",
-					link: "/bobber2",
-				},
+				{ label: "test", link: "/" },
+				{ label: "test", link: "/" },
+				{ label: "test", link: "/" },
+				{ label: "test", link: "/" },
+				{ label: "test", link: "/" },
+				{ label: "test", link: "/" },
+				{ label: "test", link: "/" },
+				{ label: "test", link: "/" },
 			],
+			initiallyOpened: true,
 		},
+		{ label: "test", defaultLink: "/" },
+		{ label: "test", defaultLink: "/", initiallyOpened: true },
 	];
 
+	return (
+		<NavbarDataProvider initialState={navbar}>
+			<AppShellIntermediate>{children}</AppShellIntermediate>
+		</NavbarDataProvider>
+	);
+}
+
+function AppShellIntermediate({ children }: DefaultAppShellProps) {
+	const { data: navbarData } = useNavbar();
 	const navbar = <NestedNavbar data={navbarData} />;
 
 	return (
-		<AppShellSpine
-			navbar={navbar}
-			children={<Routes>{children}</Routes>}></AppShellSpine>
+		<AppShellSpine navbar={navbar} opened>
+			{<Routes>{children}</Routes>}
+		</AppShellSpine>
 	);
 }

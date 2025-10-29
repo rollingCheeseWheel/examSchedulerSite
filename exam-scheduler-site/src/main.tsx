@@ -17,7 +17,7 @@ createRoot(document.getElementById("root")!).render(
 					<Route
 						path="/login"
 						element={
-							<AppShellSpine>
+							<AppShellSpine disabled>
 								<Center
 									style={{
 										height: "80dvh",

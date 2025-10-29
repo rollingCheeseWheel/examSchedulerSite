@@ -75,7 +75,7 @@ export default function AuthenticationWidget() {
 						onChange={toggle}
 						checked={saveLogin}
 					/>
-					<Anchor component="button" size="sm">
+					<Anchor href="/account/passwordreset" size="sm">
 						Forgot password?
 					</Anchor>
 				</Group>

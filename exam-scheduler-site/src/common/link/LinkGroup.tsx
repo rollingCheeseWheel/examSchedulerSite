@@ -29,11 +29,10 @@ export function LinksGroup({
 }: LinkGroupProps) {
 	const navigate = useNavigate();
 
-	let hasLinks = Array.isArray(links);
-	if (defaultLink) {
-		hasLinks = false;
-	}
-	const [opened, setOpened] = useState(initiallyOpened || false);
+	const hasLinks = !defaultLink && Array.isArray(links);
+	const [opened, setOpened] = useState(
+		(initiallyOpened && hasLinks) || false
+	);
 	const items = (hasLinks ? links : []).map((link) => (
 		<Text<"a">
 			component="a"
