@@ -6,6 +6,7 @@
 	height: 100%;
 	width: 100%;
 	padding: var(--mantine-spacing-md);
+	padding-top: 0;
 	padding-bottom: 0;
 	display: flex;
 	flex-direction: column;
@@ -30,7 +31,7 @@
 }
 
 .linksInner {
-	padding-top: var(--mantine-spacing-xl);
+	/* padding-top: var(--mantine-spacing-xl); */
 	padding-bottom: var(--mantine-spacing-xl);
 }
 

@@ -14,7 +14,7 @@ import classes from "./../common/AppShellSpine.module.css";
 import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 
-export default function AuthenticationWidget() {
+export default function LoginWidget() {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [saveLogin, { toggle }] = useDisclosure(true);
@@ -25,10 +25,10 @@ export default function AuthenticationWidget() {
 	function handleSignIn() {
 		if (!username || !password) {
 			if (!username) {
-				setUsernameError("Please enter a username");
+				setUsernameError("Please enter your username");
 			}
 			if (!password) {
-				setPasswordError("Please enter a password");
+				setPasswordError("Please enter your password");
 			}
 			return;
 		}
@@ -45,7 +45,7 @@ export default function AuthenticationWidget() {
 				<Anchor href="/signup">Create account</Anchor>
 			</Text>
 
-			<Paper withBorder shadow="sm" p={22} mt={30} radius="md">
+			<Paper withBorder shadow="sm" p={22} mt="md" radius="md">
 				<TextInput
 					label="Username"
 					placeholder="Your username"
@@ -61,7 +61,7 @@ export default function AuthenticationWidget() {
 					label="Password"
 					placeholder="Your password"
 					required
-					mt="md"
+					mt="sm"
 					radius="md"
 					onChange={(e) => {
 						setPasswordError("");
@@ -69,17 +69,14 @@ export default function AuthenticationWidget() {
 					}}
 					error={passwordError}
 				/>
-				<Group justify="space-between" mt="lg">
+				<Group justify="space-between" mt="md">
 					<Checkbox
 						label="Remember me"
 						onChange={toggle}
 						checked={saveLogin}
 					/>
-					<Anchor href="/account/passwordreset" size="sm">
-						Forgot password?
-					</Anchor>
 				</Group>
-				<Button fullWidth mt="xl" radius="md" onClick={handleSignIn}>
+				<Button fullWidth mt="md" radius="md" onClick={handleSignIn}>
 					Sign in
 				</Button>
 			</Paper>

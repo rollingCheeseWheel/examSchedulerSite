@@ -1,4 +1,4 @@
-import { AppShell, Group, Title } from "@mantine/core";
+import { AppShell, Group, LoadingOverlay, Title } from "@mantine/core";
 import classes from "./AppShellSpine.module.css";
 import ThemeButton from "../common/ThemeButton";
 import type { ReactNode } from "react";
@@ -9,6 +9,10 @@ import {
 } from "./providers/NavbarProvider";
 import Swipable from "./Swipable";
 import type { SwipeableProps } from "react-swipeable";
+import {
+	LoadingOverlayProvider,
+	useLoadingOverlay,
+} from "./providers/LoadingOverlayProvider";
 
 export interface AppShellSpineProps {
 	children?: React.ReactNode;
@@ -18,12 +22,14 @@ export interface AppShellSpineProps {
 }
 
 export function AppShellSpine(props: AppShellSpineProps) {
-	const { opened: initialState, disabled } = props;
+	const { opened, disabled } = props;
 
 	return (
-		<NavbarStateProvider initialState={(initialState && disabled) || false}>
-			<AppShellIntermediate {...props} />
-		</NavbarStateProvider>
+		<LoadingOverlayProvider>
+			<NavbarStateProvider initialState={(opened && disabled) || false}>
+				<AppShellIntermediate {...props} />
+			</NavbarStateProvider>
+		</LoadingOverlayProvider>
 	);
 }
 
@@ -32,6 +38,8 @@ function AppShellIntermediate({
 	navbar,
 	disabled,
 }: AppShellSpineProps) {
+	const { state: isLoading, props: loadingProps } = useLoadingOverlay();
+
 	const { state: opened, toggle, setState: setOpened } = useNavbarState();
 	const swipeableProps: SwipeableProps = {
 		onSwipedLeft: () => setOpened(false),
@@ -50,25 +58,28 @@ function AppShellIntermediate({
 			: {};
 
 	return (
-		<Swipable swipeableProps={swipeableProps}>
-			<AppShell {...appShellProps} header={{ height: "3rem" }}>
-				<AppShell.Header
-					style={{ margin: "0.2rem", paddingLeft: "0.4rem" }}>
-					<Group justify="space-between">
-						<Group>
-							{navbar && <IconMenu2 onClick={toggle} />}
-							<Title className={classes.title}>
-								Exam Scheduler
-							</Title>
+		<>
+			<LoadingOverlay visible={isLoading} {...loadingProps} />
+			<Swipable swipeableProps={swipeableProps}>
+				<AppShell {...appShellProps} header={{ height: "3rem" }}>
+					<AppShell.Header
+						style={{ margin: "0.2rem", paddingLeft: "0.4rem" }}>
+						<Group justify="space-between">
+							<Group>
+								{navbar && <IconMenu2 onClick={toggle} />}
+								<Title className={classes.title}>
+									Exam Scheduler
+								</Title>
+							</Group>
+							<Group>
+								<ThemeButton />
+							</Group>
 						</Group>
-						<Group>
-							<ThemeButton />
-						</Group>
-					</Group>
-				</AppShell.Header>
-				<AppShell.Main>{children}</AppShell.Main>
-				{navbar && <AppShell.Navbar>{navbar}</AppShell.Navbar>}
-			</AppShell>
-		</Swipable>
+					</AppShell.Header>
+					<AppShell.Main>{children}</AppShell.Main>
+					{navbar && <AppShell.Navbar>{navbar}</AppShell.Navbar>}
+				</AppShell>
+			</Swipable>
+		</>
 	);
 }
