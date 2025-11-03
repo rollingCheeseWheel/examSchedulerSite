@@ -9,6 +9,7 @@ import {
 } from "@mantine/core";
 import classes from "./../common/AppShellSpine.module.css";
 import { useState } from "react";
+import { IconUser, IconKey, IconSchool } from "@tabler/icons-react";
 
 export default function SignupWidget() {
 	const [username, setUsername] = useState("");
@@ -44,10 +45,24 @@ export default function SignupWidget() {
 			}
 			return;
 		}
+
+		console.log([
+			username,
+			registerPassword,
+			newAccountPassword,
+			schoolName,
+		]);
 	}
 
 	return (
-		<Container size={420} my={40}>
+		<Container
+			size={420}
+			my={40}
+			component="form"
+			onSubmit={(e) => {
+				e.preventDefault();
+				handleSignUp();
+			}}>
 			<Title ta="center" className={classes.title}>
 				Create an account!
 			</Title>
@@ -69,6 +84,8 @@ export default function SignupWidget() {
 						setUsername(e.target.value);
 					}}
 					error={usernameError}
+					leftSection={<IconUser />}
+					autoComplete="username"
 				/>
 				<PasswordInput
 					label="Digital Register password"
@@ -81,6 +98,8 @@ export default function SignupWidget() {
 						setRegisterPassword(e.target.value);
 					}}
 					error={registerPasswordError}
+					leftSection={<IconKey />}
+					autoComplete="current-password"
 				/>
 				<PasswordInput
 					label="New password"
@@ -93,6 +112,8 @@ export default function SignupWidget() {
 						setNewAccountPassword(e.target.value);
 					}}
 					error={newAccountPasswordError}
+					leftSection={<IconKey />}
+					autoComplete="new-password"
 				/>
 				<NativeSelect
 					label="Your school name"
@@ -102,8 +123,17 @@ export default function SignupWidget() {
 						setSchoolName(e.target.value);
 					}}
 					error={schoolNameError}
+					leftSection={<IconSchool />}
+					data={[
+						{
+							label: "WFO Bruneck",
+							value: "https://wfo-bruneck.digitalesregister.it/",
+						},
+						"WFO Innichen",
+					]}
+					disabled={true}
 				/>
-				<Button fullWidth mt="sm" radius="md" onClick={handleSignUp}>
+				<Button fullWidth mt="sm" radius="md" type="submit">
 					Create Account
 				</Button>
 				<Button

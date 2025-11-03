@@ -4,6 +4,7 @@ import {
 	Checkbox,
 	Container,
 	Group,
+	NativeSelect,
 	Paper,
 	PasswordInput,
 	Text,
@@ -35,7 +36,14 @@ export default function LoginWidget() {
 	}
 
 	return (
-		<Container size={420} my={40}>
+		<Container
+			size={420}
+			my={40}
+			component="form"
+			onSubmit={(e) => {
+				e.preventDefault();
+				handleSignIn();
+			}}>
 			<Title ta="center" className={classes.title}>
 				Welcome back!
 			</Title>
@@ -56,6 +64,7 @@ export default function LoginWidget() {
 						setUsername(e.target.value);
 					}}
 					error={usernameError}
+					autoComplete="username"
 				/>
 				<PasswordInput
 					label="Password"
@@ -68,7 +77,11 @@ export default function LoginWidget() {
 						setPassword(e.target.value);
 					}}
 					error={passwordError}
+					autoComplete="current-password"
 				/>
+				<NativeSelect>
+					
+				</NativeSelect>
 				<Group justify="space-between" mt="md">
 					<Checkbox
 						label="Remember me"
@@ -76,7 +89,7 @@ export default function LoginWidget() {
 						checked={saveLogin}
 					/>
 				</Group>
-				<Button fullWidth mt="md" radius="md" onClick={handleSignIn}>
+				<Button fullWidth mt="md" radius="md" type="submit">
 					Sign in
 				</Button>
 			</Paper>
