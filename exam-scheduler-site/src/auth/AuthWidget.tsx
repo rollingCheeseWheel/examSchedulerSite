@@ -1,67 +1,58 @@
 import {
-    Anchor,
-    Button,
-    Checkbox,
-    Container,
-    Group,
-    NativeSelect,
-    Paper,
-    PasswordInput,
-    Text,
-    TextInput,
-    Title,
+	Button,
+	Container,
+	NativeSelect,
+	Paper,
+	Title,
 } from "@mantine/core";
 import classes from "./../common/AppShellSpine.module.css";
-import { useState } from "react";
-import { useDisclosure, useFetch } from "@mantine/hooks";
-import type { GenericResponse } from "../types";
-
-export interface School {
-    name: string,
-    registerUri: string,
-    clientId: string
-}
+import { useRef } from "react";
+import { useFetch } from "@mantine/hooks";
+import type { School } from "../types";
 
 export default function AuthWidget() {
-    const { data, error, loading } = useFetch<GenericResponse<School[]>>("http://localhost:80/api/schools");
-    const [selectedOption, setSelectedOption] = useState("");
+	const { data, error, loading } = useFetch<School[]>("https://localhost/api/schools");
+	const selectRef = useRef<HTMLSelectElement | null>(null);
 
-    function handleAuth() {
+	function navigate() {
+		if (selectRef.current) {
+			window.location.href = selectRef.current.value
+		}
+	}
 
-    }
+	return (
+		<Container size={420} my={40}>
+			<Title ta="center" className={classes.title}>
+				Login
+			</Title>
 
-    return (
-        <Container
-            size={420}
-            my={40}
-            component="form"
-            onSubmit={(e) => {
-                e.preventDefault();
-                handleAuth();
-            }}>
-            <Title ta="center" className={classes.title}>
-                Login
-            </Title>
+			<Paper withBorder shadow="sm" p={22} mt="md" radius="md">
+				<NativeSelect
+					ref={selectRef}
+					error={error ? "Failed to load schools" : undefined}
+					label="Select your school"
+					data={data ? data.map((school) => {
+						let url = new URL("/v2/login/", new URL(school.registerUri).origin);
+						url.searchParams.set("client_id", school.clientId);
 
-            <Paper withBorder shadow="sm" p={22} mt="md" radius="md">
-                <NativeSelect
-                    error={error ? error.message : undefined}
-                    label="Select your school"
-                    data={data?.result ? data.result.map((school) => {
-                        return {
-                            label: school.name,
-                            value: school.registerUri + "?client_id=" + school.clientId
-                        }
-                    }) : undefined}
-                    required
-                    onChange={(e) => { setSelectedOption(e.target.value) }}
-                >
+						return {
+							label: school.name,
+							value: url.href
+						}
+					}) : undefined}
+					required
+				>
 
-                </NativeSelect>
-                <Button fullWidth mt="md" radius="md" type="submit" disabled={loading || !selectedOption || selectedOption === ""}>
-                    Login
-                </Button>
-            </Paper>
-        </Container >
-    );
+				</NativeSelect>
+				<Button
+					fullWidth
+					mt="md"
+					radius="md"
+					disabled={loading}
+					onClick={navigate}>
+					Login
+				</Button>
+			</Paper>
+		</Container >
+	);
 }

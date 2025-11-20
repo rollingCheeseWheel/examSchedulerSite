@@ -1,7 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import {
-	AppShellSection,
 	Center,
 	createTheme,
 	MantineProvider,
@@ -10,9 +9,7 @@ import {
 import "@mantine/core/styles.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppShellSpine } from "./common/AppShellSpine";
-import LoginWidget from "./auth/LoginWidget";
 import DefaultAppShell from "./common/DefaultAppShell";
-import SignupWidget from "./auth/SignupWidget";
 import AuthWidget from "./auth/AuthWidget";
 
 const color: MantineColorsTuple = [
@@ -47,36 +44,6 @@ createRoot(document.getElementById("root")!).render(
 										overflow: "hidden"
 									}}>
 									<AuthWidget />
-								</Center>
-							</AppShellSpine>
-						}
-					/>
-
-					<Route
-						path="/login"
-						element={
-							<AppShellSpine disabled>
-								<Center
-									style={{
-										height: "80dvh",
-										overflow: "hidden",
-									}}>
-									<LoginWidget />
-								</Center>
-							</AppShellSpine>
-						}
-					/>
-
-					<Route
-						path="/signup"
-						element={
-							<AppShellSpine disabled>
-								<Center
-									style={{
-										height: "80dvh",
-										overflow: "hidden",
-									}}>
-									<SignupWidget />
 								</Center>
 							</AppShellSpine>
 						}
