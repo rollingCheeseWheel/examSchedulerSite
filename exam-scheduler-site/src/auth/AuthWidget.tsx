@@ -21,7 +21,7 @@ export default function AuthWidget() {
 	}
 
 	return (
-		<Container size={420} my={40}>
+		<Container size={420} my={40} style={{minWidth: 300}}>
 			<Title ta="center" className={classes.title}>
 				Login
 			</Title>
@@ -29,10 +29,10 @@ export default function AuthWidget() {
 			<Paper withBorder shadow="sm" p={22} mt="md" radius="md">
 				<NativeSelect
 					ref={selectRef}
-					error={error ? "Failed to load schools" : undefined}
+					error={error ? "Failed to load schools, please try again" : undefined}
 					label="Select your school"
 					data={data ? data.map((school) => {
-						let url = new URL("/v2/login/", new URL(school.registerUri).origin);
+						const url = new URL("/v2/login/", new URL(school.registerUri).origin);
 						url.searchParams.set("client_id", school.clientId);
 
 						return {
