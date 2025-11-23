@@ -1,10 +1,12 @@
-import obj from "./endpoints";
-
 export default {
 	baseApiPath: "/api/v1",
-	schoolDropdown: () => mergePaths("signup/schools"),
+	get schoolDropdown() {
+		return mergePaths(this.baseApiPath, "signup/schools");
+	},
 };
 
-function mergePaths(path: string) {
-	return obj.baseApiPath + (path.startsWith("/") ? "" : "/") + path;
+function mergePaths(base: string, path: string) {
+	return (
+		base + (base.endsWith("/") || path.startsWith("/") ? "" : "/") + path
+	);
 }
