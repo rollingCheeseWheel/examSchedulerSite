@@ -11,6 +11,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppShellSpine } from "./common/AppShellSpine";
 import DefaultAppShell from "./common/DefaultAppShell";
 import AuthWidget from "./auth/AuthWidget";
+import { ExamSchedule } from "./schedule/Schedule";
 
 const color: MantineColorsTuple = [
 	"#f6eeff",
@@ -41,7 +42,7 @@ createRoot(document.getElementById("root")!).render(
 								<Center
 									style={{
 										height: "80dvh",
-										overflow: "hidden"
+										overflow: "hidden",
 									}}>
 									<AuthWidget />
 								</Center>
@@ -58,6 +59,52 @@ createRoot(document.getElementById("root")!).render(
 									path="*"
 									element={<Navigate to="/login" />}
 								/> */}
+
+								<Route
+									path="*"
+									element={
+										<ExamSchedule
+											{...{
+												autoLockIn: 1,
+												description: "testdescription",
+												firstExamination: "2025-10-12",
+												id: "123123123",
+												lockInOffset: "0000-00-10",
+												subject: {
+													name: "testsubject",
+												},
+												examSlots: [
+													{
+														date: "2025-10-12",
+														id: "öasldfjzhui",
+														minParticipants: 6,
+														maxParticipants: 7,
+														actuallyParticipated:
+															[],
+														participants: [
+															{
+																classroom: {
+																	calendarId:
+																		"asdfasdf",
+																	id: "lkajshdfkjlgas",
+																	name: "4E WI",
+																	schoolId:
+																		"asdflökjasdf",
+																},
+																userProfile: {
+																	firstName:
+																		"Laurin",
+																	lastName:
+																		"Feichter",
+																	id: "asdfasdf",
+																	role: 3,
+																},
+															},
+														],
+													},
+												],
+											}}></ExamSchedule>
+									}></Route>
 							</DefaultAppShell>
 						}
 					/>

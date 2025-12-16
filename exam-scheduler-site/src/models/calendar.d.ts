@@ -2,7 +2,7 @@ export interface Calendar {
     id: string;
     lastsUntil: string;
     lessons: Lesson[];
-    classroom: Classroom;
+    classroomId: string;
 }
 
 export interface Lesson {

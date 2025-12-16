@@ -1,5 +1,6 @@
 import type { Subject } from "./calendar";
 import type { AutoLockIn } from "./enums";
+import type { StudentProfile } from "./user";
 
 export interface Schedule {
     id: string;
@@ -8,10 +9,10 @@ export interface Schedule {
     lockInOffset: string;
     description: string;
     subject: Subject;
-    examSlots: ExamSlot[];
+    examSlots: ScheduleSlot[];
 }
 
-export interface ExamSlot {
+export interface ScheduleSlot {
     id: string;
     date: string;
     participants: StudentProfile[];

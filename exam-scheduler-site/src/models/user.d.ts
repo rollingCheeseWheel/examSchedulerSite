@@ -4,7 +4,6 @@ import type { UserRole } from "./enums";
 
 export interface UserProfile {
 	id: string;
-	schoolId: string;
 	firstName: string;
 	lastName: string;
 	role: number | UserRole;
