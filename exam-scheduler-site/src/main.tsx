@@ -77,28 +77,44 @@ createRoot(document.getElementById("root")!).render(
 													{
 														date: "2025-10-12",
 														id: "öasldfjzhui",
-														minParticipants: 6,
+														minParticipants: 0,
 														maxParticipants: 7,
 														actuallyParticipated:
 															[],
 														participants: [
 															{
-																classroom: {
-																	calendarId:
-																		"asdfasdf",
-																	id: "lkajshdfkjlgas",
-																	name: "4E WI",
-																	schoolId:
-																		"asdflökjasdf",
-																},
-																userProfile: {
-																	firstName:
-																		"Laurin",
-																	lastName:
-																		"Feichter",
-																	id: "asdfasdf",
-																	role: 3,
-																},
+																firstName:
+																	"Laurin",
+																lastName:
+																	"Feichter",
+																id: "asdfasdf",
+																role: 3,
+															},
+														],
+													},
+													{
+														actuallyParticipated:
+															[],
+														date: "2025-11-12",
+														id: "kjfdhszugzuie",
+														minParticipants: 4,
+														maxParticipants: 10,
+														participants: [
+															{
+																firstName:
+																	"Laurin",
+																lastName:
+																	"Feichter",
+																id: "asdfasdf",
+																role: 3,
+															},
+															{
+																firstName:
+																	"Laurin",
+																lastName:
+																	"Feichter",
+																id: "asdfasdf",
+																role: 3,
 															},
 														],
 													},

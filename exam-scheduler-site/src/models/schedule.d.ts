@@ -1,6 +1,6 @@
 import type { Subject } from "./calendar";
 import type { AutoLockIn } from "./enums";
-import type { StudentProfile } from "./user";
+import type { UserProfile } from "./user";
 
 export interface Schedule {
     id: string;
@@ -15,8 +15,8 @@ export interface Schedule {
 export interface ScheduleSlot {
     id: string;
     date: string;
-    participants: StudentProfile[];
-    actuallyParticipated: StudentProfile[];
+    participants: UserProfile[];
+    actuallyParticipated: UserProfile[];
     maxParticipants: number;
     minParticipants: number;
 }

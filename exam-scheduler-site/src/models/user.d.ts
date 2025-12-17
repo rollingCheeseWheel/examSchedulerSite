@@ -4,20 +4,13 @@ import type { UserRole } from "./enums";
 
 export interface UserProfile {
 	id: string;
-	firstName: string;
-	lastName: string;
+	firstName: string?;
+	lastName: string?;
 	role: number | UserRole;
 }
 
-interface BaseProfile {
-	userProfile: UserProfile;
-}
-
-export interface StudentProfile extends BaseProfile {
-	classroom: Classroom;
-}
-
 export interface TeacherProfile extends BaseProfile {
+	userProfile: UserProfile;
 	calendarTeacher: Teacher;
 	subject: Subject;
 	classrooms: Classroom[];
