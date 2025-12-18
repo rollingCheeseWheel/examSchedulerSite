@@ -8,7 +8,7 @@ import {
 import classes from "./../common/AppShellSpine.module.css";
 import { useRef } from "react";
 import { useFetch } from "@mantine/hooks";
-import type { School } from "../types";
+import type { School } from "../models/school";
 
 export default function AuthWidget() {
 	const { data, error, loading } = useFetch<School[]>("https://localhost/api/schools");

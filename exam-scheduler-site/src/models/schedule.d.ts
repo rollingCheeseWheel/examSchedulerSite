@@ -9,6 +9,7 @@ export interface Schedule {
     lockInOffset: string;
     description: string;
     subject: Subject;
+    selectedSlotId: string;
     examSlots: ScheduleSlot[];
 }
 

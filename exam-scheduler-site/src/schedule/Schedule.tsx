@@ -12,6 +12,8 @@ import {
 	CheckIcon,
 	Kbd,
 	Grid,
+	Divider,
+	type RadioProps,
 } from "@mantine/core";
 import type { Schedule, ScheduleSlot } from "../models/schedule";
 import ScheduleProgress from "../common/ExtendedProgessbar";
@@ -20,40 +22,49 @@ import type { UserProfile } from "../models/user";
 import { useNavigate } from "react-router-dom";
 
 export interface ExamScheduleProps extends Schedule {
-	width?: StyleProp<string | number>;
+	maxwidth?: StyleProp<string | number>;
+	teacher?: boolean;
 }
 
 export function ExamSchedule(props: ExamScheduleProps) {
-	const [checked, setChecked] = useState<string>();
+	const [checked, setChecked] = useState<string>(props.selectedSlotId);
 
-	console.log(checked);
+	function handleCheck(newId: string) {
+		setChecked(newId);
+	}
 
 	return (
-		<Paper>
-			<Container w={props.width}>
-				<Flex align="flex-end">
-					<Title order={2}>{props.subject.name}</Title>
-					<Space w="md" />
-					<Text>{props.description}</Text>
-				</Flex>
-				<Stack align="stretch" justify="flex-start">
-					{...props.examSlots.map((s, i) =>
-						ScheduleDate(s, props, i, setChecked)
-					)}
-				</Stack>
-			</Container>
+		<Paper maw={props.maxwidth} withBorder p="md" radius="md">
+			<Flex align="flex-end">
+				<Title order={2}>{props.subject.name}</Title>
+				<Space w="md" />
+				<Text>{props.description}</Text>
+			</Flex>
+			<Stack align="stretch" justify="flex-start" gap="xs">
+				{...props.examSlots.map((s, i) =>
+					ScheduleDate(s, props, i, handleCheck, checked)
+				)}
+			</Stack>
 		</Paper>
 	);
 }
 
 function ScheduleDate(
 	props: ScheduleSlot,
-	schedule: Schedule,
+	scheduleProps: ExamScheduleProps,
 	index: number,
-	setChecked: (checkedId: string) => void
+	setChecked: (checkedId: string) => void,
+	checkedId: string
 ) {
+	function useDivider() {
+		if (index === scheduleProps.examSlots.length - 1) {
+			return false;
+		}
+		return true;
+	}
+
 	return (
-		<div>
+		<>
 			<Grid>
 				<Grid.Col span="content">
 					<Text>{props.date}</Text>
@@ -67,24 +78,32 @@ function ScheduleDate(
 					/>
 				</Grid.Col>
 			</Grid>
-			<Group justify="space-between">
-				<Group gap="xs">
-					{...props.participants.map(ScheduleParticipant)}
-				</Group>
-				<Radio
-					icon={CheckIcon}
-					name={schedule.id}
-					onChange={() => setChecked(props.id)}
+			<Flex justify="space-between" direction="row-reverse">
+
+				<ScheduleRadio
+					enabled={!scheduleProps.teacher}
+					schedule={scheduleProps}
+					scheduleSlot={props}
+					setChecked={setChecked}
+					checkedId={checkedId}
 				/>
-			</Group>
-		</div>
+				<Group gap="xs">
+					{...props.participants.map((p) =>
+						ScheduleParticipant(p, !scheduleProps.teacher)
+					)}
+				</Group>
+			</Flex>
+			{/* {useDivider() && <Divider/>} */}
+		</>
 	);
 }
 
-function ScheduleParticipant(user: UserProfile) {
+function ScheduleParticipant(user: UserProfile, enableSwap: boolean) {
 	const navigate = useNavigate();
 
-	function handleClick() {}
+	function handleClick() {
+		if (!enableSwap) return;
+	}
 
 	let name = "";
 	if (user.firstName && user.lastName) {
@@ -94,4 +113,31 @@ function ScheduleParticipant(user: UserProfile) {
 	}
 
 	return <Kbd onClick={handleClick}>{name}</Kbd>;
+}
+
+interface ScheduleRadioProps {
+	scheduleSlot: ScheduleSlot;
+	schedule: Schedule;
+	setChecked: (id: string) => void;
+	checkedId: string;
+	enabled?: boolean;
+}
+
+function ScheduleRadio({
+	scheduleSlot,
+	schedule,
+	setChecked,
+	checkedId,
+	enabled,
+}: ScheduleRadioProps) {
+	return (
+		enabled && (
+			<Radio
+				icon={CheckIcon}
+				name={schedule.id}
+				onChange={() => setChecked(scheduleSlot.id)}
+				checked={scheduleSlot.id == checkedId}
+			/>
+		)
+	);
 }

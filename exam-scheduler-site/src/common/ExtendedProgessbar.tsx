@@ -22,32 +22,27 @@ export function ExtendedProgressbar(props: ExtendedProgressbarProps) {
 	];
 
 	return (
-		<Progress.Root autoContrast {...props}>
-			{
-				// min not reached
-				participants < min && (
-					<Progress.Section value={participantsValue} color="red.7">
-						<Progress.Label>{participants}</Progress.Label>
-					</Progress.Section>
-				)
-			}
-			{participants < min && (
-				<Progress.Section
-					value={minValue - participantsValue}
-					color="gray.6">
+		<Progress.Root autoContrast {...props} transitionDuration={100}>
+			<Progress.Section
+				value={participantsValue}
+				color={
+							participants > min
+								? participants >= max
+									? "green.6"
+									: "yellow.6"
+								: "red.6"
+						}
+			>
+				<Progress.Label>{participants}</Progress.Label>
+			</Progress.Section>
+			<Progress.Section
+				value={minValue - participantsValue}
+				color="gray.6"
+			>
+				{participants < min && (
 					<Progress.Label>{min - participants}</Progress.Label>
-				</Progress.Section>
-			)}
-			{
-				// ok, in bounds
-				participants >= min && participants < max && (
-					<Progress.Section
-						value={participantsValue}
-						color={participants >= max ? "green.6" : "yellow.7"}>
-						<Progress.Label>{participants}</Progress.Label>
-					</Progress.Section>
-				)
-			}
+				)}
+			</Progress.Section>
 		</Progress.Root>
 	);
 }
@@ -56,7 +51,8 @@ export default function ScheduleProgress(props: ExtendedProgressbarProps) {
 	const { participants, max: maxParticipants, min: minParticipants } = props;
 	return (
 		<Tooltip
-			label={`${participants} out of ${maxParticipants} - needs at least ${minParticipants} `}>
+			label={`${participants} out of ${maxParticipants} - needs at least ${minParticipants} `}
+		>
 			<Group justify="flex-end">
 				<Group gap="xs">
 					<Text>{minParticipants}</Text>
@@ -68,7 +64,8 @@ export default function ScheduleProgress(props: ExtendedProgressbarProps) {
 									? "green"
 									: "yellow"
 								: "red"
-						}>
+						}
+					>
 						{participants}
 					</Text>
 					<Text>/</Text>

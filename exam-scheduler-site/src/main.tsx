@@ -13,26 +13,26 @@ import DefaultAppShell from "./common/DefaultAppShell";
 import AuthWidget from "./auth/AuthWidget";
 import { ExamSchedule } from "./schedule/Schedule";
 
-const color: MantineColorsTuple = [
-	"#f6eeff",
-	"#e7d9f7",
-	"#cab1ea",
-	"#ad86dd",
-	"#9462d2",
-	"#854bcb",
-	"#7d3fc9",
-	"#6b31b2",
-	"#5f2ba0",
-	"#52238d",
-];
+// const color: MantineColorsTuple = [
+// 	"#f6eeff",
+// 	"#e7d9f7",
+// 	"#cab1ea",
+// 	"#ad86dd",
+// 	"#9462d2",
+// 	"#854bcb",
+// 	"#7d3fc9",
+// 	"#6b31b2",
+// 	"#5f2ba0",
+// 	"#52238d",
+// ];
 
-const theme = createTheme({
-	colors: { color },
-});
+// const theme = createTheme({
+// 	colors: { color },
+// });
 
 createRoot(document.getElementById("root")!).render(
 	<StrictMode>
-		<MantineProvider defaultColorScheme="auto" theme={theme}>
+		<MantineProvider defaultColorScheme="auto" /* theme={theme} */>
 			<BrowserRouter>
 				<Routes>
 					<Route
@@ -43,7 +43,8 @@ createRoot(document.getElementById("root")!).render(
 									style={{
 										height: "80dvh",
 										overflow: "hidden",
-									}}>
+									}}
+								>
 									<AuthWidget />
 								</Center>
 							</AppShellSpine>
@@ -64,6 +65,7 @@ createRoot(document.getElementById("root")!).render(
 									path="*"
 									element={
 										<ExamSchedule
+										maxwidth="500px"
 											{...{
 												autoLockIn: 1,
 												description: "testdescription",
@@ -73,12 +75,13 @@ createRoot(document.getElementById("root")!).render(
 												subject: {
 													name: "testsubject",
 												},
+												selectedSlotId: "kjfdhszugzuie",
 												examSlots: [
 													{
 														date: "2025-10-12",
 														id: "öasldfjzhui",
 														minParticipants: 0,
-														maxParticipants: 7,
+														maxParticipants: 3,
 														actuallyParticipated:
 															[],
 														participants: [
@@ -118,9 +121,61 @@ createRoot(document.getElementById("root")!).render(
 															},
 														],
 													},
+													{
+														actuallyParticipated:
+															[],
+														date: "2025-11-12",
+														id: "kjfdhszugzuie",
+														minParticipants: 0,
+														maxParticipants: 2,
+														participants: [
+															{
+																firstName:
+																	"Laurin",
+																lastName:
+																	"FeichterFeichterFeichter",
+																id: "asdfasdf",
+																role: 3,
+															},
+															{
+																firstName:
+																	"Laurin",
+																lastName:
+																	"Feichter",
+																id: "asdfasdf",
+																role: 3,
+															},
+															{
+																firstName:
+																	"Laurin",
+																lastName:
+																	"Feichter",
+																id: "asdfasdf",
+																role: 3,
+															},
+															{
+																firstName:
+																	"Laurin",
+																lastName:
+																	"Feichter",
+																id: "asdfasdf",
+																role: 3,
+															},
+															{
+																firstName:
+																	"Laurin",
+																lastName:
+																	"Feichter",
+																id: "asdfasdf",
+																role: 3,
+															},
+														],
+													},
 												],
-											}}></ExamSchedule>
-									}></Route>
+											}}
+										></ExamSchedule>
+									}
+								></Route>
 							</DefaultAppShell>
 						}
 					/>
