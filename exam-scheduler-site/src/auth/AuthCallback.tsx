@@ -3,6 +3,7 @@ import type { OAuthRequest } from "../models/auth";
 import { usePost } from "../common/usePost";
 import { useLoadingOverlay } from "../common/providers/LoadingOverlayProvider";
 import { useNavigate } from "react-router-dom";
+import { useAsync } from "../common/useAsync";
 
 export function AuthCallback() {
 	const { post, data, error, loading } = usePost<Date, OAuthRequest>("/api/auth");
@@ -16,6 +17,7 @@ export function AuthCallback() {
 			params.get("code"),
 			params.get("school_id"),
 		];
+		navigate("/auth");
 		if (!authCode || !schoolId) return;
 
 		const authRequest: OAuthRequest = {
@@ -23,7 +25,6 @@ export function AuthCallback() {
 			schoolId: schoolId,
 		};
 
-		navigate("/auth");
-		await post(authRequest); // use useEffect() idk why
+		// useAsync(post, [authRequest]);
 	}
 }
