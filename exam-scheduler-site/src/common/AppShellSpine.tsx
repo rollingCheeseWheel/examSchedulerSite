@@ -3,16 +3,10 @@ import classes from "./AppShellSpine.module.css";
 import ThemeButton from "../common/ThemeButton";
 import type { ReactNode } from "react";
 import { IconMenu2 } from "@tabler/icons-react";
-import {
-	NavbarStateProvider,
-	useNavbarState,
-} from "./providers/NavbarProvider";
 import Swipable from "./Swipable";
 import type { SwipeableProps } from "react-swipeable";
-import {
-	LoadingOverlayProvider,
-	useLoadingOverlay,
-} from "./providers/LoadingOverlayProvider";
+import { useIsFirstRender } from "@mantine/hooks";
+import { useLoadingOverlay, useNavbarState } from "./zustand/zustand";
 
 export interface AppShellSpineProps {
 	children?: React.ReactNode;
@@ -21,29 +15,24 @@ export interface AppShellSpineProps {
 	disabled?: boolean;
 }
 
-export function AppShellSpine(props: AppShellSpineProps) {
-	const { opened, disabled } = props;
-
-	return (
-		<LoadingOverlayProvider>
-			<NavbarStateProvider initialState={(opened && disabled) || false}>
-				<AppShellIntermediate {...props} />
-			</NavbarStateProvider>
-		</LoadingOverlayProvider>
-	);
-}
-
-function AppShellIntermediate({
+export function AppShellSpine({
 	children,
 	navbar,
+	opened,
 	disabled,
 }: AppShellSpineProps) {
-	const { state: isLoading, props: loadingProps } = useLoadingOverlay();
+	const isLoadingOverlayOpen =
+		useLoadingOverlay((s) => s.isOpen);
+	const { isOpen: isNavbarOpen, setState: setNavbarState, toggle } = useNavbarState();
 
-	const { state: opened, toggle, setState: setOpened } = useNavbarState();
+	if (useIsFirstRender()) {
+		// idk why this works
+		setNavbarState((opened && disabled) || false);
+	}
+
 	const swipeableProps: SwipeableProps = {
-		onSwipedLeft: () => setOpened(false),
-		onSwipedRight: () => setOpened(true),
+		onSwipedLeft: () => setNavbarState(false),
+		onSwipedRight: () => setNavbarState(true),
 	};
 
 	const appShellProps =
@@ -52,14 +41,14 @@ function AppShellIntermediate({
 					navbar: {
 						breakpoint: "sm",
 						width: 300,
-						collapsed: { desktop: opened, mobile: !opened },
+						collapsed: { desktop: isNavbarOpen, mobile: !isNavbarOpen },
 					},
 			  }
 			: {};
 
 	return (
 		<>
-			<LoadingOverlay visible={isLoading} {...loadingProps} />
+			<LoadingOverlay visible={isLoadingOverlayOpen} />
 			<Swipable swipeableProps={swipeableProps}>
 				<AppShell {...appShellProps} header={{ height: "3rem" }}>
 					<AppShell.Header

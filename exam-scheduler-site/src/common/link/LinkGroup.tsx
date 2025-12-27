@@ -11,7 +11,7 @@ import {
 import classes from "./LinkGroup.module.scss";
 import { useNavigate } from "react-router-dom";
 
-export interface LinkGroupProps {
+export interface LinkGroupProp {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	icon?: React.FC<any>;
 	label: string;
@@ -26,7 +26,7 @@ export function LinksGroup({
 	initiallyOpened,
 	links = [],
 	defaultLink,
-}: LinkGroupProps) {
+}: LinkGroupProp) {
 	const navigate = useNavigate();
 
 	const hasLinks = !defaultLink && Array.isArray(links);

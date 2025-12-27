@@ -1,27 +1,20 @@
 import type { ReactNode } from "react";
 import { AppShellSpine } from "./AppShellSpine";
-import { useLocalStorage } from "@mantine/hooks";
+import { useIsFirstRender, useLocalStorage } from "@mantine/hooks";
 import { Routes } from "react-router-dom";
-import type { LinkGroupProps } from "./link/LinkGroup";
+import type { LinkGroupProp } from "./link/LinkGroup";
 import { NestedNavbar } from "./link/NestedNavbar";
-import { NavbarDataProvider, useNavbar } from "./providers/NavbarProvider";
+import { useNavbarMenu } from "./zustand/zustand";
 
 export interface DefaultAppShellProps {
 	children?: ReactNode;
-	linkData?: LinkGroupProps[];
+	linkData?: LinkGroupProp[];
 }
 
 export default function DefaultAppShell({ children }: DefaultAppShellProps) {
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [value, _setValue] = useLocalStorage({
-		key: "auth-token",
-	});
+	const { data, setData } = useNavbarMenu();
 
-	/* if (!value) {
-		return <Navigate to="/login" />;
-	} */
-
-	const navbar: LinkGroupProps[] = [
+	const initialNavbarlinks: LinkGroupProp[] = [
 		{
 			label: "test",
 			links: [
@@ -40,16 +33,11 @@ export default function DefaultAppShell({ children }: DefaultAppShellProps) {
 		{ label: "test", defaultLink: "/", initiallyOpened: true },
 	];
 
-	return (
-		<NavbarDataProvider initialState={navbar}>
-			<AppShellIntermediate>{children}</AppShellIntermediate>
-		</NavbarDataProvider>
-	);
-}
+	if (useIsFirstRender()) {
+		setData(initialNavbarlinks);
+	}
 
-function AppShellIntermediate({ children }: DefaultAppShellProps) {
-	const { data: navbarData } = useNavbar();
-	const navbar = <NestedNavbar data={navbarData} />;
+	const navbar = <NestedNavbar data={data} />;
 
 	return (
 		<AppShellSpine navbar={navbar} opened>

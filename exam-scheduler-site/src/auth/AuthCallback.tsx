@@ -1,35 +1,38 @@
-import { useMounted } from "@mantine/hooks";
+import { useIsFirstRender } from "@mantine/hooks";
 import type { OAuthRequest } from "../models/auth";
 import { usePost } from "../common/hooks/usePost";
-import { useLoadingOverlay } from "../common/providers/LoadingOverlayProvider";
 import { useNavigate } from "react-router-dom";
+import { useLoadingOverlay } from "../common/zustand/zustand";
 
 export function AuthCallback() {
-	const { setState, state } = useLoadingOverlay();
-	const mounted = useMounted();
+	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
 	const navigate = useNavigate();
-
-	const params = new URLSearchParams(window.location.search);
-	const [authCode, schoolId] = [params.get("code"), params.get("school_id")];
-
-	if (mounted) {
-		navigate("/auth");
-		if (authCode && schoolId) {
-			const authRequest: OAuthRequest = {
-				authCode: authCode,
-				schoolId: schoolId,
-			};
-			return ActualAuthCallback(authRequest);
-		}
-	}
-}
-
-function ActualAuthCallback(authRequest: OAuthRequest) {
-	const { data, error, loading } = usePost<Date, OAuthRequest>(
-		"/api/auth",
-		authRequest,
-		undefined,
-		true
+	const { data, error, loading, post } = usePost<Date, OAuthRequest>(
+		"/api/auth"
 	);
-	// TODO: return navigate component
+
+	if (useIsFirstRender()) {
+		navigate("/auth");
+		const params = new URLSearchParams(window.location.search);
+		const [authCode, schoolId] = [
+			params.get("code"),
+			params.get("school_id"),
+		];
+		if (!authCode || !schoolId) {
+			return null;
+		}
+
+		const oAuthRequest: OAuthRequest = {
+			authCode: authCode,
+			schoolId: schoolId,
+		};
+
+		post(oAuthRequest);
+	}
+
+	setLoadingOverlayState(loading);
+	
+	if (data) {
+		navigate("/");
+	}
 }
