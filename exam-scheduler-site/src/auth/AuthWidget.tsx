@@ -10,7 +10,7 @@ import { useRef } from "react";
 import { useFetch } from "@mantine/hooks";
 import type { School } from "../models/school";
 
-export default function AuthWidget() {
+export function AuthWidget() {
 	const { data, error, loading } = useFetch<School[]>("/api/schools");
 	const selectRef = useRef<HTMLSelectElement | null>(null);
 

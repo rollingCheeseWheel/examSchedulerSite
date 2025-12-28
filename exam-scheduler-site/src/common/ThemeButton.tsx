@@ -2,7 +2,7 @@ import { ActionIcon, useMantineColorScheme } from "@mantine/core";
 import { useColorScheme } from "@mantine/hooks";
 import { IconSun, IconMoon, type ReactNode } from "@tabler/icons-react";
 
-export default function ThemeButton() {
+export function ThemeButton() {
 	const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 	const actualColorScheme = useColorScheme();
 

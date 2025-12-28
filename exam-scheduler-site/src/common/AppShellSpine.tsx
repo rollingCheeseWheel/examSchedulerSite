@@ -1,11 +1,11 @@
 import { AppShell, Group, LoadingOverlay, Title } from "@mantine/core";
 import classes from "./AppShellSpine.module.css";
-import ThemeButton from "../common/ThemeButton";
+import { ThemeButton } from "../common/ThemeButton";
 import type { ReactNode } from "react";
 import { IconMenu2 } from "@tabler/icons-react";
-import Swipable from "./Swipable";
+import { Swipable } from "./Swipable";
 import type { SwipeableProps } from "react-swipeable";
-import { useIsFirstRender } from "@mantine/hooks";
+import { useIsFirstRender, useMediaQuery } from "@mantine/hooks";
 import { useLoadingOverlay, useNavbarState } from "./zustand/zustand";
 
 export interface AppShellSpineProps {
@@ -21,9 +21,13 @@ export function AppShellSpine({
 	opened,
 	disabled,
 }: AppShellSpineProps) {
-	const isLoadingOverlayOpen =
-		useLoadingOverlay((s) => s.isOpen);
-	const { isOpen: isNavbarOpen, setState: setNavbarState, toggle } = useNavbarState();
+	const isLoadingOverlayOpen = useLoadingOverlay((s) => s.isOpen);
+	const {
+		isOpen: isNavbarOpen,
+		setState: setNavbarState,
+		toggle,
+	} = useNavbarState();
+	const isLandscape = useMediaQuery("(orientation: landscape)");
 
 	if (useIsFirstRender()) {
 		// idk why this works
@@ -31,8 +35,8 @@ export function AppShellSpine({
 	}
 
 	const swipeableProps: SwipeableProps = {
-		onSwipedLeft: () => setNavbarState(false),
-		onSwipedRight: () => setNavbarState(true),
+		onSwipedLeft: () => setNavbarState(isLandscape),
+		onSwipedRight: () => setNavbarState(!isLandscape),
 	};
 
 	const appShellProps =
@@ -41,7 +45,10 @@ export function AppShellSpine({
 					navbar: {
 						breakpoint: "sm",
 						width: 300,
-						collapsed: { desktop: isNavbarOpen, mobile: !isNavbarOpen },
+						collapsed: {
+							desktop: isNavbarOpen,
+							mobile: !isNavbarOpen,
+						},
 					},
 			  }
 			: {};

@@ -6,17 +6,14 @@ import {
 	Space,
 	Text,
 	Radio,
-	Container,
 	Stack,
 	type StyleProp,
 	CheckIcon,
 	Kbd,
 	Grid,
-	Divider,
-	type RadioProps,
 } from "@mantine/core";
 import type { Schedule, ScheduleSlot } from "../models/schedule";
-import ScheduleProgress from "../common/ExtendedProgessbar";
+import {ScheduleProgress} from "../common/ExtendedProgessbar";
 import { useState } from "react";
 import type { UserProfile } from "../models/user";
 import { useNavigate } from "react-router-dom";

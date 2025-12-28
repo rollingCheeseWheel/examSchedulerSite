@@ -3,36 +3,48 @@ import type { OAuthRequest } from "../models/auth";
 import { usePost } from "../common/hooks/usePost";
 import { useNavigate } from "react-router-dom";
 import { useLoadingOverlay } from "../common/zustand/zustand";
+import { useEffect } from "react";
 
-export function AuthCallback() {
-	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
+export function AuthCallback({
+	enabled,
+}: {
+	enabled?: boolean;
+}) {
 	const navigate = useNavigate();
-	const { data, error, loading, post } = usePost<Date, OAuthRequest>(
+	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
+	const { data, loading, error, post } = usePost<Date, OAuthRequest>(
 		"/api/auth"
 	);
+	const isEnabled = !!enabled;
 
-	if (useIsFirstRender()) {
-		navigate("/auth");
-		const params = new URLSearchParams(window.location.search);
-		const [authCode, schoolId] = [
-			params.get("code"),
-			params.get("school_id"),
-		];
-		if (!authCode || !schoolId) {
-			return null;
+	useEffect(() => {
+		if (!isEnabled) {
+			return;
+		}
+		setLoadingOverlayState(loading && isEnabled);
+		if (loading) {
+			return;
 		}
 
-		const oAuthRequest: OAuthRequest = {
-			authCode: authCode,
-			schoolId: schoolId,
-		};
+		if (data) {
+			navigate("/", { replace: true, flushSync: true });
+		} else {
+			navigate("/auth", { replace: true, flushSync: true });
+		}
+	}, [loading, data, navigate, error, isEnabled, setLoadingOverlayState]);
 
-		post(oAuthRequest);
+	if (useIsFirstRender() && isEnabled) {
+		const params = new URLSearchParams(window.location.search);
+		const authCode = params.get("code");
+		const schoolId = params.get("school_id");
+
+		if (!authCode || !schoolId) {
+			navigate("/auth", { replace: true, flushSync: true });
+			return <></>;
+		}
+
+		post({ authCode, schoolId });
 	}
 
-	setLoadingOverlayState(loading);
-	
-	if (data) {
-		navigate("/");
-	}
+	return <></>;
 }

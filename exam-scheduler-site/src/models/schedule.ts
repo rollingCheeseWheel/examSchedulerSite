@@ -4,7 +4,7 @@ import type { UserProfile } from "./user";
 
 export interface Schedule {
     id: string;
-    autoLockIn: number | AutoLockIn;
+    autoLockIn: AutoLockIn;
     firstExamination: string;
     lockInOffset: string;
     description: string;

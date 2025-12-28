@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
 import type { Result } from "../../models/result";
-import { dateTimeReviver } from "../dateReviverFunction";
 import { useAsync } from "./useAsync";
 
 export function usePost<TResponse, TBody = unknown>(url: string | URL) {
@@ -29,7 +28,7 @@ export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 	return { data, error, loading, post };
 }
 
-export function getPost<TResponse, TBody = unknown>(url: string | URL) {
+function getPost<TResponse, TBody = unknown>(url: string | URL) {
 	return async (
 		body: TBody,
 		options: RequestInit = {}
@@ -53,4 +52,14 @@ export function getPost<TResponse, TBody = unknown>(url: string | URL) {
 		const json = JSON.parse(text, dateTimeReviver) as Result<TResponse>;
 		return json;
 	};
+}
+
+function dateTimeReviver(_: string, value: unknown) {
+	if (typeof value === "string") {
+		const d = new Date(value);
+		if (!isNaN(d.getTime()) && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
+			return d;
+		}
+	}
+	return value;
 }

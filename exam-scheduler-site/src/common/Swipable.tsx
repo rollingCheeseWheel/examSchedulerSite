@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useSwipeable, type SwipeableProps } from "react-swipeable";
 
-export default function Swipable({
+export function Swipable({
 	children,
 	swipeableProps,
 }: {

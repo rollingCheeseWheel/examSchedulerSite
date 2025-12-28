@@ -47,7 +47,7 @@ export function ExtendedProgressbar(props: ExtendedProgressbarProps) {
 	);
 }
 
-export default function ScheduleProgress(props: ExtendedProgressbarProps) {
+export function ScheduleProgress(props: ExtendedProgressbarProps) {
 	const { participants, max: maxParticipants, min: minParticipants } = props;
 	return (
 		<Tooltip
@@ -69,7 +69,7 @@ export default function ScheduleProgress(props: ExtendedProgressbarProps) {
 						{participants}
 					</Text>
 					<Text>/</Text>
-					<Text c="green">{maxParticipants}</Text>
+					<Text c="blue">{maxParticipants}</Text>
 				</Group>
 				<ExtendedProgressbar style={{ flex: 1 }} {...props} />
 			</Group>

@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import type { LinkGroupProp } from "../link/LinkGroup";
+import { type Schedule } from "../../models/schedule";
+import { type UserProfile } from "../../models/user";
 
 interface DisclosureStore {
 	isOpen: boolean;
@@ -57,6 +59,32 @@ function createListStore<T>(initialState: T[] = []) {
 	}));
 }
 
+interface SingletonStore<T> {
+	data?: T;
+	setData: (data: T) => void;
+	reset: () => void;
+	clear: () => void;
+}
+
+function createSingletonStore<T>(initialState?: T) {
+	return create<SingletonStore<T>>((set) => ({
+		data: initialState,
+		setData(data) {
+			set(() => ({ data: data }));
+		},
+		clear() {
+			set(() => ({ data: undefined }));
+		},
+		reset() {
+			set(() => ({ data: initialState }));
+		},
+	}));
+}
+
 export const useLoadingOverlay = createDisclosureStore();
 export const useNavbarState = createDisclosureStore();
+
 export const useNavbarMenu = createListStore<LinkGroupProp>();
+export const useSchedules = createListStore<Schedule>();
+
+export const useUserProfile = createSingletonStore<UserProfile>();
