@@ -11,12 +11,16 @@ import {
 	CheckIcon,
 	Kbd,
 	Grid,
+	Container,
+	Box,
+	UnstyledButton,
 } from "@mantine/core";
 import type { Schedule, ScheduleSlot } from "../models/schedule";
-import {ScheduleProgress} from "../common/ExtendedProgessbar";
+import { ScheduleProgress } from "../common/ExtendedProgessbar";
 import { useState } from "react";
 import type { UserProfile } from "../models/user";
 import { useNavigate } from "react-router-dom";
+import { useClickOutside } from "@mantine/hooks";
 
 export interface ExamScheduleProps extends Schedule {
 	maxwidth?: StyleProp<string | number>;
@@ -60,11 +64,17 @@ function ScheduleDate(
 		return true;
 	}
 
+	// const ref = useClickOutside(() => setChecked(checkedId), ["mouseup", "touchend"], );
+
 	return (
-		<>
+		<div
+			onClick={(e) => {
+				e.stopPropagation();
+				setChecked(props.id);
+			}}>
 			<Grid>
 				<Grid.Col span="content">
-					<Text>{props.date}</Text>
+					<Text>{props.date.toLocaleDateString()}</Text>
 				</Grid.Col>
 				<Grid.Col span="auto">
 					<ScheduleProgress
@@ -76,12 +86,11 @@ function ScheduleDate(
 				</Grid.Col>
 			</Grid>
 			<Flex justify="space-between" direction="row-reverse">
-
 				<ScheduleRadio
 					enabled={!scheduleProps.teacher}
 					schedule={scheduleProps}
 					scheduleSlot={props}
-					setChecked={setChecked}
+					setChecked={() => {}}
 					checkedId={checkedId}
 				/>
 				<Group gap="xs">
@@ -91,7 +100,7 @@ function ScheduleDate(
 				</Group>
 			</Flex>
 			{/* {useDivider() && <Divider/>} */}
-		</>
+		</div>
 	);
 }
 

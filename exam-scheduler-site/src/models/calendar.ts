@@ -7,7 +7,7 @@ export interface Calendar {
 
 export interface Lesson {
     id: string;
-    occurances: string[];
+    occurances: Date[];
     fromHour: number;
     toHour: number;
     lessonName: string;

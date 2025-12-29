@@ -69,10 +69,13 @@ createRoot(document.getElementById("root")!).render(
 														AutoLockIn.TimeBeforeExamination,
 													description:
 														"testdescription",
-													firstExamination:
-														"2025-10-12",
+													firstExamination: new Date(
+														"2025-10-12"
+													),
 													id: "123123123",
-													lockInOffset: "0000-00-10",
+													lockInOffset: new Date(
+														"0000-00-10"
+													),
 													subject: {
 														name: "testsubject",
 													},
@@ -80,7 +83,9 @@ createRoot(document.getElementById("root")!).render(
 														"kjfdhszugzuie",
 													examSlots: [
 														{
-															date: "2025-10-12",
+															date: new Date(
+																"2025-10-12"
+															),
 															id: "öasldfjzhui",
 															minParticipants: 0,
 															maxParticipants: 3,
@@ -100,7 +105,9 @@ createRoot(document.getElementById("root")!).render(
 														{
 															actuallyParticipated:
 																[],
-															date: "2025-11-12",
+															date: new Date(
+																"2025-11-12"
+															),
 															id: "kjfdhszugzuie",
 															minParticipants: 4,
 															maxParticipants: 10,
@@ -126,8 +133,10 @@ createRoot(document.getElementById("root")!).render(
 														{
 															actuallyParticipated:
 																[],
-															date: "2025-11-12",
-															id: "kjfdhszugzuie",
+															date: new Date(
+																"2025-11-12"
+															),
+															id: "alskdjfhajklsdfh",
 															minParticipants: 0,
 															maxParticipants: 2,
 															participants: [

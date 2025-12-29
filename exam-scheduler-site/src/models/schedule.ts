@@ -5,8 +5,8 @@ import type { UserProfile } from "./user";
 export interface Schedule {
     id: string;
     autoLockIn: AutoLockIn;
-    firstExamination: string;
-    lockInOffset: string;
+    firstExamination: Date;
+    lockInOffset: Date;
     description: string;
     subject: Subject;
     selectedSlotId: string;
@@ -15,9 +15,15 @@ export interface Schedule {
 
 export interface ScheduleSlot {
     id: string;
-    date: string;
+    date: Date;
     participants: UserProfile[];
     actuallyParticipated: UserProfile[];
     maxParticipants: number;
     minParticipants: number;
+}
+
+export interface ScheduleGeneratorSlot {
+    offset: number;
+    minParticipants: number;
+    maxParticipants: number;
 }

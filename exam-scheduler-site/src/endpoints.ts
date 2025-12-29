@@ -1,12 +1,11 @@
 export default {
 	baseApiPath: "/api/v1",
 	get schoolDropdown() {
-		return mergePaths(this.baseApiPath, "signup/schools");
+		return this.get("schools");
+	},
+
+	get(...parts: string[]) {
+		parts = [this.baseApiPath, ...parts];
+		return parts.map((p) => p.replace(/^\/|\/$/g, "")).join("/");
 	},
 };
-
-function mergePaths(base: string, path: string) {
-	return (
-		base + (base.endsWith("/") || path.startsWith("/") ? "" : "/") + path
-	);
-}
