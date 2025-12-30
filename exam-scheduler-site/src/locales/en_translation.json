@@ -1,0 +1,13 @@
+{
+    "auth": {
+        "school": {
+            "error": "Failed to load schools, please try again",
+            "select": "Select your school"
+        }
+    },
+    "schedule": {
+        "progess": {
+            "tooltip": "{{curr}} out of {{max}} - {{min}} needed"
+        }
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "auth": {
+        "school": {
+            "error": "Fehler beim Laden, bitte versuche es erneut",
+            "select": "Wähle deine Schule aus"
+        }
+    },
+    "schedule": {
+        "progess": {
+            "tooltip": "{{curr}} von {{max}} - {{min}} benötigt"
+        }
+    }
+}

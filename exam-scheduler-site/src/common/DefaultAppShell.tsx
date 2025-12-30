@@ -11,10 +11,10 @@ export interface DefaultAppShellProps {
 	linkData?: LinkGroupProp[];
 }
 
-export function DefaultAppShell({ children }: DefaultAppShellProps) {
+export function DefaultAppShell({ children, linkData }: DefaultAppShellProps) {
 	const { data, setData } = useNavbarMenu();
 
-	const initialNavbarlinks: LinkGroupProp[] = [
+	const initialNavbarlinks: LinkGroupProp[] = linkData ?? [
 		{
 			label: "test",
 			links: [

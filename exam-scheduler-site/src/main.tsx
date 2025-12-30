@@ -9,6 +9,9 @@ import { AuthWidget } from "./auth/AuthWidget";
 import { ExamSchedule } from "./schedule/Schedule";
 import { AuthCallback } from "./auth/AuthCallback";
 import { AutoLockIn } from "./models/enums";
+import i18next from "i18next";
+import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
 
 // const color: MantineColorsTuple = [
 // 	"#f6eeff",
@@ -26,6 +29,27 @@ import { AutoLockIn } from "./models/enums";
 // const theme = createTheme({
 // 	colors: { color },
 // });
+
+import english from "./locales/en_translation.json";
+import german from "./locales/de_translation.json";
+
+i18next
+	.use(initReactI18next)
+	.use(LanguageDetector)
+	.init({
+		fallbackLng: "de",
+		ns: ["translation"],
+		defaultNS: "translation",
+		keySeparator: ".",
+		nsSeparator: false,
+		detection: {
+			order: ["localstorage", "navigator"],
+			caches: ["localstorage"],
+
+		}
+	});
+i18next.addResourceBundle("en", "translation", english, true);
+i18next.addResourceBundle("de", "translation", german, true);
 
 createRoot(document.getElementById("root")!).render(
 	<StrictMode>

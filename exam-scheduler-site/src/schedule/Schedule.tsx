@@ -11,16 +11,14 @@ import {
 	CheckIcon,
 	Kbd,
 	Grid,
-	Container,
-	Box,
-	UnstyledButton,
 } from "@mantine/core";
 import type { Schedule, ScheduleSlot } from "../models/schedule";
 import { ScheduleProgress } from "../common/ExtendedProgessbar";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import type { UserProfile } from "../models/user";
 import { useNavigate } from "react-router-dom";
-import { useClickOutside } from "@mantine/hooks";
+import { formatDateTime } from "../util";
+import { useTranslation } from "react-i18next";
 
 export interface ExamScheduleProps extends Schedule {
 	maxwidth?: StyleProp<string | number>;
@@ -57,6 +55,8 @@ function ScheduleDate(
 	setChecked: (checkedId: string) => void,
 	checkedId: string
 ) {
+	const { i18n } = useTranslation();
+
 	function useDivider() {
 		if (index === scheduleProps.examSlots.length - 1) {
 			return false;
@@ -64,17 +64,11 @@ function ScheduleDate(
 		return true;
 	}
 
-	// const ref = useClickOutside(() => setChecked(checkedId), ["mouseup", "touchend"], );
-
 	return (
-		<div
-			onClick={(e) => {
-				e.stopPropagation();
-				setChecked(props.id);
-			}}>
+		<>
 			<Grid>
 				<Grid.Col span="content">
-					<Text>{props.date.toLocaleDateString()}</Text>
+					<Text>{formatDateTime(props.date, i18n.language)}</Text>
 				</Grid.Col>
 				<Grid.Col span="auto">
 					<ScheduleProgress
@@ -90,7 +84,7 @@ function ScheduleDate(
 					enabled={!scheduleProps.teacher}
 					schedule={scheduleProps}
 					scheduleSlot={props}
-					setChecked={() => {}}
+					setChecked={setChecked}
 					checkedId={checkedId}
 				/>
 				<Group gap="xs">
@@ -100,13 +94,11 @@ function ScheduleDate(
 				</Group>
 			</Flex>
 			{/* {useDivider() && <Divider/>} */}
-		</div>
+		</>
 	);
 }
 
 function ScheduleParticipant(user: UserProfile, enableSwap: boolean) {
-	const navigate = useNavigate();
-
 	function handleClick() {
 		if (!enableSwap) return;
 	}

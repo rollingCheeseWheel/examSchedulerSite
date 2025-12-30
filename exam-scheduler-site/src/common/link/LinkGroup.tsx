@@ -10,6 +10,7 @@ import {
 } from "@mantine/core";
 import classes from "./LinkGroup.module.scss";
 import { useNavigate } from "react-router-dom";
+import { useId } from "@mantine/hooks";
 
 export interface LinkGroupProp {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,7 +21,7 @@ export interface LinkGroupProp {
 	defaultLink?: string;
 }
 
-export function LinksGroup({
+export function LinkGroup({
 	icon: Icon,
 	label,
 	initiallyOpened,
@@ -37,8 +38,7 @@ export function LinksGroup({
 		<Text<"a">
 			component="a"
 			className={classes.link}
-			href={link.link}
-			key={link.label}
+			href={link.link}	
 			onClick={(event) => {
 				event.preventDefault();
 				navigate(link.link);

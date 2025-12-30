@@ -1,6 +1,6 @@
 export default {
-	locales: ["en", "it", "de"],
-	output: "public/locales/$LOCALE/$NAMESPACE.json",
+	locales: ["en", "de"],
+	output: "src/locales/$LOCALE_$NAMESPACE.json",
 	input: ["src/**/*.{ts,tsx,js,jsx}"],
 	lexers: {
 		ts: ["JavascriptLexer"],
@@ -8,7 +8,7 @@ export default {
 		default: ["JsxLexer"],
 	},
 	keySeparator: ".",
-	namespaceSeparator: ":",
+	namespaceSeparator: false,
 	defaultValue: "",
 	defaultNamespace: "translation",
 	createOldCatalogs: true,

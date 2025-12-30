@@ -9,10 +9,12 @@ import classes from "./../common/AppShellSpine.module.css";
 import { useRef } from "react";
 import { useFetch } from "@mantine/hooks";
 import type { School } from "../models/school";
+import { useTranslation } from "react-i18next";
 
 export function AuthWidget() {
 	const { data, error, loading } = useFetch<School[]>("/api/schools");
 	const selectRef = useRef<HTMLSelectElement | null>(null);
+	const {t} = useTranslation();
 
 	function navigate() {
 		if (selectRef.current) {
@@ -29,8 +31,8 @@ export function AuthWidget() {
 			<Paper withBorder shadow="sm" p={22} mt="md" radius="md">
 				<NativeSelect
 					ref={selectRef}
-					error={error ? "Failed to load schools, please try again" : undefined}
-					label="Select your school"
+					error={error ? t("auth.school.error") : undefined} // Failed to load schools, please try again
+					label={t("auth.school.select")} // "Select your school"
 					data={data ? data.map((school) => {
 						const url = new URL("/v2/login/", new URL(school.registerUri).origin);
 						url.searchParams.set("client_id", school.clientId);
