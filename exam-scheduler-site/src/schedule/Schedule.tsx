@@ -11,6 +11,7 @@ import {
 	CheckIcon,
 	Kbd,
 	Grid,
+	Container,
 } from "@mantine/core";
 import type { Schedule, ScheduleSlot } from "../models/schedule";
 import { ScheduleProgress } from "../common/ExtendedProgessbar";
@@ -40,8 +41,8 @@ export function ExamSchedule(props: ExamScheduleProps) {
 				<Text>{props.description}</Text>
 			</Flex>
 			<Stack align="stretch" justify="flex-start" gap="xs">
-				{...props.examSlots.map((s, i) =>
-					ScheduleDate(s, props, i, handleCheck, checked)
+				{...props.examSlots.map((s) =>
+					ScheduleDate(s, props, handleCheck, checked)
 				)}
 			</Stack>
 		</Paper>
@@ -51,21 +52,13 @@ export function ExamSchedule(props: ExamScheduleProps) {
 function ScheduleDate(
 	props: ScheduleSlot,
 	scheduleProps: ExamScheduleProps,
-	index: number,
 	setChecked: (checkedId: string) => void,
 	checkedId: string
 ) {
 	const { i18n } = useTranslation();
 
-	function useDivider() {
-		if (index === scheduleProps.examSlots.length - 1) {
-			return false;
-		}
-		return true;
-	}
-
 	return (
-		<>
+		<div>
 			<Grid>
 				<Grid.Col span="content">
 					<Text>{formatDateTime(props.date, i18n.language)}</Text>
@@ -93,8 +86,7 @@ function ScheduleDate(
 					)}
 				</Group>
 			</Flex>
-			{/* {useDivider() && <Divider/>} */}
-		</>
+		</div>
 	);
 }
 

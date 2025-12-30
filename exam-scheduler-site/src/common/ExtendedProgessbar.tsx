@@ -15,13 +15,13 @@ interface ExtendedProgressbarProps extends ProgressRootProps {
 
 export function ExtendedProgressbar(props: ExtendedProgressbarProps) {
 	const { participants, max, min } = props;
-	const [participantsValue, minValue] = [
-		(participants * 100) / Math.max(1, max),
-		(min * 100) / Math.max(1, max),
-	];
+	const participantsValue = Math.round(
+		(participants * 100) / Math.max(1, max)
+	);
+	const minValue = Math.round((min * 100) / Math.max(1, max));
 
 	return (
-		<Progress.Root autoContrast {...props} orientation="horizontal">
+		<Progress.Root autoContrast {...props}>
 			<Progress.Section
 				value={participantsValue}
 				color={
@@ -46,18 +46,16 @@ export function ExtendedProgressbar(props: ExtendedProgressbarProps) {
 
 export function ScheduleProgress(props: ExtendedProgressbarProps) {
 	const { participants: curr, max: max, min: min } = props;
-	console.log(curr, max, min);
-
 	const { t } = useTranslation();
+
 	return (
 		<Tooltip
 			label={t("schedule.progess.tooltip", {
+				// {{curr}} out of {{max}} - {{min}} needed
 				min: min,
 				max: max,
 				curr: curr,
 			})}>
-			{" "}
-			{/* {{curr}} out of {{max}} - {{min}} needed */}
 			<Group justify="flex-end">
 				<Group gap="xs">
 					<Text>{min}</Text>
