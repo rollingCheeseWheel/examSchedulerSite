@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 import { AppShellSpine } from "./AppShellSpine";
 import { useIsFirstRender, useLocalStorage } from "@mantine/hooks";
 import { Routes } from "react-router-dom";
-import type { LinkGroupProp } from "./link/LinkGroup";
-import { NestedNavbar } from "./link/NestedNavbar";
-import { useNavbarMenu } from "./zustand/zustand";
+import type { LinkGroupProp } from "../navbar-link-group/LinkGroup";
+import { NestedNavbar } from "../navbar-link-group/NestedNavbar";
+import { useNavbarMenu } from "../../zustand/zustand";
 
 export interface DefaultAppShellProps {
 	children?: ReactNode;

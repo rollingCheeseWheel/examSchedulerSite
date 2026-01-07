@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import type { LinkGroupProp } from "../link/LinkGroup";
-import { type Schedule } from "../../models/schedule";
-import { type UserProfile } from "../../models/user";
+import type { LinkGroupProp } from "../components/navbar-link-group/LinkGroup";
+import { type Schedule } from "../models/schedule";
+import { type UserProfile } from "../models/user";
 
 interface DisclosureStore {
 	isOpen: boolean;

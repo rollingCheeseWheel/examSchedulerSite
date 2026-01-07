@@ -13,12 +13,11 @@ import {
 	Grid,
 	Container,
 } from "@mantine/core";
-import type { Schedule, ScheduleSlot } from "../models/schedule";
-import { ScheduleProgress } from "../common/ExtendedProgessbar";
-import { useState, useTransition } from "react";
-import type { UserProfile } from "../models/user";
-import { useNavigate } from "react-router-dom";
-import { formatDateTime } from "../util";
+import type { Schedule, ScheduleSlot } from "../../models/schedule";
+import { ScheduleProgress } from "../ExtendedProgessbar";
+import { useState } from "react";
+import type { UserProfile } from "../../models/user";
+import { formatDateTime } from "../../util";
 import { useTranslation } from "react-i18next";
 
 export interface ExamScheduleProps extends Schedule {

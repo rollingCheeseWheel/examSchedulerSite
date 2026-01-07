@@ -1,12 +1,12 @@
 import { AppShell, Group, LoadingOverlay, Title } from "@mantine/core";
 import classes from "./AppShellSpine.module.css";
-import { ThemeButton } from "../common/ThemeButton";
+import { ThemeButton } from "../ThemeButton";
 import type { ReactNode } from "react";
 import { IconMenu2 } from "@tabler/icons-react";
-import { Swipable } from "./Swipable";
+import { Swipable } from "../Swipable";
 import type { SwipeableProps } from "react-swipeable";
 import { useIsFirstRender, useMediaQuery } from "@mantine/hooks";
-import { useLoadingOverlay, useNavbarState } from "./zustand/zustand";
+import { useLoadingOverlay, useNavbarState } from "../../zustand/zustand";
 
 export interface AppShellSpineProps {
 	children?: React.ReactNode;

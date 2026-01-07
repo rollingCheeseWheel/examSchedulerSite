@@ -5,10 +5,9 @@ import {
 	Paper,
 	Title,
 } from "@mantine/core";
-import classes from "./../common/AppShellSpine.module.css";
 import { useRef } from "react";
 import { useFetch } from "@mantine/hooks";
-import type { School } from "../models/school";
+import type { School } from "../../models/school";
 import { useTranslation } from "react-i18next";
 
 export function AuthWidget() {
@@ -24,7 +23,7 @@ export function AuthWidget() {
 
 	return (
 		<Container size={420} my={40} style={{minWidth: 300}}>
-			<Title ta="center" className={classes.title}>
+			<Title ta="center" className="title">
 				Login
 			</Title>
 

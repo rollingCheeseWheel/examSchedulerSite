@@ -1,8 +1,8 @@
 import { useIsFirstRender } from "@mantine/hooks";
-import type { OAuthRequest } from "../models/auth";
-import { usePost } from "../common/hooks/usePost";
+import type { OAuthRequest } from "../../models/auth";
+import { usePost } from "../../hooks/usePost";
 import { useNavigate } from "react-router-dom";
-import { useLoadingOverlay } from "../common/zustand/zustand";
+import { useLoadingOverlay } from "../../zustand/zustand";
 import { useEffect } from "react";
 
 export function AuthCallback({

@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
-import type { Result } from "../../models/result";
-import { useAsync } from "./useAsync";
+import type { Result } from "../models/result";
 
 export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 	const [data, setData] = useState<Result<TResponse>>();
