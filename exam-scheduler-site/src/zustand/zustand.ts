@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import type { LinkGroupProp } from "../components/navbar-link-group/LinkGroup";
-import { type Schedule } from "../models/schedule";
-import { type UserProfile } from "../models/user";
+import type { Schedule } from "../models/schedule";
+import type { UserProfile } from "../models/user";
+import type { Calendar } from "../models/calendar";
 
 interface DisclosureStore {
 	isOpen: boolean;
@@ -88,3 +89,4 @@ export const useNavbarMenu = createListStore<LinkGroupProp>();
 export const useSchedules = createListStore<Schedule>();
 
 export const useUserProfile = createSingletonStore<UserProfile>();
+export const useCalendar = createSingletonStore<Calendar>();

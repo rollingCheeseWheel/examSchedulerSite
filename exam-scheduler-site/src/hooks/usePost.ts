@@ -3,7 +3,7 @@ import type { Result } from "../models/result";
 
 export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 	const [data, setData] = useState<Result<TResponse>>();
-	const [error, setError] = useState<unknown>(null);
+	const [error, setError] = useState<Error>();
 	const [loading, setLoading] = useState<boolean>(true);
 
 	const post = useCallback(
@@ -15,8 +15,17 @@ export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 				const res = await getPost<TResponse, TBody>(url)(body, options);
 				setData(res);
 				return res;
-			} catch (e) {
-				setError(e);
+			} catch (error) {
+				if (error instanceof Error) {
+					setError(error);
+				}
+				const formedError = new Error(
+					`Non Error value was thrown: ${
+						typeof error === "object" ? JSON.stringify(error) : error
+					}`
+				);
+				setError(formedError);
+				throw formedError;
 			} finally {
 				setLoading(false);
 			}
@@ -27,7 +36,7 @@ export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 	return { data, error, loading, post };
 }
 
-function getPost<TResponse, TBody = unknown>(url: string | URL) {
+export function getPost<TResponse, TBody = unknown>(url: string | URL) {
 	return async (
 		body: TBody,
 		options: RequestInit = {}
@@ -53,7 +62,7 @@ function getPost<TResponse, TBody = unknown>(url: string | URL) {
 	};
 }
 
-function dateTimeReviver(_: string, value: unknown) {
+export function dateTimeReviver(_: string, value: unknown) {
 	if (typeof value === "string") {
 		const d = new Date(value);
 		if (!isNaN(d.getTime()) && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
