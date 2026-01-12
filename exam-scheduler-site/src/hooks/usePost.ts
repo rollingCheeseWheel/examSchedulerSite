@@ -6,12 +6,22 @@ export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 	const [error, setError] = useState<Error>();
 	const [loading, setLoading] = useState<boolean>(true);
 
+	const [terminated, setTerminated] = useState<boolean>(false);
+
+	function terminate() {
+		setTerminated(true);
+		setLoading(false);
+	}
+
 	const post = useCallback(
 		async (
 			body: TBody,
 			options: RequestInit = {}
 		): Promise<Result<TResponse> | undefined> => {
 			try {
+				setLoading(true);
+				setError(undefined);
+				setData(undefined);
 				const res = await getPost<TResponse, TBody>(url)(body, options);
 				setData(res);
 				return res;
@@ -33,7 +43,7 @@ export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 		[url]
 	);
 
-	return { data, error, loading, post };
+	return { data, error, loading, post, terminate, terminated };
 }
 
 export function getPost<TResponse, TBody = unknown>(url: string | URL) {

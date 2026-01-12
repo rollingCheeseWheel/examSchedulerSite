@@ -1,4 +1,4 @@
-export default {
+export const endpoints =  {
 	baseApiPath: "/api/v1",
 	get schoolDropdown() {
 		return this.get("schools");
@@ -9,3 +9,5 @@ export default {
 		return parts.map((p) => p.replace(/^\/|\/$/g, "")).join("/");
 	},
 };
+
+export type Enpoints = keyof typeof endpoints;

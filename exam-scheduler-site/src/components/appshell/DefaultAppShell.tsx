@@ -5,13 +5,19 @@ import { Routes } from "react-router-dom";
 import type { LinkGroupProp } from "../navbar-link-group/LinkGroup";
 import { NestedNavbar } from "../navbar-link-group/NestedNavbar";
 import { useNavbarMenu } from "../../zustand/zustand";
+import { AuthCallback } from "../auth/AuthCallback";
 
 export interface DefaultAppShellProps {
 	children?: ReactNode;
 	linkData?: LinkGroupProp[];
+	authEnabled?: boolean;
 }
 
-export function DefaultAppShell({ children, linkData }: DefaultAppShellProps) {
+export function DefaultAppShell({
+	children,
+	linkData,
+	authEnabled,
+}: DefaultAppShellProps) {
 	const { data, setData } = useNavbarMenu();
 
 	const initialNavbarlinks: LinkGroupProp[] = linkData ?? [
@@ -41,7 +47,8 @@ export function DefaultAppShell({ children, linkData }: DefaultAppShellProps) {
 
 	return (
 		<AppShellSpine navbar={navbar} opened>
-			{<Routes>{children}</Routes>}
+			<AuthCallback enabled={authEnabled}></AuthCallback>
+			<Routes>{children}</Routes>
 		</AppShellSpine>
 	);
 }

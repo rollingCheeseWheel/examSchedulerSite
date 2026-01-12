@@ -62,7 +62,7 @@ function createListStore<T>(initialState: T[] = []) {
 
 interface SingletonStore<T> {
 	data?: T;
-	setData: (data: T) => void;
+	setData: (data?: T) => void;
 	reset: () => void;
 	clear: () => void;
 }
@@ -90,3 +90,4 @@ export const useSchedules = createListStore<Schedule>();
 
 export const useUserProfile = createSingletonStore<UserProfile>();
 export const useCalendar = createSingletonStore<Calendar>();
+export const useCrossSiteError = createSingletonStore<string>();

@@ -10,7 +10,8 @@ export default defineConfig({
       },
     }),
   ],
-  // build: {
-  //   minify: "esbuild",
-  // }
+  build: {
+    minify: "esbuild",
+    outDir: "C:/Users/manue/source/repos/examScheduler/examScheduler/wwwroot",
+  }
 })

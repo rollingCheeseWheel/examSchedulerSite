@@ -6,6 +6,12 @@
         }
     },
     "schedule": {
+        "create": {
+            "calendar": {
+                "decrement": "Vorherige Woche",
+                "increment": "Nächste Woche"
+            }
+        },
         "progess": {
             "tooltip": "{{curr}} von {{max}} - {{min}} benötigt"
         }

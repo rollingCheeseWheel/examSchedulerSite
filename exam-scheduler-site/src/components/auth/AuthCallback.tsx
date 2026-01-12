@@ -1,50 +1,40 @@
 import { useIsFirstRender } from "@mantine/hooks";
 import type { OAuthRequest } from "../../models/auth";
 import { usePost } from "../../hooks/usePost";
-import { useNavigate } from "react-router-dom";
-import { useLoadingOverlay } from "../../zustand/zustand";
-import { useEffect } from "react";
+import { Navigate } from "react-router-dom";
+import { useCrossSiteError, useLoadingOverlay, useUserProfile } from "../../zustand/zustand";
+import type { ReactNode } from "react";
+import type { UserProfile } from "../../models/user";
 
-export function AuthCallback({
-	enabled,
-}: {
-	enabled?: boolean;
-}) {
-	const navigate = useNavigate();
+export function AuthCallback({ enabled }: { enabled?: boolean }) {
 	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
-	const { data, loading, error, post } = usePost<Date, OAuthRequest>(
-		"/api/auth"
-	);
-	const isEnabled = !!enabled;
+	const setUserProfile = useUserProfile((s) => s.setData);
+	const setCrossSiteError = useCrossSiteError((s) => s.setData);
+	const { data, loading, error, terminated, post, terminate } = usePost<
+		UserProfile,
+		OAuthRequest
+	>("/api/auth");
 
-	useEffect(() => {
-		if (!isEnabled) {
-			return;
-		}
-		setLoadingOverlayState(loading && isEnabled);
-		if (loading) {
-			return;
-		}
-
-		if (data) {
-			navigate("/", { replace: true, flushSync: true });
-		} else {
-			navigate("/auth", { replace: true, flushSync: true });
-		}
-	}, [loading, data, navigate, error, isEnabled, setLoadingOverlayState]);
-
-	if (useIsFirstRender() && isEnabled) {
+	if (useIsFirstRender() && enabled) {
 		const params = new URLSearchParams(window.location.search);
 		const authCode = params.get("code");
 		const schoolId = params.get("school_id");
 
 		if (!authCode || !schoolId) {
-			navigate("/auth", { replace: true, flushSync: true });
-			return <></>;
+			terminate();
+		} else if (enabled) {
+			post({ authCode, schoolId });
 		}
-
-		post({ authCode, schoolId });
 	}
 
-	return <></>;
+	setLoadingOverlayState(loading && !terminated && !!enabled);
+	if (loading && !terminated) {
+		return <></>;
+	} else if (data) {
+		setUserProfile(data.data)
+		return <></>;
+	} else {
+		setCrossSiteError(error?.message);
+		return <Navigate to="/auth" replace />;
+	}
 }

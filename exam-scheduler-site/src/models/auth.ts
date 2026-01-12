@@ -1,13 +1,13 @@
 export interface OAuthRequest {
-    authCode: string;
-    schoolId: string;
+	authCode: string;
+	schoolId: string;
 }
 
 export interface TokenExtendRequest {
-    refreshToken: string;
+	refreshToken: string;
 }
 
 export interface TokenResponse {
-    accessToken: string;
-    refreshToken: string;
+	accessToken: string;
+	refreshToken: string;
 }
