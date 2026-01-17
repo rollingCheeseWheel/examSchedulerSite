@@ -27,6 +27,7 @@
 		"@mantine/nprogress": "^8.3.5",
 		"@mantine/spotlight": "^8.3.5",
 		"@mantine/tiptap": "^8.3.5",
+		"@microsoft/signalr": "^10.0.0",
 		"@tabler/icons-react": "^3.35.0",
 		"@tiptap/extension-link": "^3.9.0",
 		"@tiptap/pm": "^3.9.0",
