@@ -1,20 +1,25 @@
+import type { BrandedId } from "./brand";
 import type { Subject } from "./calendar";
 import type { AutoLockIn } from "./enums";
 import type { UserProfile } from "./user";
 
+export type ScheduleId = BrandedId<"schedule">;
+export type ScheduleSlotId = BrandedId<"schedule.slot">;
+export type SwapRequestId = BrandedId<"swaprequest">;
+
 export interface Schedule {
-	id: string;
+	id: ScheduleId;
 	autoLockIn: AutoLockIn;
 	firstExamination: Date;
 	lockInOffset: Date;
 	description: string;
 	subject: Subject;
-	selectedSlotId: string;
+	selectedSlotId: ScheduleSlotId;
 	examSlots: ScheduleSlot[];
 }
 
 export interface ScheduleSlot {
-	id: string;
+	id: ScheduleSlotId;
 	date: Date;
 	participants: UserProfile[];
 	actuallyParticipated: UserProfile[];
@@ -29,7 +34,7 @@ export interface ScheduleGeneratorSlot {
 }
 
 export interface SwapRequest {
-	id: string;
+	id: SwapRequestId;
 	scheduleId: string;
 	requestingStudentId: string;
 	requestedStudentId: string;
