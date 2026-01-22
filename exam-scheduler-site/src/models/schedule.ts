@@ -4,8 +4,7 @@ import type { AutoLockIn } from "./enums";
 import type { UserProfile } from "./user";
 
 export type ScheduleId = BrandedId<"schedule">;
-export type ScheduleSlotId = BrandedId<"schedule.slot">;
-export type SwapRequestId = BrandedId<"swaprequest">;
+export type ExamSlotId = BrandedId<"examslot">;
 
 export interface Schedule {
 	id: ScheduleId;
@@ -14,12 +13,11 @@ export interface Schedule {
 	lockInOffset: Date;
 	description: string;
 	subject: Subject;
-	selectedSlotId: ScheduleSlotId;
-	examSlots: ScheduleSlot[];
+	examSlots: ExamSlot[];
 }
 
-export interface ScheduleSlot {
-	id: ScheduleSlotId;
+export interface ExamSlot {
+	id: ExamSlotId;
 	date: Date;
 	participants: UserProfile[];
 	actuallyParticipated: UserProfile[];
@@ -31,12 +29,4 @@ export interface ScheduleGeneratorSlot {
 	offset: number;
 	minParticipants: number;
 	maxParticipants: number;
-}
-
-export interface SwapRequest {
-	id: SwapRequestId;
-	scheduleId: string;
-	requestingStudentId: string;
-	requestedStudentId: string;
-	expirationDate: Date;
 }

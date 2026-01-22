@@ -13,7 +13,7 @@ import {
 	Grid,
 	Container,
 } from "@mantine/core";
-import type { Schedule, ScheduleSlot } from "../../models/schedule";
+import type { Schedule, ExamSlot } from "../../models/schedule";
 import { ScheduleProgress } from "../ExtendedProgessbar";
 import { useState } from "react";
 import type { UserProfile } from "../../models/user";
@@ -49,7 +49,7 @@ export function ExamSchedule(props: ExamScheduleProps) {
 }
 
 function ScheduleDate(
-	props: ScheduleSlot,
+	props: ExamSlot,
 	scheduleProps: ExamScheduleProps,
 	setChecked: (checkedId: string) => void,
 	checkedId: string
@@ -105,7 +105,7 @@ function ScheduleParticipant(user: UserProfile, enableSwap: boolean) {
 }
 
 interface ScheduleRadioProps {
-	scheduleSlot: ScheduleSlot;
+	scheduleSlot: ExamSlot;
 	schedule: Schedule;
 	setChecked: (id: string) => void;
 	checkedId: string;

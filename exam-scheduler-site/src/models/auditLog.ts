@@ -1,8 +1,9 @@
+import type { Guid } from "./brand";
 import type { AuditLogActor } from "./enums";
 
 export interface AuditLog {
 	timestamp: Date;
-	actor: string;
+	actorId: Guid;
 	actorType: AuditLogActor;
 	actorName?: string;
 	action: string;

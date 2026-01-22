@@ -1,5 +1,4 @@
 import type { BrandedId } from "./brand";
-import type { ClassroomId } from "./classroom";
 
 export type CalendarId = BrandedId<"calendar">;
 export type LessonId = BrandedId<"lesson">;
@@ -8,7 +7,6 @@ export interface Calendar {
 	id: CalendarId;
 	lastsUntil: Date;
 	lessons: Lesson[];
-	classroomId: ClassroomId;
 }
 
 export interface Lesson {
@@ -18,7 +16,7 @@ export interface Lesson {
 	toHour: number;
 	lessonName: string;
 	teachers: Teacher[];
-	subject: Subject;
+	subjectName: string;
 }
 
 export interface Teacher {
