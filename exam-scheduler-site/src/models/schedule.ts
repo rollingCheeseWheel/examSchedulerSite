@@ -1,19 +1,26 @@
-import type { BrandedId } from "./brand";
-import type { Subject } from "./calendar";
-import type { AutoLockIn } from "./enums";
+import type { AuditLog } from "./auditLog";
+import type { Brand, BrandedId } from "./brand";
+import type { ClassroomId } from "./classroom";
+import type { AutoLockIn, SlotFillingBehaviour } from "./enums";
+import type { SwapRequest } from "./swapRequest";
 import type { UserProfile } from "./user";
 
 export type ScheduleId = BrandedId<"schedule">;
 export type ExamSlotId = BrandedId<"examslot">;
 
+export type TimeSpan = Brand<Date, "timespan">;
+
 export interface Schedule {
 	id: ScheduleId;
+	startDate: Date;
+	endDate: Date;
 	autoLockIn: AutoLockIn;
-	firstExamination: Date;
-	lockInOffset: Date;
+	lockInOffset: TimeSpan;
 	description: string;
-	subject: Subject;
+	subjectName: string;
 	examSlots: ExamSlot[];
+	auditLogs: AuditLog[];
+	swapRequests: SwapRequest[];
 }
 
 export interface ExamSlot {
@@ -25,8 +32,20 @@ export interface ExamSlot {
 	minParticipants: number;
 }
 
+export interface ScheduleCreateRequest {
+	subjectName: string;
+	classroomId: ClassroomId;
+	slotFillingBehaviour: SlotFillingBehaviour;
+	startDate: Date;
+	endDate: Date;
+	autoLockIn: AutoLockIn;
+	lockInOffset: TimeSpan;
+	generatorSlots: ScheduleGeneratorSlot[];
+	description?: string;
+}
+
 export interface ScheduleGeneratorSlot {
-	offset: number;
+	offset: TimeSpan;
 	minParticipants: number;
 	maxParticipants: number;
 }
