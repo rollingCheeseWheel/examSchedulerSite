@@ -21,9 +21,9 @@ export function AppShellSpine({
 	opened,
 	disabled,
 }: AppShellSpineProps) {
-	const isLoadingOverlayOpen = useLoadingOverlay((s) => s.isOpen);
+	const isLoadingOverlayOpen = useLoadingOverlay((s) => s.state);
 	const {
-		isOpen: isNavbarOpen,
+		state: isNavbarOpen,
 		setState: setNavbarState,
 		toggle,
 	} = useNavbarState();

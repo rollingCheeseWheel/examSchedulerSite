@@ -1,16 +1,20 @@
 import { Button, Container, NativeSelect, Paper, Title } from "@mantine/core";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useFetch } from "@mantine/hooks";
 import type { School } from "../../models/school";
 import { useTranslation } from "react-i18next";
 import { useCrossSiteError } from "../../zustand/zustand";
+import { endpoints } from "../../endpoints";
 
 export function AuthWidget() {
-	const { data, error, loading, abort } = useFetch<School[]>("/api/schools");
-	const previousError = useCrossSiteError((s) => s.data);
-	if (previousError) {
-		abort();
-	}
+	const { data, error: schoolFetchError, loading, abort } = useFetch<School[]>(
+		endpoints.schools,
+	);
+	const crossSiteError = useCrossSiteError((s) => s.instance);
+
+	useEffect(() => {
+		return abort;
+	}, [abort]);
 
 	const selectRef = useRef<HTMLSelectElement | null>(null);
 	const { t } = useTranslation();
@@ -31,30 +35,30 @@ export function AuthWidget() {
 				<NativeSelect
 					ref={selectRef}
 					error={
-						previousError ?? error
-							? t("auth.school.error")
-							: undefined
+						(crossSiteError ?? schoolFetchError) ?
+							t("auth.school.error")
+						:	undefined
 					} // Failed to load schools, please try again
 					label={t("auth.school.select")} // "Select your school"
 					data={
-						data
-							? data.map((school) => {
-									const url = new URL(
-										"/v2/login/",
-										new URL(school.registerUri).origin
-									);
-									url.searchParams.set(
-										"client_id",
-										school.clientId
-									);
+						data ?
+							data.map((school) => {
+								const url = new URL(
+									"/v2/login/",
+									new URL(school.registerUri).origin,
+								);
+								url.searchParams.set(
+									"client_id",
+									school.clientId,
+								);
 
-									return {
-										label: school.name,
-										value: url.href,
-										disabled: !school.isEnabled,
-									};
-							  })
-							: undefined
+								return {
+									label: school.name,
+									value: url.href,
+									disabled: !school.isEnabled,
+								};
+							})
+						:	undefined
 					}
 					required></NativeSelect>
 				<Button

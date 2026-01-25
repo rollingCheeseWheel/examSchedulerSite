@@ -2,11 +2,11 @@ declare const __brand: unique symbol;
 declare const __extends: unique symbol;
 
 export type Brand<T, B extends string> = T & {
-	[__brand]: B;
+	readonly [__brand]?: B;
 };
 
 type Extends<B> = {
-	[__extends]: B;
+	readonly [__extends]?: B;
 };
 
 type BrandBase<T> = T extends Brand<infer A, string> ? A : never;

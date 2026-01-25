@@ -2,10 +2,12 @@ import { create } from "zustand";
 import type { LinkGroupProp } from "../components/navbar-link-group/LinkGroup";
 import type { Schedule } from "../models/schedule";
 import type { UserProfile } from "../models/user";
-import type { Calendar } from "../models/calendar";
+import type { Classroom } from "../models/classroom";
+import { HubConnection } from "@microsoft/signalr";
 
 interface DisclosureStore {
-	isOpen: boolean;
+	state: boolean;
+	hasChanged: boolean;
 	open: () => void;
 	close: () => void;
 	setState: (state: boolean) => void;
@@ -15,27 +17,29 @@ interface DisclosureStore {
 
 function createDisclosureStore(initialState: boolean = false) {
 	return create<DisclosureStore>((set) => ({
-		isOpen: initialState,
+		state: initialState,
+		hasChanged: false,
 		open() {
-			set(() => ({ isOpen: true }));
+			set(() => ({ state: true, hasChanged: true }));
 		},
 		close() {
-			set(() => ({ isOpen: false }));
+			set(() => ({ state: false, hasChanged: true }));
 		},
 		setState(state) {
-			set(() => ({ isOpen: state }));
+			set(() => ({ state: state, hasChanged: true }));
 		},
 		toggle() {
-			set((state) => ({ isOpen: !state.isOpen }));
+			set((state) => ({ state: !state.state, hasChanged: true }));
 		},
 		reset() {
-			set(() => ({ isOpen: initialState }));
+			set(() => ({ state: initialState, hasChanged: true }));
 		},
 	}));
 }
 
 interface ListStore<T> {
 	data: T[];
+	hasChanged: boolean;
 	setData: (data: T[]) => void;
 	append: (...data: T[]) => void;
 	reset: () => void;
@@ -45,39 +49,45 @@ interface ListStore<T> {
 function createListStore<T>(initialState: T[] = []) {
 	return create<ListStore<T>>((set) => ({
 		data: initialState,
+		hasChanged: false,
 		setData(data) {
-			set(() => ({ data: data }));
+			set(() => ({ data: data, hasChanged: true }));
 		},
 		append(...data) {
-			set((state) => ({ data: state.data.concat(data) }));
+			set((state) => ({
+				data: state.data.concat(data),
+				hasChanged: true,
+			}));
 		},
 		reset() {
-			set(() => ({ data: initialState }));
+			set(() => ({ data: initialState, hasChanged: true }));
 		},
 		clear() {
-			set(() => ({ data: [] }));
+			set(() => ({ data: [], hasChanged: true }));
 		},
 	}));
 }
 
 interface SingletonStore<T> {
-	data?: T;
+	instance?: T;
+	hasChanged: boolean;
 	setData: (data?: T) => void;
 	reset: () => void;
 	clear: () => void;
 }
 
-function createSingletonStore<T>(initialState?: T) {
+function createSingletonStore<T>(initialInstance?: T) {
 	return create<SingletonStore<T>>((set) => ({
-		data: initialState,
+		instance: initialInstance,
+		hasChanged: false,
 		setData(data) {
-			set(() => ({ data: data }));
+			set(() => ({ instance: data, hasChanged: true }));
 		},
 		clear() {
-			set(() => ({ data: undefined }));
+			set(() => ({ instance: undefined, hasChanged: true }));
 		},
 		reset() {
-			set(() => ({ data: initialState }));
+			set(() => ({ instance: initialInstance, hasChanged: true }));
 		},
 	}));
 }
@@ -87,7 +97,8 @@ export const useNavbarState = createDisclosureStore();
 
 export const useNavbarMenu = createListStore<LinkGroupProp>();
 export const useSchedules = createListStore<Schedule>();
+export const useClassrooms = createListStore<Classroom>();
 
 export const useUserProfile = createSingletonStore<UserProfile>();
-export const useCalendar = createSingletonStore<Calendar>();
 export const useCrossSiteError = createSingletonStore<string>();
+export const useSignalRConnection = createSingletonStore<HubConnection>();

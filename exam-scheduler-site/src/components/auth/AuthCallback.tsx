@@ -2,9 +2,13 @@ import { useIsFirstRender } from "@mantine/hooks";
 import type { OAuthRequest } from "../../models/auth";
 import { usePost } from "../../hooks/usePost";
 import { Navigate } from "react-router-dom";
-import { useCrossSiteError, useLoadingOverlay, useUserProfile } from "../../zustand/zustand";
-import type { ReactNode } from "react";
+import {
+	useCrossSiteError,
+	useLoadingOverlay,
+	useUserProfile,
+} from "../../zustand/zustand";
 import type { UserProfile } from "../../models/user";
+import { endpoints } from "../../endpoints";
 
 export function AuthCallback({ enabled }: { enabled?: boolean }) {
 	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
@@ -13,7 +17,7 @@ export function AuthCallback({ enabled }: { enabled?: boolean }) {
 	const { data, loading, error, terminated, post, terminate } = usePost<
 		UserProfile,
 		OAuthRequest
-	>("/api/auth");
+	>(endpoints.auth.login);
 
 	if (useIsFirstRender() && enabled) {
 		const params = new URLSearchParams(window.location.search);
@@ -29,10 +33,10 @@ export function AuthCallback({ enabled }: { enabled?: boolean }) {
 
 	setLoadingOverlayState(loading && !terminated && !!enabled);
 	if (loading && !terminated) {
-		return <></>;
+		return;
 	} else if (data) {
-		setUserProfile(data.data)
-		return <></>;
+		setUserProfile(data.data);
+		return <Navigate to="" replace />;
 	} else {
 		setCrossSiteError(error?.message);
 		return <Navigate to="/auth" replace />;

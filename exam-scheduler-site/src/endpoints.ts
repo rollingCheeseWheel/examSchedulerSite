@@ -1,13 +1,19 @@
-export const endpoints =  {
-	baseApiPath: "/api/v1",
-	get schoolDropdown() {
-		return this.get("schools");
-	},
+export const baseApiPath = "api";
 
-	get(...parts: string[]) {
-		parts = [this.baseApiPath, ...parts];
-		return parts.map((p) => p.replace(/^\/|\/$/g, "")).join("/");
+export function join(...parts: string[]) {
+	parts = [baseApiPath, ...parts];
+	return parts
+		.map((p) => p.split(/^\/|\/$/g))
+		.flat()
+		.join("/");
+}
+
+export const endpoints = {
+	schools: join("schools"),
+	auth: {
+		login: join("auth"),
+		refresh: join("auth", "refresh"),
 	},
+	classrooms: join("classroom", "all"),
+	scheduleHub: join("hubs", "schedule"),
 };
-
-export type Enpoints = keyof typeof endpoints;

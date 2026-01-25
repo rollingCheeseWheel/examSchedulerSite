@@ -6,9 +6,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppShellSpine } from "./components/appshell/AppShellSpine";
 import { DefaultAppShell } from "./components/appshell/DefaultAppShell";
 import { AuthWidget } from "./components/auth/AuthWidget";
-import { ExamSchedule } from "./components/schedule/Schedule";
-import { AuthCallback } from "./components/auth/AuthCallback";
-import { AutoLockIn } from "./models/enums";
 import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
@@ -33,6 +30,24 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import english from "./locales/en_translation.json";
 import german from "./locales/de_translation.json";
 import { CreateScheduleWidget } from "./components/schedule-create/CreateScheduleWidget";
+import axios from "axios";
+import { refreshSession } from "./components/auth/refreshSession";
+
+export const api = axios.create({
+	withCredentials: true,
+});
+
+api.interceptors.response.use(
+	(r) => r,
+	async (error) => {
+		if (error.response?.status === 401 && !error.config._retry) {
+			error.config._retry = true;
+			await refreshSession();
+			return api.request(error.config);
+		}
+		return Promise.reject(error);
+	},
+);
 
 i18next
 	.use(initReactI18next)
@@ -77,12 +92,12 @@ createRoot(document.getElementById("root")!).render(
 							<DefaultAppShell authEnabled>
 								<Route
 									path="*"
-									element={<CreateScheduleWidget />}></Route>
+									element={<CreateScheduleWidget/>}></Route>
 							</DefaultAppShell>
 						}
 					/>
 				</Routes>
 			</BrowserRouter>
 		</MantineProvider>
-	</StrictMode>
+	</StrictMode>,
 );

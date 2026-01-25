@@ -4,27 +4,37 @@ import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { Lesson } from "../../models/calendar";
 import { groupBy, mapMap } from "../../util";
-import { useCalendar } from "../../zustand/zustand";
+import { useClassrooms } from "../../zustand/zustand";
+import type { ClassroomId } from "../../models/classroom";
 
-export function CreateScheduleWidget() {
-	const calendar = useCalendar((s) => s.data);
+export function CreateScheduleWidget({
+	classroomId,
+}: {
+	classroomId?: ClassroomId;
+}) {
+	const classrooms = useClassrooms((s) => s.data);
 	const [page, setPage] = useState(new Date());
+
+	const calendar = classrooms.find((c) => c.id === classroomId)?.calendar;
+	if (!calendar || !classroomId) {
+		return;
+	}
 
 	const grouped = groupBy(
 		calendar?.lessons ?? [],
-		(i) => i.occurances.at(0)?.getDay() ?? Number.MIN_SAFE_INTEGER
+		(i) => i.occurances.at(0)?.getDay() ?? Number.MIN_SAFE_INTEGER,
 	);
 
 	return CalendarSkeleton(
 		mapMap(grouped, (k, i) => CalendarDay(i, k, page)),
 		page,
-		setPage
+		setPage,
 	);
 }
 function CalendarSkeleton(
 	children: ReactNode[],
 	currentPage: Date,
-	setPage: (date: Date) => void
+	setPage: (date: Date) => void,
 ) {
 	const { t } = useTranslation();
 

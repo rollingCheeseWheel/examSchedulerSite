@@ -1,5 +1,8 @@
 import { useCallback, useState } from "react";
 import type { Result } from "../models/result";
+import type { AxiosRequestConfig } from "axios";
+import { api } from "../main";
+import axios from "axios";
 
 export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 	const [data, setData] = useState<Result<TResponse>>();
@@ -16,7 +19,7 @@ export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 	const post = useCallback(
 		async (
 			body: TBody,
-			options: RequestInit = {}
+			options: AxiosRequestConfig = {},
 		): Promise<Result<TResponse> | undefined> => {
 			try {
 				setLoading(true);
@@ -31,8 +34,10 @@ export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 				}
 				const formedError = new Error(
 					`Non Error value was thrown: ${
-						typeof error === "object" ? JSON.stringify(error) : error
-					}`
+						typeof error === "object" ?
+							JSON.stringify(error)
+						:	error
+					}`,
 				);
 				setError(formedError);
 				throw formedError;
@@ -40,7 +45,7 @@ export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 				setLoading(false);
 			}
 		},
-		[url]
+		[url],
 	);
 
 	return { data, error, loading, post, terminate, terminated };
@@ -48,26 +53,33 @@ export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 
 export function getPost<TResponse, TBody = unknown>(url: string | URL) {
 	return async (
-		body: TBody,
-		options: RequestInit = {}
+		body: TBody | null | undefined = undefined,
+		options: AxiosRequestConfig = {},
 	): Promise<Result<TResponse>> => {
-		const res = await fetch(url, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				...(options.headers ?? {}),
+		const res = await api.post<Result<TResponse>>(
+			url.toString(),
+			body ?? undefined,
+			{
+				headers: {
+					"Content-Type": "application/json",
+					...options.headers,
+				},
+				transformResponse: [
+					...(axios.defaults.transformResponse as []),
+					(data: string) => {
+						JSON.parse(data, dateTimeReviver) as Result<TResponse>;
+					},
+				],
+				...options,
 			},
-			body: JSON.stringify(body),
-			...options,
-		});
+		);
 
-		if (!res.ok) {
-			const text = await res.text().catch(() => res.statusText);
-			throw new Error(text || res.statusText || `HTTP ${res.status}`);
+		const json = res.data;
+
+		if (!json.success) {
+			throw new Error(json.errors?.join(" | "));
 		}
 
-		const text = await res.text();
-		const json = JSON.parse(text, dateTimeReviver) as Result<TResponse>;
 		return json;
 	};
 }

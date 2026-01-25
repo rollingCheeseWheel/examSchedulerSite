@@ -11,14 +11,14 @@ import {
 	CheckIcon,
 	Kbd,
 	Grid,
-	Container,
 } from "@mantine/core";
-import type { Schedule, ExamSlot } from "../../models/schedule";
+import type { Schedule, ExamSlot, ExamSlotId } from "../../models/schedule";
 import { ScheduleProgress } from "../ExtendedProgessbar";
 import { useState } from "react";
 import type { UserProfile } from "../../models/user";
-import { formatDateTime } from "../../util";
+import { formatDateTime, sort } from "../../util";
 import { useTranslation } from "react-i18next";
+import { useUserProfile } from "../../zustand/zustand";
 
 export interface ExamScheduleProps extends Schedule {
 	maxwidth?: StyleProp<string | number>;
@@ -26,22 +26,31 @@ export interface ExamScheduleProps extends Schedule {
 }
 
 export function ExamSchedule(props: ExamScheduleProps) {
-	const [checked, setChecked] = useState<string>(props.selectedSlotId);
+	const userId = useUserProfile((s) => s.instance)?.id;
 
-	function handleCheck(newId: string) {
+	const selectedSlotId = props.examSlots
+		.sort(sort((s) => s.date))
+		.find(
+			(s) =>
+				s.actuallyParticipated.find((a) => a.id == userId) ||
+				s.participants.find((p) => p.id == userId),
+		)?.id;
+
+	const [checked, setChecked] = useState<ExamSlotId>(selectedSlotId ?? "");
+	function handleCheck(newId: ExamSlotId) {
 		setChecked(newId);
 	}
 
 	return (
 		<Paper maw={props.maxwidth} withBorder p="md" radius="md">
 			<Flex align="flex-end">
-				<Title order={2}>{props.subject.name}</Title>
+				<Title order={2}>{props.subjectName}</Title>
 				<Space w="md" />
 				<Text>{props.description}</Text>
 			</Flex>
 			<Stack align="stretch" justify="flex-start" gap="xs">
 				{...props.examSlots.map((s) =>
-					ScheduleDate(s, props, handleCheck, checked)
+					ScheduleDate(s, props, handleCheck, checked),
 				)}
 			</Stack>
 		</Paper>
@@ -51,8 +60,8 @@ export function ExamSchedule(props: ExamScheduleProps) {
 function ScheduleDate(
 	props: ExamSlot,
 	scheduleProps: ExamScheduleProps,
-	setChecked: (checkedId: string) => void,
-	checkedId: string
+	setChecked: (checkedId: ExamSlotId) => void,
+	checkedId: ExamSlotId,
 ) {
 	const { i18n } = useTranslation();
 
@@ -81,7 +90,7 @@ function ScheduleDate(
 				/>
 				<Group gap="xs">
 					{...props.participants.map((p) =>
-						ScheduleParticipant(p, !scheduleProps.teacher)
+						ScheduleParticipant(p, !scheduleProps.teacher),
 					)}
 				</Group>
 			</Flex>
@@ -93,22 +102,14 @@ function ScheduleParticipant(user: UserProfile, enableSwap: boolean) {
 	function handleClick() {
 		if (!enableSwap) return;
 	}
-
-	let name = "";
-	if (user.firstName && user.lastName) {
-		name = user.firstName + " " + user.lastName;
-	} else {
-		name = user.lastName ?? user.firstName ?? user.id;
-	}
-
-	return <Kbd onClick={handleClick}>{name}</Kbd>;
+	return <Kbd onClick={handleClick}>{user.name}</Kbd>;
 }
 
 interface ScheduleRadioProps {
 	scheduleSlot: ExamSlot;
 	schedule: Schedule;
-	setChecked: (id: string) => void;
-	checkedId: string;
+	setChecked: (id: ExamSlotId) => void;
+	checkedId: ExamSlotId;
 	enabled?: boolean;
 }
 

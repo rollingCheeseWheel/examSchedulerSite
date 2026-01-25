@@ -16,11 +16,11 @@ export interface Schedule {
 	endDate: Date;
 	autoLockIn: AutoLockIn;
 	lockInOffset: TimeSpan;
-	description: string;
 	subjectName: string;
 	examSlots: ExamSlot[];
 	auditLogs: AuditLog[];
 	swapRequests: SwapRequest[];
+	description?: string;
 }
 
 export interface ExamSlot {
