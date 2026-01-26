@@ -28,13 +28,12 @@ export interface ExamScheduleProps extends Schedule {
 export function ExamSchedule(props: ExamScheduleProps) {
 	const userId = useUserProfile((s) => s.instance)?.id;
 
-	const selectedSlotId = props.examSlots
-		.sort(sort((s) => s.date))
-		.find(
-			(s) =>
-				s.actuallyParticipated.find((a) => a.id == userId) ||
-				s.participants.find((p) => p.id == userId),
-		)?.id;
+	const selectedSlotId =
+		props.examSlots.find((s) =>
+			s.actuallyParticipated.find((p) => p.id == userId),
+		)?.id ??
+		props.examSlots.find((s) => s.participants.find((p) => p.id == userId))
+			?.id;
 
 	const [checked, setChecked] = useState<ExamSlotId>(selectedSlotId ?? "");
 	function handleCheck(newId: ExamSlotId) {
