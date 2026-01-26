@@ -1,34 +1,114 @@
 import { useCallback, useEffect, useRef } from "react";
-import { HubConnectionBuilder } from "@microsoft/signalr";
-import { useSignalRConnection } from "../zustand/zustand";
+import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
+import { useScheduleHubConnection } from "../zustand/zustand";
 import { endpoints } from "../endpoints";
+import type {
+	ExamSlotId,
+	Schedule,
+	ScheduleCreateRequest,
+	ScheduleId,
+} from "../models/schedule";
+import type { Result } from "../models/result";
+import type { UserProfile, UserProfileId } from "../models/user";
+import type { SwapRequestId } from "../models/swapRequest";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Handlers = Record<string, (...args: any[]) => void>;
+export interface ScheduleClient {
+	ReceiveInitial: (schedules: Schedule[]) => void;
+	UpdateSchedule: (scheduleId: ScheduleId, schedule: Schedule) => void;
+}
+
+export interface ScheduleHub {
+	RegisterForSlot: (
+		slotId: ExamSlotId,
+	) => Promise<Result<boolean>> | undefined;
+
+	CreateSwapRequest: (
+		scheduleId: ScheduleId,
+		userId: UserProfileId,
+	) => Promise<Result<boolean>> | undefined;
+	AcceptSwapRequest: (
+		swaprequestId: SwapRequestId,
+	) => Promise<Result<boolean>> | undefined;
+	DeleteSwapRequest: (
+		swaprequestId: SwapRequestId,
+	) => Promise<Result<boolean>> | undefined;
+
+	CreateSchedule: (
+		request: ScheduleCreateRequest,
+	) => Promise<Result<boolean>> | undefined;
+	ReportStudents: (
+		slotId: ExamSlotId,
+		actualParticipants: UserProfile[],
+	) => Promise<Result<boolean>> | undefined;
+}
 
 export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 	const { instance: connection, setData: setConnection } =
-		useSignalRConnection();
-	const handlersRef = useRef<Handlers>({});
+		useScheduleHubConnection();
+	const handlersRef = useRef<ScheduleClient>(undefined);
+	const connectionRef = useRef<HubConnection>(undefined);
 
 	const init = useCallback(
-		async (handlers: Handlers) => {
+		async (handlers: ScheduleClient) => {
 			let conn = connection;
 
 			if (!connection) {
-				conn = createConnection(hubUrl);
-				await conn.start();
+				connectionRef.current = createConnection(hubUrl);
+				await connectionRef.current.start();
+				conn = {
+					AcceptSwapRequest(swaprequestId) {
+						return connectionRef.current?.invoke(
+							"AcceptSwapRequest",
+							swaprequestId,
+						);
+					},
+					CreateSchedule(request) {
+						return connectionRef.current?.invoke(
+							"CreateSchedule",
+							request,
+						);
+					},
+					CreateSwapRequest(scheduleId, userId) {
+						return connectionRef.current?.invoke(
+							"CreateSwapRequest",
+							scheduleId,
+							userId,
+						);
+					},
+					DeleteSwapRequest(swaprequestId) {
+						return connectionRef.current?.invoke(
+							"DeleteSwapRequest",
+							swaprequestId,
+						);
+					},
+					RegisterForSlot(slotId) {
+						return connectionRef.current?.invoke(
+							"RegisterForSlot",
+							slotId,
+						);
+					},
+					ReportStudents(slotId, actualParticipants) {
+						return connectionRef.current?.invoke(
+							"ReportStudents",
+							slotId,
+							actualParticipants,
+						);
+					},
+				};
+
 				setConnection(conn);
 			}
 
-			Object.entries(handlersRef.current).forEach(
-				([eventName, handler]) => {
-					conn?.off(eventName, handler);
-				},
-			);
+			if (handlersRef.current) {
+				Object.entries(handlersRef.current).forEach(
+					([eventName, handler]) => {
+						connectionRef.current?.off(eventName, handler);
+					},
+				);
+			}
 
 			Object.entries(handlers).forEach(([eventName, handler]) => {
-				conn?.on(eventName, handler);
+				connectionRef.current?.on(eventName, handler);
 			});
 
 			handlersRef.current = handlers;
@@ -38,13 +118,13 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 
 	useEffect(() => {
 		return () => {
-			if (!connection) return;
+			if (!connection || !handlersRef.current) return;
 			Object.entries(handlersRef.current).forEach(
 				([eventName, handler]) => {
-					connection.off(eventName, handler);
+					connectionRef.current?.off(eventName, handler);
 				},
 			);
-			handlersRef.current = {};
+			handlersRef.current = undefined;
 		};
 	}, [connection]);
 

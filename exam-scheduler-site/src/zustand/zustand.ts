@@ -4,6 +4,7 @@ import type { Schedule } from "../models/schedule";
 import type { UserProfile } from "../models/user";
 import type { Classroom } from "../models/classroom";
 import { HubConnection } from "@microsoft/signalr";
+import type { ScheduleHub } from "../hooks/userSignalR";
 
 interface DisclosureStore {
 	state: boolean;
@@ -101,4 +102,4 @@ export const useClassrooms = createListStore<Classroom>();
 
 export const useUserProfile = createSingletonStore<UserProfile>();
 export const useCrossSiteError = createSingletonStore<string>();
-export const useSignalRConnection = createSingletonStore<HubConnection>();
+export const useScheduleHubConnection = createSingletonStore<ScheduleHub>();

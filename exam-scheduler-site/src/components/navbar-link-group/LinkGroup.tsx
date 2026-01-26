@@ -10,14 +10,18 @@ import {
 } from "@mantine/core";
 import classes from "./LinkGroup.module.scss";
 import { useNavigate } from "react-router-dom";
-import { useId } from "@mantine/hooks";
+
+export interface NestedLinkProp {
+	label: string;
+	link: string;
+}
 
 export interface LinkGroupProp {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	icon?: React.FC<any>;
 	label: string;
 	initiallyOpened?: boolean;
-	links?: { label: string; link: string }[];
+	links?: NestedLinkProp[];
 	defaultLink?: string;
 }
 
@@ -30,15 +34,15 @@ export function LinkGroup({
 }: LinkGroupProp) {
 	const navigate = useNavigate();
 
-	const hasLinks = !defaultLink && Array.isArray(links);
+	const hasLinks = !defaultLink && links.length !== 0;
 	const [opened, setOpened] = useState(
-		(initiallyOpened && hasLinks) || false
+		(initiallyOpened && hasLinks) || false,
 	);
 	const items = (hasLinks ? links : []).map((link) => (
 		<Text<"a">
 			component="a"
 			className={classes.link}
-			href={link.link}	
+			href={link.link}
 			onClick={(event) => {
 				event.preventDefault();
 				navigate(link.link);
@@ -51,9 +55,9 @@ export function LinkGroup({
 		<>
 			<UnstyledButton
 				onClick={
-					defaultLink
-						? () => navigate(defaultLink)
-						: () => setOpened((o) => !o)
+					defaultLink ?
+						() => navigate(defaultLink)
+					:	() => setOpened((o) => !o)
 				}
 				className={classes.control}>
 				<Group justify="space-between" gap={0}>
@@ -75,7 +79,9 @@ export function LinkGroup({
 					)}
 				</Group>
 			</UnstyledButton>
-			{hasLinks ? <Collapse in={opened}>{items}</Collapse> : null}
+			{hasLinks ?
+				<Collapse in={opened}>{items}</Collapse>
+			:	null}
 		</>
 	);
 }

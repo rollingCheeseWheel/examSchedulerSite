@@ -89,7 +89,7 @@ createRoot(document.getElementById("root")!).render(
 					<Route
 						path="*"
 						element={
-							<DefaultAppShell authEnabled>
+							<DefaultAppShell >
 								<Route
 									path="*"
 									element={<CreateScheduleWidget/>}></Route>

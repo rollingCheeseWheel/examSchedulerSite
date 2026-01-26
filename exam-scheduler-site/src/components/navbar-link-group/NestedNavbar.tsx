@@ -1,8 +1,10 @@
-import { LinkGroup, type LinkGroupProp } from "./LinkGroup";
+import { useNavbarMenu } from "../../zustand/zustand";
+import { LinkGroup } from "./LinkGroup";
 import classes from "./NestedNavbar.module.css";
 import { ScrollArea } from "@mantine/core";
 
-export function NestedNavbar({ data }: { data?: LinkGroupProp[] }) {
+export function NestedNavbar() {
+	const data = useNavbarMenu(s => s.data);
 	const links = (data ?? []).map((item) => (
 		<LinkGroup {...item} key={item.label} />
 	));
