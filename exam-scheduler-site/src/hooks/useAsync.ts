@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useLatch } from "./useLatch";
 
-export function useAsync<TArgs extends readonly unknown[], TResult>(
+export function useAsync<TArgs extends readonly never[], TResult>(
 	fun: (...args: TArgs) => Promise<TResult>,
 	args: TArgs,
-	dependencies: readonly unknown[] = [],
+	dependencies: readonly never[] = [],
 	instantFetch: boolean = false
 ) {
-	const [data, setData] = useState<TResult | null>(null);
-	const [error, setError] = useState<unknown>(null);
+	const [data, setData] = useState<TResult | null | undefined>();
+	const [error, setError] = useState<unknown>(undefined);
 	const [loading, setLoading] = useState(false);
 	const [fetch, { setLatch }] = useLatch(instantFetch);
 
@@ -17,7 +17,7 @@ export function useAsync<TArgs extends readonly unknown[], TResult>(
 
 		const run = async () => {
 			setLoading(true);
-			setError(null);
+			setError(undefined);
 
 			try {
 				const result = await fun(...args);

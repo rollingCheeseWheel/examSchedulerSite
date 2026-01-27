@@ -21,6 +21,7 @@ import {
 	IconChalkboardTeacher,
 	IconReplaceUser,
 } from "@tabler/icons-react";
+import { useIsFirstRender } from "@mantine/hooks";
 
 export interface DefaultAppShellProps {
 	children?: ReactNode;
@@ -33,87 +34,235 @@ export function DefaultAppShell({
 }: DefaultAppShellProps) {
 	useNavbarMenu((s) => s.setData)(useNavbarLinksForUser());
 
+	const setUserProfile = useUserProfile((s) => s.setData);
 	const setSchedules = useSchedules((s) => s.setData);
 
-	setSchedules([
-		{
-			id: "sadfasdf",
-			startDate: new Date("2026-01-01"),
-			endDate: new Date("2026-02-01"),
-			lockInOffset: new Date("0000-00-01"),
-			autoLockIn: AutoLockIn.FixedDate,
-			subjectName: "RK",
-			description: "handelsrecht und arbeitsrecht",
-			examSlots: [
-				{
-					id: "asdfasdf",
-					date: new Date("2026-01-01"),
-					minParticipants: 1,
-					maxParticipants: 4,
-					participants: [
-						{
-							id: "676767",
-							name: "Laurin Feichter",
-							role: UserRole.Student,
-						},
-						{
-							id: "676767",
-							name: "Laurin Feichter",
-							role: UserRole.Student,
-						},
-						{
-							id: "676767",
-							name: "Laurin Feichter",
-							role: UserRole.Student,
-						},
-						{
-							id: "676767",
-							name: "Laurin Feichter",
-							role: UserRole.Student,
-						},
-						{
-							id: "676767",
-							name: "Laurin Feichter",
-							role: UserRole.Student,
-						},
-						{
-							id: "676767",
-							name: "Laurin Feichter",
-							role: UserRole.Student,
-						},
-						{
-							id: "676767",
-							name: "Laurin Feichter",
-							role: UserRole.Student,
-						},
-						{
-							id: "676767",
-							name: "Laurin Feichter",
-							role: UserRole.Student,
-						},
-						{
-							id: "676767",
-							name: "Laurin Feichter",
-							role: UserRole.Student,
-						},
-						{
-							id: "676767",
-							name: "Laurin Feichter",
-							role: UserRole.Student,
-						},
-						{
-							id: "676767",
-							name: "Laurin Feichter",
-							role: UserRole.Student,
-						},
-					],
-					actuallyParticipated: [],
-				},
-			],
-			swapRequests: [],
-			auditLogs: [],
-		},
-	]);
+	if (useIsFirstRender()) {
+		setUserProfile({
+			id: "asfdasdfasdf",
+			name: "Laurin Feichter",
+			role: UserRole.Student,
+		});
+
+		setSchedules([
+			{
+				id: "sadfasdf",
+				startDate: new Date("2026-01-01"),
+				endDate: new Date("2026-02-01"),
+				lockInOffset: new Date("0000-00-01"),
+				autoLockIn: AutoLockIn.FixedDate,
+				subjectName: "RK",
+				description: "handelsrecht und arbeitsrecht",
+				examSlots: [
+					{
+						id: "asdfasdfasdf",
+						date: new Date("2026-01-01"),
+						minParticipants: 1,
+						maxParticipants: 56,
+						participants: [
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+						],
+						actuallyParticipated: [],
+					},
+					{
+						id: "sdfghdfghdfgh",
+						date: new Date("2026-01-02"),
+						minParticipants: 1,
+						maxParticipants: 4,
+						participants: [
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+						],
+						actuallyParticipated: [],
+					},
+					{
+						id: "QWAERASDFF",
+						date: new Date("2026-01-03"),
+						minParticipants: 1,
+						maxParticipants: 4,
+						participants: [
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Laurin Feichter",
+								role: UserRole.Student,
+							},
+						],
+						actuallyParticipated: [
+							{
+								id: "676767",
+								name: "Fabian Zingerle",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Fabian Zingerle",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Fabian Zingerle",
+								role: UserRole.Student,
+							},
+							{
+								id: "676767",
+								name: "Fabian Zingerle",
+								role: UserRole.Student,
+							},
+						],
+					},
+				],
+				swapRequests: [],
+				auditLogs: [],
+			},
+		]);
+	}
 
 	return (
 		<AppShellSpine navbar={<NestedNavbar />} opened>

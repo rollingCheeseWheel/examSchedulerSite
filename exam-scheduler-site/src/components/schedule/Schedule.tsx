@@ -12,14 +12,15 @@ import {
 	Kbd,
 	Grid,
 	ThemeIcon,
+	Button,
 } from "@mantine/core";
 import type { Schedule, ExamSlot, ExamSlotId } from "../../models/schedule";
 import { ScheduleProgress } from "../ExtendedProgessbar";
 import { useState } from "react";
-import type { UserProfile } from "../../models/user";
+import type { UserProfile, UserProfileId } from "../../models/user";
 import { formatDateTime } from "../../util";
 import { useTranslation } from "react-i18next";
-import { IconTransfer } from "@tabler/icons-react";
+import { IconSettingsCheck, IconTransfer } from "@tabler/icons-react";
 
 export interface ExamScheduleProps extends Schedule {
 	maxwidth?: StyleProp<string | number>;
@@ -38,11 +39,10 @@ export function ExamSchedule(props: ExamScheduleProps) {
 
 	return (
 		<Paper maw={props.maxwidth} withBorder p="md" radius="md">
-			<Flex align="flex-end">
+			<Group justify="space-between">
 				<Title order={2}>{props.subjectName}</Title>
-				<Space w="md" />
 				<Text>{props.description}</Text>
-			</Flex>
+			</Group>
 			<Stack align="stretch" justify="flex-start" gap="xs">
 				{...props.examSlots.map((s) =>
 					ScheduleDate(s, props, handleCheck, checked),
@@ -61,21 +61,38 @@ function ScheduleDate(
 	const { i18n } = useTranslation();
 
 	return (
-		<div>
+		<>
 			<Grid>
 				<Grid.Col span="content">
 					<Text>{formatDateTime(props.date, i18n.language)}</Text>
 				</Grid.Col>
 				<Grid.Col span="auto">
 					<ScheduleProgress
-						participants={props.participants.length}
+						participants={
+							props.actuallyParticipated.length ||
+							props.participants.length
+						}
 						min={props.minParticipants}
 						max={props.maxParticipants}
 						size="xl"
 					/>
 				</Grid.Col>
 			</Grid>
-			<Flex justify="space-between" direction="row-reverse">
+			<Flex justify="space-between" /* direction="row-reverse" */>
+				<Group gap="xs">
+					{...(props.actuallyParticipated.length ?
+						props.actuallyParticipated
+					:	props.participants
+					).map((p) =>
+						ScheduleParticipant(p, !scheduleProps.teacher),
+					)}
+				</Group>
+				{/* <RegisterForSlotButton
+					scheduleSlot={props}
+					setChecked={setChecked}
+					currentSelectedId={checkedId}
+				/> */}
+
 				<ScheduleRadio
 					enabled={!scheduleProps.teacher}
 					schedule={scheduleProps}
@@ -83,13 +100,8 @@ function ScheduleDate(
 					setChecked={setChecked}
 					checkedId={checkedId}
 				/>
-				<Group gap="xs">
-					{...props.participants.map((p) =>
-						ScheduleParticipant(p, !scheduleProps.teacher),
-					)}
-				</Group>
 			</Flex>
-		</div>
+		</>
 	);
 }
 
@@ -97,7 +109,15 @@ function ScheduleParticipant(user: UserProfile, enableSwap: boolean) {
 	function handleClick() {
 		if (!enableSwap) return;
 	}
-	return <Kbd onClick={handleClick}>{user.name}</Kbd>;
+	return (
+		<Button
+			component={Kbd}
+			variant="default"
+			size="compact-md"
+			onClick={handleClick}>
+			{user.name}
+		</Button>
+	);
 }
 
 interface ScheduleRadioProps {
@@ -125,4 +145,35 @@ function ScheduleRadio({
 			/>
 		)
 	);
+}
+
+function RegisterForSlotButton(props: {
+	scheduleSlot: ExamSlot;
+	setChecked: (examSlotId: ExamSlotId) => void;
+	showSwapOverlay: (slotId: ExamSlotId) => void;
+	currentSelectedId: ExamSlotId;
+	locked?: boolean;
+	openForSwap?: boolean;
+}) {
+	const { t } = useTranslation();
+	const thisScheduleId = props.scheduleSlot.id;
+
+	const selected =
+		thisScheduleId === props.currentSelectedId || !!props.locked;
+
+	if (!selected && props.openForSwap) {
+		return (
+			<Button onClick={() => props.showSwapOverlay(thisScheduleId)}>
+				{t("schedule.register.swap")}
+			</Button>
+		);
+	} else if (selected) {
+		return <Button disabled>{t("schedule.register.selected")}</Button>;
+	} else {
+		return (
+			<Button onClick={() => props.setChecked(thisScheduleId)}>
+				{t("schedule.register.unselected")}
+			</Button>
+		);
+	}
 }

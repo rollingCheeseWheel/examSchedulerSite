@@ -24,7 +24,7 @@ export interface ScheduleHub {
 
 	CreateSwapRequest: (
 		scheduleId: ScheduleId,
-		userId: UserProfileId,
+		examSlotId: ExamSlotId,
 	) => Promise<Result<boolean>> | undefined;
 	AcceptSwapRequest: (
 		swaprequestId: SwapRequestId,
@@ -57,38 +57,38 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 				await connectionRef.current.start();
 				conn = {
 					AcceptSwapRequest(swaprequestId) {
-						return connectionRef.current?.invoke(
+						return connectionRef.current?.invoke<Result<boolean>>(
 							"AcceptSwapRequest",
 							swaprequestId,
 						);
 					},
 					CreateSchedule(request) {
-						return connectionRef.current?.invoke(
+						return connectionRef.current?.invoke<Result<boolean>>(
 							"CreateSchedule",
 							request,
 						);
 					},
 					CreateSwapRequest(scheduleId, userId) {
-						return connectionRef.current?.invoke(
+						return connectionRef.current?.invoke<Result<boolean>>(
 							"CreateSwapRequest",
 							scheduleId,
 							userId,
 						);
 					},
 					DeleteSwapRequest(swaprequestId) {
-						return connectionRef.current?.invoke(
+						return connectionRef.current?.invoke<Result<boolean>>(
 							"DeleteSwapRequest",
 							swaprequestId,
 						);
 					},
 					RegisterForSlot(slotId) {
-						return connectionRef.current?.invoke(
+						return connectionRef.current?.invoke<Result<boolean>>(
 							"RegisterForSlot",
 							slotId,
 						);
 					},
 					ReportStudents(slotId, actualParticipants) {
-						return connectionRef.current?.invoke(
+						return connectionRef.current?.invoke<Result<boolean>>(
 							"ReportStudents",
 							slotId,
 							actualParticipants,

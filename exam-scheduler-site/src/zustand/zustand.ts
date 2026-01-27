@@ -3,7 +3,6 @@ import type { LinkGroupProp } from "../components/navbar-link-group/LinkGroup";
 import type { Schedule } from "../models/schedule";
 import type { UserProfile } from "../models/user";
 import type { Classroom } from "../models/classroom";
-import { HubConnection } from "@microsoft/signalr";
 import type { ScheduleHub } from "../hooks/userSignalR";
 
 interface DisclosureStore {

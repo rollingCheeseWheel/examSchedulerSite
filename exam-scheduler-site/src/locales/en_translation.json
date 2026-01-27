@@ -5,6 +5,11 @@
             "select": "Select your school"
         }
     },
+    "navbar": {
+        "createforclassroom": "",
+        "overview": "",
+        "swaprequests": ""
+    },
     "schedule": {
         "create": {
             "calendar": {
