@@ -9,10 +9,11 @@ import { NestedNavbar } from "../navbar-link-group/NestedNavbar";
 import {
 	useClassrooms,
 	useNavbarMenu,
+	useSchedules,
 	useUserProfile,
 } from "../../zustand/zustand";
 import { AuthCallback } from "../auth/AuthCallback";
-import { UserRole } from "../../models/enums";
+import { AutoLockIn, UserRole } from "../../models/enums";
 import { useTranslation } from "react-i18next";
 import { join } from "../../endpoints";
 import {
@@ -31,6 +32,88 @@ export function DefaultAppShell({
 	authEnabled,
 }: DefaultAppShellProps) {
 	useNavbarMenu((s) => s.setData)(useNavbarLinksForUser());
+
+	const setSchedules = useSchedules((s) => s.setData);
+
+	setSchedules([
+		{
+			id: "sadfasdf",
+			startDate: new Date("2026-01-01"),
+			endDate: new Date("2026-02-01"),
+			lockInOffset: new Date("0000-00-01"),
+			autoLockIn: AutoLockIn.FixedDate,
+			subjectName: "RK",
+			description: "handelsrecht und arbeitsrecht",
+			examSlots: [
+				{
+					id: "asdfasdf",
+					date: new Date("2026-01-01"),
+					minParticipants: 1,
+					maxParticipants: 4,
+					participants: [
+						{
+							id: "676767",
+							name: "Laurin Feichter",
+							role: UserRole.Student,
+						},
+						{
+							id: "676767",
+							name: "Laurin Feichter",
+							role: UserRole.Student,
+						},
+						{
+							id: "676767",
+							name: "Laurin Feichter",
+							role: UserRole.Student,
+						},
+						{
+							id: "676767",
+							name: "Laurin Feichter",
+							role: UserRole.Student,
+						},
+						{
+							id: "676767",
+							name: "Laurin Feichter",
+							role: UserRole.Student,
+						},
+						{
+							id: "676767",
+							name: "Laurin Feichter",
+							role: UserRole.Student,
+						},
+						{
+							id: "676767",
+							name: "Laurin Feichter",
+							role: UserRole.Student,
+						},
+						{
+							id: "676767",
+							name: "Laurin Feichter",
+							role: UserRole.Student,
+						},
+						{
+							id: "676767",
+							name: "Laurin Feichter",
+							role: UserRole.Student,
+						},
+						{
+							id: "676767",
+							name: "Laurin Feichter",
+							role: UserRole.Student,
+						},
+						{
+							id: "676767",
+							name: "Laurin Feichter",
+							role: UserRole.Student,
+						},
+					],
+					actuallyParticipated: [],
+				},
+			],
+			swapRequests: [],
+			auditLogs: [],
+		},
+	]);
 
 	return (
 		<AppShellSpine navbar={<NestedNavbar />} opened>
@@ -84,6 +167,11 @@ function useNavbarLinksForUser(): LinkGroupProp[] {
 				// 	icon: IconCalendarClock,
 				// },
 				// {
+				// 	label: t("navbar.swaprequests"),
+				// 	defaultLink: "/swaprequests",
+				// 	icon: IconReplaceUser,
+				// },
+				// {
 				// 	label: t("navbar.createforclassroom"),
 				// 	links: classrooms.map<NestedLinkProp>((c) => ({
 				// 		label: c.name,
@@ -91,11 +179,6 @@ function useNavbarLinksForUser(): LinkGroupProp[] {
 				// 	})),
 				// 	initiallyOpened: true,
 				// 	icon: IconChalkboardTeacher,
-				// },
-				// {
-				// 	label: t("navbar.swaprequests"),
-				// 	defaultLink: "/swaprequests",
-				// 	icon: IconReplaceUser,
 				// },
 			];
 	}

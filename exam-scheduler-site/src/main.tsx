@@ -32,6 +32,7 @@ import german from "./locales/de_translation.json";
 import { CreateScheduleWidget } from "./components/schedule-create/CreateScheduleWidget";
 import axios from "axios";
 import { refreshSession } from "./components/auth/refreshSession";
+import { ScheduleWidget } from "./components/schedule/ScheduleWidget";
 
 export const api = axios.create({
 	withCredentials: true,
@@ -79,20 +80,22 @@ createRoot(document.getElementById("root")!).render(
 									style={{
 										height: "80dvh",
 										overflow: "hidden",
-									}}>
+									}}
+								>
 									<AuthWidget />
 								</Center>
 							</AppShellSpine>
 						}
 					/>
-
 					<Route
 						path="*"
 						element={
-							<DefaultAppShell >
+							<DefaultAppShell>
+								<Route path="/" element={<ScheduleWidget maxwidth="600px" />} />
 								<Route
-									path="*"
-									element={<CreateScheduleWidget/>}></Route>
+									path="create"
+									element={<CreateScheduleWidget />}
+								/>
 							</DefaultAppShell>
 						}
 					/>

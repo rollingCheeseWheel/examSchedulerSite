@@ -116,6 +116,10 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 		[hubUrl, connection, setConnection],
 	);
 
+    const rejoin = () => {
+        connectionRef.current?.start()
+    }
+
 	useEffect(() => {
 		return () => {
 			if (!connection || !handlersRef.current) return;
@@ -128,7 +132,7 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 		};
 	}, [connection]);
 
-	return init;
+	return {init,rejoin};
 }
 
 export function createConnection(hubUrl: string) {

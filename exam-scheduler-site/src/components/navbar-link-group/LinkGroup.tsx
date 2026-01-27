@@ -63,7 +63,7 @@ export function LinkGroup({
 				<Group justify="space-between" gap={0}>
 					<Box style={{ display: "flex", alignItems: "center" }}>
 						<ThemeIcon variant="light" size={30}>
-							{Icon && <Icon size={18} />}
+							{Icon && <Icon size={26} />}
 						</ThemeIcon>
 						<Box ml="md">{label}</Box>
 					</Box>

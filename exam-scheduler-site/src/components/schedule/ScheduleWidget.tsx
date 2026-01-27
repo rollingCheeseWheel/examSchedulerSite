@@ -10,12 +10,13 @@ interface ScheduleWidgetProps {
 }
 
 export function ScheduleWidget(props: ScheduleWidgetProps) {
-	const {instance: userProfile, hasChanged: hasAuthenticated} = useUserProfile()
+	const { instance: userProfile, hasChanged: hasAuthenticated } =
+		useUserProfile();
 	const { data: schedules, setData: setSchedules } = useSchedules();
-	const initHub = useScheduleHubInit();
+	const { init } = useScheduleHubInit();
 
 	if (useIsFirstRender() && hasAuthenticated) {
-		initHub({
+		init({
 			ReceiveInitial(schedules) {
 				setSchedules(schedules);
 			},
@@ -30,9 +31,24 @@ export function ScheduleWidget(props: ScheduleWidgetProps) {
 
 	return (
 		<Grid grow>
-			{...schedules.map((s) => (
+			{...schedules.map((schedule) => (
 				<ExamSchedule
-					{...{ ...s, teacher: userProfile?.role === UserRole.Teacher, maxwidth: props.maxwidth }}
+					{...{
+						...schedule,
+						teacher: userProfile?.role === UserRole.Teacher,
+						maxwidth: props.maxwidth,
+						selectedSlotId:
+							schedule.examSlots.find((slot) =>
+								slot.actuallyParticipated.find(
+									(p) => p.id === userProfile?.id,
+								),
+							)?.id ??
+							schedule.examSlots.find((slot) =>
+								slot.participants.find(
+									(p) => p.id === userProfile?.id,
+								),
+							)?.id,
+					}}
 				/>
 			))}
 		</Grid>

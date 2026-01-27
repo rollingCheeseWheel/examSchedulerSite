@@ -11,31 +11,27 @@ import {
 	CheckIcon,
 	Kbd,
 	Grid,
+	ThemeIcon,
 } from "@mantine/core";
 import type { Schedule, ExamSlot, ExamSlotId } from "../../models/schedule";
 import { ScheduleProgress } from "../ExtendedProgessbar";
 import { useState } from "react";
 import type { UserProfile } from "../../models/user";
-import { formatDateTime, sort } from "../../util";
+import { formatDateTime } from "../../util";
 import { useTranslation } from "react-i18next";
-import { useUserProfile } from "../../zustand/zustand";
+import { IconTransfer } from "@tabler/icons-react";
 
 export interface ExamScheduleProps extends Schedule {
 	maxwidth?: StyleProp<string | number>;
 	teacher?: boolean;
+	selectedSlotId?: ExamSlotId;
 }
 
 export function ExamSchedule(props: ExamScheduleProps) {
-	const userId = useUserProfile((s) => s.instance)?.id;
+	const [checked, setChecked] = useState<ExamSlotId>(
+		props.selectedSlotId ?? "",
+	);
 
-	const selectedSlotId =
-		props.examSlots.find((s) =>
-			s.actuallyParticipated.find((p) => p.id == userId),
-		)?.id ??
-		props.examSlots.find((s) => s.participants.find((p) => p.id == userId))
-			?.id;
-
-	const [checked, setChecked] = useState<ExamSlotId>(selectedSlotId ?? "");
 	function handleCheck(newId: ExamSlotId) {
 		setChecked(newId);
 	}
