@@ -16,12 +16,11 @@ export interface Lesson {
 	toHour: number;
 	lessonName: string;
 	teachers: Teacher[];
-	subjectName: string;
+	subject: Subject;
 }
 
 export interface Teacher {
-	firstName: string;
-	lastName: string;
+	name: string;
 }
 
 export interface Subject {

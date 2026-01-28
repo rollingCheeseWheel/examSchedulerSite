@@ -4,8 +4,10 @@ import type { AuditLogActor } from "./enums";
 export interface AuditLog {
 	timestamp: Date;
 	action: string;
-	actorId: Guid;
 	actorType: AuditLogActor;
-	actorName?: string;
+	firstActorId: Guid;
+	secondActorId: Guid;
+	firstActorName?: string;
+	secondActorName?: string;
 	description?: string;
 }

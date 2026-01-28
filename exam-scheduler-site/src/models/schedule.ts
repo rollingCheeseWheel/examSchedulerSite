@@ -1,6 +1,7 @@
 import type { TimeSpan } from "../util";
 import type { AuditLog } from "./auditLog";
 import type { BrandedId } from "./brand";
+import type { Subject, Teacher } from "./calendar";
 import type { ClassroomId } from "./classroom";
 import type { AutoLockIn, SlotFillingBehaviour } from "./enums";
 import type { SwapRequest } from "./swapRequest";
@@ -15,11 +16,12 @@ export interface Schedule {
 	endDate: Date;
 	autoLockIn: AutoLockIn;
 	lockInOffset: TimeSpan;
-	subjectName: string;
+	description?: string;
+	subject: Subject;
+	teachers: Teacher[];
 	examSlots: ExamSlot[];
 	auditLogs: AuditLog[];
 	swapRequests: SwapRequest[];
-	description?: string;
 }
 
 export interface ExamSlot {
@@ -28,6 +30,7 @@ export interface ExamSlot {
 	participants: UserProfile[];
 	maxParticipants: number;
 	minParticipants: number;
+	isLocked: boolean;
 }
 
 export interface ScheduleCreateRequest {
