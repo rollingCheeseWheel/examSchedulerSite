@@ -1,5 +1,6 @@
+import type { TimeSpan } from "../util";
 import type { AuditLog } from "./auditLog";
-import type { Brand, BrandedId } from "./brand";
+import type { BrandedId } from "./brand";
 import type { ClassroomId } from "./classroom";
 import type { AutoLockIn, SlotFillingBehaviour } from "./enums";
 import type { SwapRequest } from "./swapRequest";
@@ -7,8 +8,6 @@ import type { UserProfile } from "./user";
 
 export type ScheduleId = BrandedId<"schedule">;
 export type ExamSlotId = BrandedId<"examslot">;
-
-export type TimeSpan = Brand<Date, "timespan">;
 
 export interface Schedule {
 	id: ScheduleId;
@@ -27,7 +26,6 @@ export interface ExamSlot {
 	id: ExamSlotId;
 	date: Date;
 	participants: UserProfile[];
-	actuallyParticipated: UserProfile[];
 	maxParticipants: number;
 	minParticipants: number;
 }

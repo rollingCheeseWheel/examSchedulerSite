@@ -37,17 +37,11 @@ export function ScheduleWidget(props: ScheduleWidgetProps) {
 						...schedule,
 						teacher: userProfile?.role === UserRole.Teacher,
 						maxwidth: props.maxwidth,
-						selectedSlotId:
-							schedule.examSlots.find((slot) =>
-								slot.actuallyParticipated.find(
-									(p) => p.id === userProfile?.id,
-								),
-							)?.id ??
-							schedule.examSlots.find((slot) =>
-								slot.participants.find(
-									(p) => p.id === userProfile?.id,
-								),
-							)?.id,
+						selectedSlotId: schedule.examSlots.find((slot) =>
+							slot.participants.find(
+								(p) => p.id === userProfile?.id,
+							),
+						)?.id,
 					}}
 				/>
 			))}

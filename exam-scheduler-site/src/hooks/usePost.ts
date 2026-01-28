@@ -3,6 +3,7 @@ import type { Result } from "../models/result";
 import type { AxiosRequestConfig } from "axios";
 import { api } from "../main";
 import axios from "axios";
+import { TimeSpan } from "../util";
 
 export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 	const [data, setData] = useState<Result<TResponse>>();
@@ -34,9 +35,9 @@ export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 				}
 				const formedError = new Error(
 					`Non Error value was thrown: ${
-						typeof error === "object" ?
-							JSON.stringify(error)
-						:	error
+						typeof error === "object"
+							? JSON.stringify(error)
+							: error
 					}`,
 				);
 				setError(formedError);
@@ -67,7 +68,7 @@ export function getPost<TResponse, TBody = unknown>(url: string | URL) {
 				transformResponse: [
 					...(axios.defaults.transformResponse as []),
 					(data: string) => {
-						JSON.parse(data, dateTimeReviver) as Result<TResponse>;
+						JSON.parse(data, jsonReviver) as Result<TResponse>;
 					},
 				],
 				...options,
@@ -84,12 +85,36 @@ export function getPost<TResponse, TBody = unknown>(url: string | URL) {
 	};
 }
 
-export function dateTimeReviver(_: string, value: unknown) {
+export const jsonReviver = reviverCombiner(dateReviver, timeSpanReviver);
+
+export function reviverCombiner(
+	...revivers: ((key: string, value: unknown) => unknown)[]
+) {
+	function combinedReviver(key: string, value: unknown) {
+		for (const reviver of revivers) {
+			try {
+				return reviver(key, value);
+			} catch {}
+		}
+		return value;
+	}
+
+	return combinedReviver;
+}
+
+export function dateReviver(_: string, value: unknown) {
 	if (typeof value === "string") {
 		const d = new Date(value);
 		if (!isNaN(d.getTime()) && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
 			return d;
 		}
 	}
-	return value;
+	throw new Error();
+}
+
+export function timeSpanReviver(_: string, value: unknown) {
+	if (typeof value === "string") {
+		return TimeSpan.parse(value);
+	}
+	throw new Error();
 }

@@ -68,10 +68,7 @@ function ScheduleDate(
 				</Grid.Col>
 				<Grid.Col span="auto">
 					<ScheduleProgress
-						participants={
-							props.actuallyParticipated.length ||
-							props.participants.length
-						}
+						participants={props.participants.length}
 						min={props.minParticipants}
 						max={props.maxParticipants}
 						size="xl"
@@ -80,10 +77,7 @@ function ScheduleDate(
 			</Grid>
 			<Flex justify="space-between" /* direction="row-reverse" */>
 				<Group gap="xs">
-					{...(props.actuallyParticipated.length ?
-						props.actuallyParticipated
-					:	props.participants
-					).map((p) =>
+					{...props.participants.map((p) =>
 						ScheduleParticipant(p, !scheduleProps.teacher),
 					)}
 				</Group>
@@ -114,7 +108,8 @@ function ScheduleParticipant(user: UserProfile, enableSwap: boolean) {
 			component={Kbd}
 			variant="default"
 			size="compact-md"
-			onClick={handleClick}>
+			onClick={handleClick}
+		>
 			{user.name}
 		</Button>
 	);

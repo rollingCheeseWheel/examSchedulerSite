@@ -9,7 +9,7 @@ export default {
 	},
 	keySeparator: ".",
 	namespaceSeparator: false,
-	defaultValue: "",
+	defaultValue: "MISSING",
 	defaultNamespace: "translation",
 	createOldCatalogs: true,
 	sort: true,

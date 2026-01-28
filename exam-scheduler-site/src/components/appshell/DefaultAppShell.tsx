@@ -106,7 +106,6 @@ export function DefaultAppShell({
 								role: UserRole.Student,
 							},
 						],
-						actuallyParticipated: [],
 					},
 					{
 						id: "sdfghdfghdfgh",
@@ -170,7 +169,6 @@ export function DefaultAppShell({
 								role: UserRole.Student,
 							},
 						],
-						actuallyParticipated: [],
 					},
 					{
 						id: "QWAERASDFF",
@@ -231,28 +229,6 @@ export function DefaultAppShell({
 							{
 								id: "676767",
 								name: "Laurin Feichter",
-								role: UserRole.Student,
-							},
-						],
-						actuallyParticipated: [
-							{
-								id: "676767",
-								name: "Fabian Zingerle",
-								role: UserRole.Student,
-							},
-							{
-								id: "676767",
-								name: "Fabian Zingerle",
-								role: UserRole.Student,
-							},
-							{
-								id: "676767",
-								name: "Fabian Zingerle",
-								role: UserRole.Student,
-							},
-							{
-								id: "676767",
-								name: "Fabian Zingerle",
 								role: UserRole.Student,
 							},
 						],
