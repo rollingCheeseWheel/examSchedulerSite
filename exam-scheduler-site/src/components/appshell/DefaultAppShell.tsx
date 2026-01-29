@@ -39,7 +39,7 @@ export function DefaultAppShell({
 
 	if (useIsFirstRender()) {
 		setUserProfile({
-			id: "asfdasdfasdf",
+			id: "676767",
 			name: "Laurin Feichter",
 			role: UserRole.Student,
 		});
@@ -51,9 +51,9 @@ export function DefaultAppShell({
 				endDate: new Date("2026-02-01"),
 				lockInOffset: new Date("0000-00-01"),
 				autoLockIn: AutoLockIn.FixedDate,
-				subject: { name: "Rechts Kunde" },
+				subject: { name: "Rechtskunde" },
 				teachers: [{ name: "Brigitta Niederkofler" }],
-				description: "handelsrecht und arbeitsrecht",
+				description: "Handelsrecht und Arbeitsrecht",
 				examSlots: [
 					{
 						id: "asdfasdfasdf",
@@ -104,7 +104,7 @@ export function DefaultAppShell({
 							},
 							{
 								id: "676767",
-								name: "Laurin Feichter",
+								name: "Lauasdfasdfasdfrin Feichter",
 								role: UserRole.Student,
 							},
 						],
@@ -116,46 +116,6 @@ export function DefaultAppShell({
 						maxParticipants: 4,
 						isLocked: true,
 						participants: [
-							{
-								id: "676767",
-								name: "Laurin Feichter",
-								role: UserRole.Student,
-							},
-							{
-								id: "676767",
-								name: "Laurin Feichter",
-								role: UserRole.Student,
-							},
-							{
-								id: "676767",
-								name: "Laurin Feichter",
-								role: UserRole.Student,
-							},
-							{
-								id: "676767",
-								name: "Laurin Feichter",
-								role: UserRole.Student,
-							},
-							{
-								id: "676767",
-								name: "Laurin Feichter",
-								role: UserRole.Student,
-							},
-							{
-								id: "676767",
-								name: "Laurin Feichter",
-								role: UserRole.Student,
-							},
-							{
-								id: "676767",
-								name: "Laurin Feichter",
-								role: UserRole.Student,
-							},
-							{
-								id: "676767",
-								name: "Laurin Feichter",
-								role: UserRole.Student,
-							},
 							{
 								id: "676767",
 								name: "Laurin Feichter",
@@ -238,7 +198,20 @@ export function DefaultAppShell({
 						],
 					},
 				],
-				swapRequests: [],
+				swapRequests: [
+					{
+						id: "aölkjklöasdhf",
+						requestedSlotId: "asdfasdfasdf",
+						requestingStudentId: "676767",
+						requestingStudentName: "Laurin Feichter",
+					},
+					{
+						id: "aölkjklöasdhf",
+						requestedSlotId: "asdfasdfasdf",
+						requestingStudentId: "asdfasdfasdf",
+						requestingStudentName: "Laurin Feichter",
+					},
+				],
 				auditLogs: [],
 			},
 		]);
@@ -290,25 +263,25 @@ function useNavbarLinksForUser(): LinkGroupProp[] {
 			];
 		default:
 			return [
-				// {
-				// 	label: t("navbar.overview"),
-				// 	defaultLink: "/",
-				// 	icon: IconCalendarClock,
-				// },
-				// {
-				// 	label: t("navbar.swaprequests"),
-				// 	defaultLink: "/swaprequests",
-				// 	icon: IconReplaceUser,
-				// },
-				// {
-				// 	label: t("navbar.createforclassroom"),
-				// 	links: classrooms.map<NestedLinkProp>((c) => ({
-				// 		label: c.name,
-				// 		link: join("classroom", c.id),
-				// 	})),
-				// 	initiallyOpened: true,
-				// 	icon: IconChalkboardTeacher,
-				// },
+				{
+					label: t("navbar.overview"),
+					defaultLink: "/",
+					icon: IconCalendarClock,
+				},
+				{
+					label: t("navbar.swaprequests"),
+					defaultLink: "/swaprequests",
+					icon: IconReplaceUser,
+				},
+				{
+					label: t("navbar.createforclassroom"),
+					links: classrooms.map<NestedLinkProp>((c) => ({
+						label: c.name,
+						link: join("classroom", c.id),
+					})),
+					initiallyOpened: true,
+					icon: IconChalkboardTeacher,
+				},
 			];
 	}
 }

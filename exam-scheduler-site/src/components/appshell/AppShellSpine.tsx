@@ -1,4 +1,5 @@
 import { AppShell, Group, LoadingOverlay, Title } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import classes from "./AppShellSpine.module.css";
 import { ThemeButton } from "../ThemeButton";
 import type { ReactNode } from "react";
@@ -7,6 +8,8 @@ import { Swipable } from "../Swipable";
 import type { SwipeableProps } from "react-swipeable";
 import { useIsFirstRender, useMediaQuery } from "@mantine/hooks";
 import { useLoadingOverlay, useNavbarState } from "../../zustand/zustand";
+import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 
 export interface AppShellSpineProps {
 	children?: React.ReactNode;
@@ -40,18 +43,18 @@ export function AppShellSpine({
 	};
 
 	const appShellProps =
-		navbar && !disabled
-			? {
-					navbar: {
-						breakpoint: "sm",
-						width: 300,
-						collapsed: {
-							desktop: isNavbarOpen,
-							mobile: !isNavbarOpen,
-						},
+		navbar && !disabled ?
+			{
+				navbar: {
+					breakpoint: "sm",
+					width: 300,
+					collapsed: {
+						desktop: isNavbarOpen,
+						mobile: !isNavbarOpen,
 					},
-			  }
-			: {};
+				},
+			}
+		:	{};
 
 	return (
 		<>
@@ -72,7 +75,10 @@ export function AppShellSpine({
 							</Group>
 						</Group>
 					</AppShell.Header>
-					<AppShell.Main>{children}</AppShell.Main>
+					<AppShell.Main>
+						<Notifications />
+						{children}
+					</AppShell.Main>
 					{navbar && <AppShell.Navbar>{navbar}</AppShell.Navbar>}
 				</AppShell>
 			</Swipable>

@@ -6,9 +6,9 @@
         }
     },
     "navbar": {
-        "createforclassroom": "",
-        "overview": "",
-        "swaprequests": ""
+        "createforclassroom": "Create",
+        "overview": "Overview",
+        "swaprequests": "Swap Requests"
     },
     "schedule": {
         "create": {
@@ -19,6 +19,15 @@
         },
         "progess": {
             "tooltip": "{{curr}} out of {{max}} - {{min}} needed"
-        }
+        },
+        "register": "Sign up",
+        "swap": "Swap"
+    },
+    "swaprequest": {
+        "accept": "Accept swap",
+        "delete": "Delete swap"
+    },
+    "swaprequests": {
+        "title": "Swap requests"
     }
 }

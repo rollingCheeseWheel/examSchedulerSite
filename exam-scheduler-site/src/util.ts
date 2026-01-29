@@ -5,7 +5,7 @@ export const dateTimeFormats: Record<"schedule", Intl.DateTimeFormatOptions> = {
 	schedule: {
 		weekday: "long",
 		day: "numeric",
-		month: "long",
+		month: "short",
 	},
 } as const;
 

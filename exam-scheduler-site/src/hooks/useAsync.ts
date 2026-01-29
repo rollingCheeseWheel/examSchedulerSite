@@ -5,7 +5,7 @@ export function useAsync<TArgs extends readonly never[], TResult>(
 	fun: (...args: TArgs) => Promise<TResult>,
 	args: TArgs,
 	dependencies: readonly never[] = [],
-	instantFetch: boolean = false
+	instantFetch: boolean = false,
 ) {
 	const [data, setData] = useState<TResult | null | undefined>();
 	const [error, setError] = useState<unknown>(undefined);

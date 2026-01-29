@@ -57,7 +57,7 @@ export function ScheduleProgress(props: ExtendedProgressbarProps) {
 				curr: curr,
 			})}>
 			<Group justify="flex-end">
-				<Group gap="xs">
+				{/* <Group gap="xs">
 					<Text>{min}</Text>
 					<Text>|</Text>
 					<Text
@@ -73,7 +73,7 @@ export function ScheduleProgress(props: ExtendedProgressbarProps) {
 					</Text>
 					<Text fw={700}>/</Text>
 					<Text fw={700}>{max}</Text>
-				</Group>
+				</Group> */}
 				<ExtendedProgressbar style={{ flex: 1 }} {...props} />
 			</Group>
 		</Tooltip>

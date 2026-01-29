@@ -9,7 +9,7 @@ import type {
 	ScheduleId,
 } from "../models/schedule";
 import type { Result } from "../models/result";
-import type { UserProfile, UserProfileId } from "../models/user";
+import type { UserProfile } from "../models/user";
 import type { SwapRequestId } from "../models/swapRequest";
 
 export interface ScheduleClient {

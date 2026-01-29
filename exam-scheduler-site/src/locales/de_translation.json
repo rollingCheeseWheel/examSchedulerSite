@@ -6,9 +6,9 @@
         }
     },
     "navbar": {
-        "createforclassroom": "",
-        "overview": "",
-        "swaprequests": ""
+        "createforclassroom": "Erstellen",
+        "overview": "Übersicht",
+        "swaprequests": "Tauschanfragen"
     },
     "schedule": {
         "create": {
@@ -19,6 +19,15 @@
         },
         "progess": {
             "tooltip": "{{curr}} von {{max}} - {{min}} benötigt"
-        }
+        },
+        "register": "Einschreiben",
+        "swap": "Tauschen"
+    },
+    "swaprequest": {
+        "accept": "Tauschen",
+        "delete": "Löschen"
+    },
+    "swaprequests": {
+        "title": "Tauschanfragen"
     }
 }
