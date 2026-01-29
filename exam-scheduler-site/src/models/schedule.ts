@@ -1,6 +1,5 @@
-import type { TimeSpan } from "../util";
 import type { AuditLog } from "./auditLog";
-import type { BrandedId } from "./brand";
+import type { Brand, BrandedId } from "./brand";
 import type { Subject, Teacher } from "./calendar";
 import type { ClassroomId } from "./classroom";
 import type { AutoLockIn, SlotFillingBehaviour } from "./enums";
@@ -9,6 +8,8 @@ import type { UserProfile } from "./user";
 
 export type ScheduleId = BrandedId<"schedule">;
 export type ExamSlotId = BrandedId<"examslot">;
+
+export type TimeSpan = Brand<Date, "timespan">;
 
 export interface Schedule {
 	id: ScheduleId;

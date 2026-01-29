@@ -3,7 +3,7 @@ import type { LinkGroupProp } from "../components/navbar-link-group/LinkGroup";
 import type { Schedule } from "../models/schedule";
 import type { UserProfile } from "../models/user";
 import type { Classroom } from "../models/classroom";
-import type { ScheduleHub } from "../hooks/userSignalR";
+import type { ScheduleHub } from "../hooks/useSignalR";
 
 interface DisclosureStore {
 	state: boolean;

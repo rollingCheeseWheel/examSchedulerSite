@@ -3,7 +3,6 @@ import type { Result } from "../models/result";
 import type { AxiosRequestConfig } from "axios";
 import { api } from "../main";
 import axios from "axios";
-import { TimeSpan } from "../util";
 
 export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 	const [data, setData] = useState<Result<TResponse>>();
@@ -85,7 +84,7 @@ export function getPost<TResponse, TBody = unknown>(url: string | URL) {
 	};
 }
 
-export const jsonReviver = reviverCombiner(dateReviver, timeSpanReviver);
+export const jsonReviver = reviverCombiner(dateReviver);
 
 export function reviverCombiner(
 	...revivers: ((key: string, value: unknown) => unknown)[]
@@ -108,13 +107,6 @@ export function dateReviver(_: string, value: unknown) {
 		if (!isNaN(d.getTime()) && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
 			return d;
 		}
-	}
-	throw new Error();
-}
-
-export function timeSpanReviver(_: string, value: unknown) {
-	if (typeof value === "string") {
-		return TimeSpan.parse(value);
 	}
 	throw new Error();
 }

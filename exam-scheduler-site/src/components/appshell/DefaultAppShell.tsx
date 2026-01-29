@@ -51,7 +51,8 @@ export function DefaultAppShell({
 				endDate: new Date("2026-02-01"),
 				lockInOffset: new Date("0000-00-01"),
 				autoLockIn: AutoLockIn.FixedDate,
-				subjectName: "RK",
+				subject: { name: "Rechts Kunde" },
+				teachers: [{ name: "Brigitta Niederkofler" }],
 				description: "handelsrecht und arbeitsrecht",
 				examSlots: [
 					{
@@ -59,6 +60,7 @@ export function DefaultAppShell({
 						date: new Date("2026-01-01"),
 						minParticipants: 1,
 						maxParticipants: 56,
+						isLocked: true,
 						participants: [
 							{
 								id: "676767",
@@ -112,6 +114,7 @@ export function DefaultAppShell({
 						date: new Date("2026-01-02"),
 						minParticipants: 1,
 						maxParticipants: 4,
+						isLocked: true,
 						participants: [
 							{
 								id: "676767",
@@ -175,6 +178,7 @@ export function DefaultAppShell({
 						date: new Date("2026-01-03"),
 						minParticipants: 1,
 						maxParticipants: 4,
+						isLocked: false,
 						participants: [
 							{
 								id: "676767",

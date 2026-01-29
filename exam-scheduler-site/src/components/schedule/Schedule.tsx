@@ -40,7 +40,7 @@ export function ExamSchedule(props: ExamScheduleProps) {
 	return (
 		<Paper maw={props.maxwidth} withBorder p="md" radius="md">
 			<Group justify="space-between">
-				<Title order={2}>{props.subjectName}</Title>
+				<Title order={2}>{props.subject.name}</Title>
 				<Text>{props.description}</Text>
 			</Group>
 			<Stack align="stretch" justify="flex-start" gap="xs">

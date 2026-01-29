@@ -1,6 +1,6 @@
 import { Grid, type StyleProp } from "@mantine/core";
 import { useSchedules, useUserProfile } from "../../zustand/zustand";
-import { useSignalRInit as useScheduleHubInit } from "../../hooks/userSignalR";
+import { useSignalRInit as useScheduleHubInit } from "../../hooks/useSignalR";
 import { useIsFirstRender } from "@mantine/hooks";
 import { UserRole } from "../../models/enums";
 import { ExamSchedule } from "./Schedule";
@@ -18,9 +18,13 @@ export function ScheduleWidget(props: ScheduleWidgetProps) {
 	if (useIsFirstRender() && hasAuthenticated) {
 		init({
 			ReceiveInitial(schedules) {
+				console.log(schedules);
+				
 				setSchedules(schedules);
 			},
 			UpdateSchedule(scheduleId, schedule) {
+				console.log(schedule);
+				
 				setSchedules([
 					...schedules.filter((s) => s.id !== scheduleId),
 					schedule,
