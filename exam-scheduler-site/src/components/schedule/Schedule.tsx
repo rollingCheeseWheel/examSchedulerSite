@@ -38,6 +38,7 @@ import { UserRole } from "../../models/enums";
 import { usePromise } from "../../hooks/usePromise";
 import type { Result } from "../../models/result";
 import { useToggle } from "../../hooks/useToggle";
+import { useIgnoredSwapRequests } from "../../hooks/useIgnoredSwapRequests";
 
 export function ExamSchedule(props: {
 	schedule: Schedule;
@@ -65,8 +66,7 @@ export function ExamSchedule(props: {
 			withBorder
 			p="md"
 			radius="md"
-			key={props.schedule.id}
-		>
+			key={props.schedule.id}>
 			{loading && <LoadingOverlay />}
 			<Group justify="space-between">
 				<Title order={2}>{props.schedule.subject.name}</Title>
@@ -103,10 +103,12 @@ function ScheduleDate(props: {
 	acceptSwapRequest: (id: SwapRequestId) => void;
 	deleteSwapRequest: (id: SwapRequestId) => void;
 }) {
-	const { i18n, t } = useTranslation();
+	const { i18n } = useTranslation();
+	const { ignoredIds, ignore } = useIgnoredSwapRequests();
 
 	const thisSlotsSwapRequest = props.schedule.swapRequests.filter(
-		(sr) => sr.requestedSlotId === props.slot.id,
+		(sr) =>
+			sr.requestedSlotId === props.slot.id && !ignoredIds.includes(sr.id),
 	);
 
 	return (
@@ -148,6 +150,7 @@ function ScheduleDate(props: {
 					swaprequests={thisSlotsSwapRequest}
 					accept={props.acceptSwapRequest}
 					delete={props.deleteSwapRequest}
+					ignore={ignore}
 				/>
 			)}
 		</>
@@ -175,8 +178,7 @@ function SlotSelectButton(props: {
 				(isInSwapState ? props.createSwap : props.select)(props.slot.id)
 			}
 			rightSection={isInSwapState ? <IconReplaceUser /> : <IconCheck />}
-			variant={isInSwapState ? "light" : "filled"}
-		>
+			variant={isInSwapState ? "light" : "filled"}>
 			{isInSwapState ? t("schedule.swap") : t("schedule.register")}
 		</Button>
 	);
@@ -186,8 +188,9 @@ function SwapRequestDrawer(props: {
 	swaprequests: SwapRequest[];
 	accept: (id: SwapRequestId) => void;
 	delete: (id: SwapRequestId) => void;
+	ignore: (id: SwapRequestId) => void;
 }) {
-	const { state, toggle } = useToggle(true);
+	const { state, toggle } = useToggle(false);
 	const { t } = useTranslation();
 
 	return (
@@ -197,14 +200,15 @@ function SwapRequestDrawer(props: {
 				<Group justify="space-between" onClick={toggle}>
 					<Center>
 						<Title order={4}>{t("swaprequests.title")}</Title>
-							<IconChevronRight style={{
+						<IconChevronRight
+							style={{
 								transition: "transform 200ms ease",
-								transform: state ? "rotate(90deg)" : "none"
-							}} />
+								transform: state ? "rotate(90deg)" : "none",
+							}}
+						/>
 					</Center>
 				</Group>
-			}
-		>
+			}>
 			<Collapse in={state}>
 				<Flex gap="md">
 					{...props.swaprequests.map((sr) => (
@@ -233,14 +237,14 @@ function SwapRequestItem(props: {
 			<Button
 				// size="compact-sm"
 				variant={
-					userId === props.swapRequest.requestingStudentId
-						? "default"
-						: "light"
+					userId === props.swapRequest.requestingStudentId ?
+						"default"
+					:	"light"
 				}
 				onClick={() =>
-					(userId === props.swapRequest.requestingStudentId
-						? props.delete
-						: props.accept)(props.swapRequest.id)
+					(userId === props.swapRequest.requestingStudentId ?
+						props.delete
+					:	props.accept)(props.swapRequest.id)
 				}
 				leftSection={
 					<Center>
@@ -250,16 +254,13 @@ function SwapRequestItem(props: {
 					</Center>
 				}
 				rightSection={
-					userId === props.swapRequest.requestingStudentId ? (
+					userId === props.swapRequest.requestingStudentId ?
 						<IconX />
-					) : (
-						<IconCheck />
-					)
-				}
-			>
-				{userId === props.swapRequest.requestingStudentId
-					? t("swaprequest.delete")
-					: t("swaprequest.accept")}
+					:	<IconCheck />
+				}>
+				{userId === props.swapRequest.requestingStudentId ?
+					t("swaprequest.delete")
+				:	t("swaprequest.accept")}
 			</Button>
 		</Group>
 	);

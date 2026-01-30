@@ -32,7 +32,7 @@ export function ExtendedProgressbar(props: ExtendedProgressbarProps) {
 						: "yellow.6"
 				}
 			>
-				<Progress.Label>{participants}</Progress.Label>
+				<Progress.Label>{participants} / {max}</Progress.Label>
 			</Progress.Section>
 			{/* {participants < min && (
 				<Progress.Section

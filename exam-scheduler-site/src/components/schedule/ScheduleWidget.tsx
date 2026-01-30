@@ -4,6 +4,8 @@ import { useSignalRInit as useScheduleHubInit } from "../../hooks/useSignalR";
 import { useIsFirstRender } from "@mantine/hooks";
 import { ExamSchedule } from "./Schedule";
 import type { ExamSlot, Schedule } from "../../models/schedule";
+import { useIgnoredSwapRequests } from "../../hooks/useIgnoredSwapRequests";
+import type { SwapRequest } from "../../models/swapRequest";
 
 interface ScheduleWidgetProps {
 	maxwidth?: StyleProp<string | number>;
@@ -39,10 +41,9 @@ export function ScheduleWidget(props: ScheduleWidgetProps) {
 				const mappedSlots = schedule.examSlots
 					.sort((a, b) => a.date.getTime() - b.date.getTime())
 					.map<ExamSlot>((s) => {
-						const sorted = s.participants.sort(
-							(a, b) => a.name.length - b.name.length,
-						)
-						.reverse();
+						const sorted = s.participants
+							.sort((a, b) => a.name.length - b.name.length)
+							.reverse();
 
 						return { ...s, participants: sorted };
 					});
