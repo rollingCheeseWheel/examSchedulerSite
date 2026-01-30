@@ -13,16 +13,20 @@ import {
 	Divider,
 	Alert,
 	Center,
+	Drawer,
+	Collapse,
+	Space,
+	Transition,
 } from "@mantine/core";
 import type { Schedule, ExamSlot, ExamSlotId } from "../../models/schedule";
-import { ScheduleProgress } from "../ExtendedProgessbar";
+import { ScheduleProgress } from "./ExtendedProgessbar";
 import type { UserProfile } from "../../models/user";
 import { formatDateTime } from "../../util";
 import { useTranslation } from "react-i18next";
 import {
 	IconCheck,
+	IconChevronRight,
 	IconReplaceUser,
-	IconTransfer,
 	IconX,
 } from "@tabler/icons-react";
 import type { SwapRequest, SwapRequestId } from "../../models/swapRequest";
@@ -33,6 +37,7 @@ import {
 import { UserRole } from "../../models/enums";
 import { usePromise } from "../../hooks/usePromise";
 import type { Result } from "../../models/result";
+import { useToggle } from "../../hooks/useToggle";
 
 export function ExamSchedule(props: {
 	schedule: Schedule;
@@ -60,7 +65,8 @@ export function ExamSchedule(props: {
 			withBorder
 			p="md"
 			radius="md"
-			key={props.schedule.id}>
+			key={props.schedule.id}
+		>
 			{loading && <LoadingOverlay />}
 			<Group justify="space-between">
 				<Title order={2}>{props.schedule.subject.name}</Title>
@@ -127,31 +133,22 @@ function ScheduleDate(props: {
 					</Group>
 				</Grid.Col>
 				<Grid.Col span="content">
-					{	
-						props.slot.id !== props.selectedSlotId && (
-							<SlotSelectButton
-								slot={props.slot}
-								currentSelectedSlotId={props.selectedSlotId}
-								select={props.selectSlot}
-								createSwap={props.createSwapRequest}
-							/>
-						)}
+					{props.slot.id !== props.selectedSlotId && (
+						<SlotSelectButton
+							slot={props.slot}
+							currentSelectedSlotId={props.selectedSlotId}
+							select={props.selectSlot}
+							createSwap={props.createSwapRequest}
+						/>
+					)}
 				</Grid.Col>
 			</Grid>
 			{thisSlotsSwapRequest.length != 0 && !props.slot.isLocked && (
-				<Alert
-					variant="outline"
-					title={<Title order={4}>{t("swaprequests.title")}</Title>}>
-					<Flex gap="md">
-						{...thisSlotsSwapRequest.map((sr) => (
-							<SwapRequestItem
-								swapRequest={sr}
-								accept={props.acceptSwapRequest}
-								delete={props.deleteSwapRequest}
-							/>
-						))}
-					</Flex>
-				</Alert>
+				<SwapRequestDrawer
+					swaprequests={thisSlotsSwapRequest}
+					accept={props.acceptSwapRequest}
+					delete={props.deleteSwapRequest}
+				/>
 			)}
 		</>
 	);
@@ -178,9 +175,48 @@ function SlotSelectButton(props: {
 				(isInSwapState ? props.createSwap : props.select)(props.slot.id)
 			}
 			rightSection={isInSwapState ? <IconReplaceUser /> : <IconCheck />}
-			variant={isInSwapState ? "light" : "filled"}>
+			variant={isInSwapState ? "light" : "filled"}
+		>
 			{isInSwapState ? t("schedule.swap") : t("schedule.register")}
 		</Button>
+	);
+}
+
+function SwapRequestDrawer(props: {
+	swaprequests: SwapRequest[];
+	accept: (id: SwapRequestId) => void;
+	delete: (id: SwapRequestId) => void;
+}) {
+	const { state, toggle } = useToggle(true);
+	const { t } = useTranslation();
+
+	return (
+		<Alert
+			variant="outline"
+			title={
+				<Group justify="space-between" onClick={toggle}>
+					<Center>
+						<Title order={4}>{t("swaprequests.title")}</Title>
+							<IconChevronRight style={{
+								transition: "transform 200ms ease",
+								transform: state ? "rotate(90deg)" : "none"
+							}} />
+					</Center>
+				</Group>
+			}
+		>
+			<Collapse in={state}>
+				<Flex gap="md">
+					{...props.swaprequests.map((sr) => (
+						<SwapRequestItem
+							swapRequest={sr}
+							accept={props.accept}
+							delete={props.delete}
+						/>
+					))}
+				</Flex>
+			</Collapse>
+		</Alert>
 	);
 }
 
@@ -197,14 +233,14 @@ function SwapRequestItem(props: {
 			<Button
 				// size="compact-sm"
 				variant={
-					userId === props.swapRequest.requestingStudentId ?
-						"default"
-					:	"light"
+					userId === props.swapRequest.requestingStudentId
+						? "default"
+						: "light"
 				}
 				onClick={() =>
-					(userId === props.swapRequest.requestingStudentId ?
-						props.delete
-					:	props.accept)(props.swapRequest.id)
+					(userId === props.swapRequest.requestingStudentId
+						? props.delete
+						: props.accept)(props.swapRequest.id)
 				}
 				leftSection={
 					<Center>
@@ -214,13 +250,16 @@ function SwapRequestItem(props: {
 					</Center>
 				}
 				rightSection={
-					userId === props.swapRequest.requestingStudentId ?
+					userId === props.swapRequest.requestingStudentId ? (
 						<IconX />
-					:	<IconCheck />
-				}>
-				{userId === props.swapRequest.requestingStudentId ?
-					t("swaprequest.delete")
-				:	t("swaprequest.accept")}
+					) : (
+						<IconCheck />
+					)
+				}
+			>
+				{userId === props.swapRequest.requestingStudentId
+					? t("swaprequest.delete")
+					: t("swaprequest.accept")}
 			</Button>
 		</Group>
 	);

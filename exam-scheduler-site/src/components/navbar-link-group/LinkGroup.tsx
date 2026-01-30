@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { IconChevronRight } from "@tabler/icons-react";
 import {
 	Box,
@@ -10,6 +9,7 @@ import {
 } from "@mantine/core";
 import classes from "./LinkGroup.module.scss";
 import { useNavigate } from "react-router-dom";
+import { useToggle } from "../../hooks/useToggle";
 
 export interface NestedLinkProp {
 	label: string;
@@ -35,7 +35,7 @@ export function LinkGroup({
 	const navigate = useNavigate();
 
 	const hasLinks = !defaultLink && links.length !== 0;
-	const [opened, setOpened] = useState(
+	const { state: opened, toggle } = useToggle(
 		(initiallyOpened && hasLinks) || false,
 	);
 	const items = (hasLinks ? links : []).map((link) => (
@@ -46,7 +46,8 @@ export function LinkGroup({
 			onClick={(event) => {
 				event.preventDefault();
 				navigate(link.link);
-			}}>
+			}}
+		>
 			{link.label}
 		</Text>
 	));
@@ -54,12 +55,9 @@ export function LinkGroup({
 	return (
 		<>
 			<UnstyledButton
-				onClick={
-					defaultLink ?
-						() => navigate(defaultLink)
-					:	() => setOpened((o) => !o)
-				}
-				className={classes.control}>
+				onClick={defaultLink ? () => navigate(defaultLink) : toggle}
+				className={classes.control}
+			>
 				<Group justify="space-between" gap={0}>
 					<Box style={{ display: "flex", alignItems: "center" }}>
 						<ThemeIcon variant="light" size={30}>
@@ -73,15 +71,13 @@ export function LinkGroup({
 							stroke={1.5}
 							size={16}
 							style={{
-								transform: opened ? "rotate(-90deg)" : "none",
+								transform: opened ? "rotate(90deg)" : "none",
 							}}
 						/>
 					)}
 				</Group>
 			</UnstyledButton>
-			{hasLinks ?
-				<Collapse in={opened}>{items}</Collapse>
-			:	null}
+			{hasLinks ? <Collapse in={opened}>{items}</Collapse> : null}
 		</>
 	);
 }

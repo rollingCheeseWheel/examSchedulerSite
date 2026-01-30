@@ -16,7 +16,7 @@ interface ExtendedProgressbarProps extends ProgressRootProps {
 export function ExtendedProgressbar(props: ExtendedProgressbarProps) {
 	const { participants, max, min } = props;
 	const participantsValue = Math.round(
-		(participants * 100) / Math.max(1, max)
+		(participants * 100) / Math.max(1, max),
 	);
 	const minValue = Math.round((min * 100) / Math.max(1, max));
 
@@ -27,19 +27,21 @@ export function ExtendedProgressbar(props: ExtendedProgressbarProps) {
 				color={
 					participants > min
 						? participants >= max
-							? "green.6"
-							: "yellow.6"
-						: "red.6"
-				}>
+							? "gray.6"
+							: "green.6"
+						: "yellow.6"
+				}
+			>
 				<Progress.Label>{participants}</Progress.Label>
 			</Progress.Section>
-			{participants < min && (
+			{/* {participants < min && (
 				<Progress.Section
 					value={minValue - participantsValue}
-					color="gray.6">
+					color="gray.6"
+				>
 					<Progress.Label>{min - participants}</Progress.Label>
 				</Progress.Section>
-			)}
+			)} */}
 		</Progress.Root>
 	);
 }
@@ -55,27 +57,10 @@ export function ScheduleProgress(props: ExtendedProgressbarProps) {
 				min: min,
 				max: max,
 				curr: curr,
-			})}>
-			<Group justify="flex-end">
-				{/* <Group gap="xs">
-					<Text>{min}</Text>
-					<Text>|</Text>
-					<Text
-						fw={700}
-						c={
-							curr > min
-								? curr >= max
-									? "green"
-									: "yellow"
-								: "red"
-						}>
-						{curr}
-					</Text>
-					<Text fw={700}>/</Text>
-					<Text fw={700}>{max}</Text>
-				</Group> */}
-				<ExtendedProgressbar style={{ flex: 1 }} {...props} />
-			</Group>
+			})}
+		>
+			<ExtendedProgressbar style={{ flex: 1 }} {...props} />
 		</Tooltip>
 	);
 }
+	

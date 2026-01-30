@@ -58,9 +58,9 @@ export function DefaultAppShell({
 					{
 						id: "asdfasdfasdf",
 						date: new Date("2026-01-01"),
-						minParticipants: 1,
+						minParticipants: 30,
 						maxParticipants: 56,
-						isLocked: true,
+						isLocked: false,
 						participants: [
 							{
 								id: "676767",
@@ -114,7 +114,7 @@ export function DefaultAppShell({
 						date: new Date("2026-01-02"),
 						minParticipants: 1,
 						maxParticipants: 4,
-						isLocked: true,
+						isLocked: false,
 						participants: [
 							{
 								id: "676767",
