@@ -4,6 +4,8 @@ import { useSignalRInit as useScheduleHubInit } from "../../hooks/useSignalR";
 import { useIsFirstRender } from "@mantine/hooks";
 import { ExamSchedule } from "./Schedule";
 import type { ExamSlot, Schedule } from "../../models/schedule";
+import { useIgnoredSwapRequests } from "../../hooks/useIgnoredSwapRequests";
+import type { SwapRequest } from "../../models/swapRequest";
 import { useEffect } from "react";
 
 interface ScheduleWidgetProps {
