@@ -4,6 +4,7 @@ import { useSignalRInit as useScheduleHubInit } from "../../hooks/useSignalR";
 import { useIsFirstRender } from "@mantine/hooks";
 import { ExamSchedule } from "./Schedule";
 import type { ExamSlot, Schedule } from "../../models/schedule";
+import { useEffect } from "react";
 
 interface ScheduleWidgetProps {
 	maxwidth?: StyleProp<string | number>;
@@ -15,23 +16,25 @@ export function ScheduleWidget(props: ScheduleWidgetProps) {
 	const { data: schedules, setData: setSchedules } = useSchedules();
 	const { init } = useScheduleHubInit();
 
-	if (useIsFirstRender() && hasAuthenticated) {
-		init({
-			ReceiveInitial(schedules) {
-				console.log(schedules);
+	useEffect(() => {
+		if (hasAuthenticated) {
+			init({
+				ReceiveInitial(schedules) {
+					console.log(schedules);
 
-				setSchedules(schedules);
-			},
-			UpdateSchedule(scheduleId, schedule) {
-				console.log(schedule);
+					setSchedules(schedules);
+				},
+				UpdateSchedule(scheduleId, schedule) {
+					console.log(schedule);
 
-				setSchedules([
-					...schedules.filter((s) => s.id !== scheduleId),
-					schedule,
-				]);
-			},
-		});
-	}
+					setSchedules([
+						...schedules.filter((s) => s.id !== scheduleId),
+						schedule,
+					]);
+				},
+			});
+		}
+	}, [hasAuthenticated]);
 
 	return (
 		<Grid grow gutter={0}>
@@ -39,10 +42,9 @@ export function ScheduleWidget(props: ScheduleWidgetProps) {
 				const mappedSlots = schedule.examSlots
 					.sort((a, b) => a.date.getTime() - b.date.getTime())
 					.map<ExamSlot>((s) => {
-						const sorted = s.participants.sort(
-							(a, b) => a.name.length - b.name.length,
-						)
-						.reverse();
+						const sorted = s.participants
+							.sort((a, b) => a.name.length - b.name.length)
+							.reverse();
 
 						return { ...s, participants: sorted };
 					});
