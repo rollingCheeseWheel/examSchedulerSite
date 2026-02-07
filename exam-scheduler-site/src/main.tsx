@@ -9,24 +9,6 @@ import { AuthWidget } from "./components/auth/AuthWidget";
 import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
-
-// const color: MantineColorsTuple = [
-// 	"#f6eeff",
-// 	"#e7d9f7",
-// 	"#cab1ea",
-// 	"#ad86dd",
-// 	"#9462d2",
-// 	"#854bcb",
-// 	"#7d3fc9",
-// 	"#6b31b2",
-// 	"#5f2ba0",
-// 	"#52238d",
-// ];
-
-// const theme = createTheme({
-// 	colors: { color },
-// });
-
 import english from "./locales/en_translation.json";
 import german from "./locales/de_translation.json";
 import { CreateScheduleWidget } from "./components/schedule-create/CreateScheduleWidget";
@@ -80,8 +62,7 @@ createRoot(document.getElementById("root")!).render(
 									style={{
 										height: "80dvh",
 										overflow: "hidden",
-									}}
-								>
+									}}>
 									<AuthWidget />
 								</Center>
 							</AppShellSpine>
@@ -91,7 +72,12 @@ createRoot(document.getElementById("root")!).render(
 						path="*"
 						element={
 							<DefaultAppShell>
-								<Route path="/" element={<ScheduleWidget maxwidth="600px" />} />
+								<Route
+									path="/"
+									element={
+										<ScheduleWidget maxwidth="600px" />
+									}
+								/>
 								<Route
 									path="create"
 									element={<CreateScheduleWidget />}

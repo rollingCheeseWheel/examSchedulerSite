@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
+import { type HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 import { useScheduleHubConnection } from "../zustand/zustand";
 import { endpoints } from "../endpoints";
 import type {
