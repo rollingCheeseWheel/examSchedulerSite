@@ -1,16 +1,16 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLatch } from "./useLatch";
 
 export function useAsync<TArgs extends readonly never[], TResult>(
 	fun: (...args: TArgs) => Promise<TResult>,
 	args: TArgs,
-	dependencies: readonly never[] = [],
 	instantFetch: boolean = false,
 ) {
 	const [data, setData] = useState<TResult | null | undefined>();
 	const [error, setError] = useState<unknown>(undefined);
 	const [loading, setLoading] = useState(false);
-	const [fetch, { setLatch }] = useLatch(instantFetch);
+	const { value: fetch, setLatch } = useLatch(instantFetch);
+	const { value: terminated, setLatch: setTerminated } = useLatch(false);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -21,23 +21,23 @@ export function useAsync<TArgs extends readonly never[], TResult>(
 
 			try {
 				const result = await fun(...args);
-				if (!cancelled) setData(result);
+				if (!cancelled && !terminated) setData(result);
 			} catch (e) {
-				if (!cancelled) setError(e);
+				if (!cancelled && !terminated) setError(e);
 			} finally {
-				if (!cancelled) setLoading(false);
+				if (!cancelled && !terminated) setLoading(false);
 			}
 		};
 
-		if (fetch) {
+		if (fetch && !cancelled && !terminated) {
 			run();
 		}
 
 		return () => {
 			cancelled = true;
+			setTerminated(true);
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [...dependencies, fetch]);
+	}, [args, fetch, fun, setTerminated, terminated]);
 
 	return {
 		data,

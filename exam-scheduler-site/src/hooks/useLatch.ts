@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 
 export function useLatch(initial: boolean) {
 	const [value, setValue] = useState(initial);
@@ -20,5 +20,5 @@ export function useLatch(initial: boolean) {
 		setValue(v && !value);
 	};
 
-	return [value, { latch, setLatch }] as const;
+	return { value, latch, setLatch } as const;
 }

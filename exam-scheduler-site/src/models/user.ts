@@ -1,10 +1,11 @@
-import type { BrandedId } from "./brand";
+import type { BrandedId, BrandedString } from "./brand";
 import type { UserRole } from "./enums";
 
 export type UserProfileId = BrandedId<"userprofile">;
+export type Username = BrandedString<"username">;
 
 export interface UserProfile {
 	id: UserProfileId;
-	name: string;
+	name: Username;
 	role: UserRole;
 }

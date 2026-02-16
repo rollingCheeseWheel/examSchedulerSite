@@ -1,44 +1,41 @@
 import {
-	Group,
-	Flex,
-	Paper,
-	Title,
-	Text,
-	Stack,
-	type StyleProp,
-	Kbd,
-	Grid,
-	Button,
-	LoadingOverlay,
-	Divider,
 	Alert,
+	Button,
 	Center,
-	Drawer,
 	Collapse,
-	Space,
-	Transition,
+	Divider,
+	Flex,
+	Grid,
+	Group,
+	Kbd,
+	LoadingOverlay,
+	Paper,
+	Stack,
+	Text,
+	Title,
+	type StyleProp,
 } from "@mantine/core";
-import type { Schedule, ExamSlot, ExamSlotId } from "../../models/schedule";
-import { ScheduleProgress } from "./ExtendedProgessbar";
-import type { UserProfile } from "../../models/user";
-import { formatDateTime } from "../../util";
-import { useTranslation } from "react-i18next";
 import {
 	IconCheck,
 	IconChevronRight,
 	IconReplaceUser,
 	IconX,
 } from "@tabler/icons-react";
-import type { SwapRequest, SwapRequestId } from "../../models/swapRequest";
+import { useTranslation } from "react-i18next";
+import { useIgnoredSwapRequests } from "../../../hooks/useIgnoredSwapRequests";
+import { usePromise } from "../../../hooks/usePromise";
+import { useToggle } from "../../../hooks/useToggle";
+import { UserRole } from "../../../models/enums";
+import type { Result } from "../../../models/result";
+import type { ExamSlot, ExamSlotId, Schedule } from "../../../models/schedule";
+import type { SwapRequest, SwapRequestId } from "../../../models/swapRequest";
+import type { UserProfile } from "../../../models/user";
+import { formatDateTime, type Action } from "../../../util";
 import {
 	useScheduleHubConnection,
 	useUserProfile,
-} from "../../zustand/zustand";
-import { UserRole } from "../../models/enums";
-import { usePromise } from "../../hooks/usePromise";
-import type { Result } from "../../models/result";
-import { useToggle } from "../../hooks/useToggle";
-import { useIgnoredSwapRequests } from "../../hooks/useIgnoredSwapRequests";
+} from "../../../zustand/zustand";
+import { ScheduleProgress } from "./ExtendedProgessbar";
 
 export function ExamSchedule(props: {
 	schedule: Schedule;
@@ -46,9 +43,9 @@ export function ExamSchedule(props: {
 	maxwidth?: StyleProp<string | number>;
 }) {
 	const isTeacher =
-		useUserProfile((s) => s.instance?.role) === UserRole.Teacher;
+		useUserProfile((s) => s.data?.role) === UserRole.Teacher;
 
-	const hubConnection = useScheduleHubConnection((s) => s.instance);
+	const hubConnection = useScheduleHubConnection((s) => s.data);
 	const { loading, error, resolve } = usePromise<Result<boolean>>();
 
 	const joinSlot = (id: ExamSlotId) =>
@@ -98,10 +95,10 @@ function ScheduleDate(props: {
 	schedule: Schedule;
 	slot: ExamSlot;
 	selectedSlotId?: ExamSlotId;
-	selectSlot: (id: ExamSlotId) => void;
-	createSwapRequest: (id: ExamSlotId) => void;
-	acceptSwapRequest: (id: SwapRequestId) => void;
-	deleteSwapRequest: (id: SwapRequestId) => void;
+	selectSlot: Action<[ExamSlotId]>;
+	createSwapRequest: Action<[ExamSlotId]>;
+	acceptSwapRequest: Action<[SwapRequestId]>;
+	deleteSwapRequest: Action<[SwapRequestId]>;
 }) {
 	const { i18n } = useTranslation();
 	const { ignoredIds, ignore } = useIgnoredSwapRequests();
@@ -186,9 +183,9 @@ function SlotSelectButton(props: {
 
 function SwapRequestDrawer(props: {
 	swaprequests: SwapRequest[];
-	accept: (id: SwapRequestId) => void;
-	delete: (id: SwapRequestId) => void;
-	ignore: (id: SwapRequestId) => void;
+	accept: Action<[SwapRequestId]>;
+	delete: Action<[SwapRequestId]>;
+	ignore: Action<[SwapRequestId]>;
 }) {
 	const { state, toggle } = useToggle(false);
 	const { t } = useTranslation();
@@ -226,11 +223,11 @@ function SwapRequestDrawer(props: {
 
 function SwapRequestItem(props: {
 	swapRequest: SwapRequest;
-	accept: (id: SwapRequestId) => void;
-	delete: (id: SwapRequestId) => void;
+	accept: Action<[SwapRequestId]>;
+	delete: Action<[SwapRequestId]>;
 }) {
 	const { t } = useTranslation();
-	const userId = useUserProfile((s) => s.instance?.id);
+	const userId = useUserProfile((s) => s.data?.id);
 
 	return (
 		<Group>

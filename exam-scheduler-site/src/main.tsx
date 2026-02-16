@@ -1,20 +1,20 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
 import { Center, MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { AppShellSpine } from "./components/appshell/AppShellSpine";
-import { DefaultAppShell } from "./components/appshell/DefaultAppShell";
-import { AuthWidget } from "./components/auth/AuthWidget";
-import i18next from "i18next";
-import { initReactI18next } from "react-i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
-import english from "./locales/en_translation.json";
-import german from "./locales/de_translation.json";
-import { CreateScheduleWidget } from "./components/schedule-create/CreateScheduleWidget";
 import axios from "axios";
-import { refreshSession } from "./components/auth/refreshSession";
-import { ScheduleWidget } from "./components/schedule/ScheduleWidget";
+import i18next from "i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { initReactI18next } from "react-i18next";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { AppShellSpine } from "./components/common/appshell/AppShellSpine";
+import { DefaultAppShell } from "./components/common/appshell/DefaultAppShell";
+import { AuthWidget } from "./components/common/auth/AuthWidget";
+import { refreshSession } from "./components/common/auth/refreshSession";
+import { ScheduleWidget } from "./components/common/schedule/ScheduleWidget";
+import { CreateScheduleWidget } from "./components/teacher/schedule-create/CreateScheduleWidget";
+import german from "./locales/de_translation.json";
+import english from "./locales/en_translation.json";
 
 export const api = axios.create({
 	withCredentials: true,

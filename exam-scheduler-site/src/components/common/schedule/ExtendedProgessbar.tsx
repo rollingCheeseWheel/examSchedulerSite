@@ -1,10 +1,4 @@
-import {
-	Group,
-	Progress,
-	Text,
-	Tooltip,
-	type ProgressRootProps,
-} from "@mantine/core";
+import { Progress, Tooltip, type ProgressRootProps } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 
 interface ExtendedProgressbarProps extends ProgressRootProps {
@@ -25,14 +19,15 @@ export function ExtendedProgressbar(props: ExtendedProgressbarProps) {
 			<Progress.Section
 				value={participantsValue}
 				color={
-					participants > min
-						? participants >= max
-							? "gray.6"
-							: "green.6"
-						: "yellow.6"
-				}
-			>
-				<Progress.Label>{participants} / {max}</Progress.Label>
+					participants > min ?
+						participants >= max ?
+							"gray.6"
+						:	"green.6"
+					:	"yellow.6"
+				}>
+				<Progress.Label>
+					{participants} / {max}
+				</Progress.Label>
 			</Progress.Section>
 			{/* {participants < min && (
 				<Progress.Section
@@ -57,10 +52,8 @@ export function ScheduleProgress(props: ExtendedProgressbarProps) {
 				min: min,
 				max: max,
 				curr: curr,
-			})}
-		>
+			})}>
 			<ExtendedProgressbar style={{ flex: 1 }} {...props} />
 		</Tooltip>
 	);
 }
-	

@@ -1,7 +1,14 @@
-import type { BrandedId } from "./brand";
+import type { Brand, BrandedId, BrandedString } from "./brand";
 
 export type CalendarId = BrandedId<"calendar">;
 export type LessonId = BrandedId<"lesson">;
+
+export type SubjectName = BrandedString<"subjectname">;
+export type TeacherName = BrandedString<"teachername">;
+export type LessonName = BrandedString<"lessonname">;
+
+export type FromHour = Brand<number, "fromhour">;
+export type ToHour = Brand<number, "tohour">;
 
 export interface Calendar {
 	id: CalendarId;
@@ -12,17 +19,17 @@ export interface Calendar {
 export interface Lesson {
 	id: LessonId;
 	occurances: Date[];
-	fromHour: number;
-	toHour: number;
-	lessonName: string;
+	fromHour: FromHour;
+	toHour: ToHour;
+	lessonName: LessonName;
 	teachers: Teacher[];
 	subject: Subject;
 }
 
 export interface Teacher {
-	name: string;
+	name: TeacherName;
 }
 
 export interface Subject {
-	name: string;
+	name: SubjectName;
 }

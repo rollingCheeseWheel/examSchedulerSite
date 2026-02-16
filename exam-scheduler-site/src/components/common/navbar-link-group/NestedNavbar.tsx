@@ -1,7 +1,7 @@
-import { useNavbarMenu } from "../../zustand/zustand";
+import { ScrollArea } from "@mantine/core";
+import { useNavbarMenu } from "../../../zustand/zustand";
 import { LinkGroup } from "./LinkGroup";
 import classes from "./NestedNavbar.module.css";
-import { ScrollArea } from "@mantine/core";
 
 export function NestedNavbar() {
 	const data = useNavbarMenu(s => s.data);

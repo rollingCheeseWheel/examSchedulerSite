@@ -1,27 +1,27 @@
-import type { ReactNode } from "react";
-import { AppShellSpine } from "./AppShellSpine";
-import { Routes } from "react-router-dom";
-import type {
-	LinkGroupProp,
-	NestedLinkProp,
-} from "../navbar-link-group/LinkGroup";
-import { NestedNavbar } from "../navbar-link-group/NestedNavbar";
-import {
-	useClassrooms,
-	useNavbarMenu,
-	useSchedules,
-	useUserProfile,
-} from "../../zustand/zustand";
-import { AuthCallback } from "../auth/AuthCallback";
-import { AutoLockIn, UserRole } from "../../models/enums";
-import { useTranslation } from "react-i18next";
-import { join } from "../../endpoints";
+import { useIsFirstRender } from "@mantine/hooks";
 import {
 	IconCalendarClock,
 	IconChalkboardTeacher,
 	IconReplaceUser,
 } from "@tabler/icons-react";
-import { useIsFirstRender } from "@mantine/hooks";
+import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
+import { Routes } from "react-router-dom";
+import { join } from "../../../endpoints";
+import { AutoLockIn, UserRole } from "../../../models/enums";
+import {
+	useClassrooms,
+	useNavbarMenu,
+	useSchedules,
+	useUserProfile,
+} from "../../../zustand/zustand";
+import type {
+	LinkGroupProp,
+	NestedLinkProp,
+} from "../../common/navbar-link-group/LinkGroup";
+import { NestedNavbar } from "../../common/navbar-link-group/NestedNavbar";
+import { AuthCallback } from "../auth/AuthCallback";
+import { AppShellSpine } from "./AppShellSpine";
 
 export interface DefaultAppShellProps {
 	children?: ReactNode;
@@ -226,7 +226,7 @@ export function DefaultAppShell({
 }
 
 function useNavbarLinksForUser(): LinkGroupProp[] {
-	const role = useUserProfile((s) => s.instance)?.role;
+	const role = useUserProfile((s) => s.data)?.role;
 	const classrooms = useClassrooms((s) => s.data);
 	const { t } = useTranslation();
 

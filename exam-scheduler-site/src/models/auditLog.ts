@@ -1,13 +1,17 @@
-import type { Guid } from "./brand";
+import type { BrandedString, Guid } from "./brand";
 import type { AuditLogActor } from "./enums";
+
+export type ActionName = BrandedString<"action">;
+export type ActorName = BrandedString<"actorname">;
+export type AuditLogDescription = BrandedString<"auditlogdescription">;
 
 export interface AuditLog {
 	timestamp: Date;
-	action: string;
+	action: ActionName;
 	actorType: AuditLogActor;
 	firstActorId: Guid;
 	secondActorId: Guid;
-	firstActorName?: string;
-	secondActorName?: string;
-	description?: string;
+	firstActorName?: ActorName;
+	secondActorName?: ActorName;
+	description?: AuditLogDescription;
 }

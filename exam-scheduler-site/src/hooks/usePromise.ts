@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export function usePromise<TResult = never>() {
 	const [data, setData] = useState<TResult | undefined | null>();

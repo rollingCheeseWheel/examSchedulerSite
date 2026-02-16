@@ -9,12 +9,17 @@ import type { UserProfile } from "./user";
 export type ScheduleId = BrandedId<"schedule">;
 export type ExamSlotId = BrandedId<"examslot">;
 
+export type StartDate = Brand<Date, "start">;
+export type EndDate = Brand<Date, "end">;
 export type TimeSpan = Brand<Date, "timespan">;
+
+export type Mininum = Brand<number, "min">;
+export type Maximum = Brand<number, "max">;
 
 export interface Schedule {
 	id: ScheduleId;
-	startDate: Date;
-	endDate: Date;
+	startDate: StartDate;
+	endDate: EndDate;
 	autoLockIn: AutoLockIn;
 	lockInOffset: TimeSpan;
 	description?: string;
@@ -29,8 +34,8 @@ export interface ExamSlot {
 	id: ExamSlotId;
 	date: Date;
 	participants: UserProfile[];
-	maxParticipants: number;
-	minParticipants: number;
+	maxParticipants: Mininum;
+	minParticipants: Mininum;
 	isLocked: boolean;
 }
 
@@ -38,8 +43,8 @@ export interface ScheduleCreateRequest {
 	subjectName: string;
 	classroomId: ClassroomId;
 	slotFillingBehaviour: SlotFillingBehaviour;
-	startDate: Date;
-	endDate: Date;
+	startDate: StartDate;
+	endDate: EndDate;
 	autoLockIn: AutoLockIn;
 	lockInOffset: TimeSpan;
 	generatorSlots: ScheduleGeneratorSlot[];
@@ -48,6 +53,6 @@ export interface ScheduleCreateRequest {
 
 export interface ScheduleGeneratorSlot {
 	offset: TimeSpan;
-	minParticipants: number;
-	maxParticipants: number;
+	minParticipants: Mininum;
+	maxParticipants: Maximum;
 }

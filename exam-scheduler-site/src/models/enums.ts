@@ -22,6 +22,7 @@ export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 export const SlotFillingBehaviour = {
 	RandomizeUnassigned: 0,
 	RandomizeUnassignedThenCompact: 1,
-	CompactAll: 2
-}
-export type SlotFillingBehaviour = (typeof SlotFillingBehaviour)[keyof typeof SlotFillingBehaviour];
+	CompactAll: 2,
+};
+export type SlotFillingBehaviour =
+	(typeof SlotFillingBehaviour)[keyof typeof SlotFillingBehaviour];

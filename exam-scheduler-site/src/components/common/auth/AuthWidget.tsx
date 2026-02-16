@@ -1,23 +1,25 @@
 import { Button, Container, NativeSelect, Paper, Title } from "@mantine/core";
-import { useEffect, useRef } from "react";
 import { useFetch } from "@mantine/hooks";
-import type { School } from "../../models/school";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { useCrossSiteError } from "../../zustand/zustand";
-import { endpoints } from "../../endpoints";
+import { endpoints } from "../../../endpoints";
+import type { School } from "../../../models/school";
+import { useCrossSiteError } from "../../../zustand/zustand";
 
 export function AuthWidget() {
-	const { data, error: schoolFetchError, loading, abort } = useFetch<School[]>(
-		endpoints.schools,
-	);
-	const crossSiteError = useCrossSiteError((s) => s.instance);
-
-	useEffect(() => {
-		return abort;
-	}, [abort]);
-
+	const {
+		data,
+		error: schoolFetchError,
+		loading,
+		abort: abortSchoolLoad,
+	} = useFetch<School[]>(endpoints.schools);
+	const crossSiteError = useCrossSiteError((s) => s.data);
 	const selectRef = useRef<HTMLSelectElement | null>(null);
 	const { t } = useTranslation();
+
+	useEffect(() => {
+		return abortSchoolLoad;
+	}, [abortSchoolLoad]);
 
 	function navigate() {
 		if (selectRef.current) {

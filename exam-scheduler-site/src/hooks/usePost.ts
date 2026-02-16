@@ -1,8 +1,8 @@
-import { useCallback, useState } from "react";
-import type { Result } from "../models/result";
 import type { AxiosRequestConfig } from "axios";
-import { api } from "../main";
 import axios from "axios";
+import { useCallback, useState } from "react";
+import { api } from "../main";
+import type { Result } from "../models/result";
 
 export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 	const [data, setData] = useState<Result<TResponse>>();
@@ -34,9 +34,9 @@ export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 				}
 				const formedError = new Error(
 					`Non Error value was thrown: ${
-						typeof error === "object"
-							? JSON.stringify(error)
-							: error
+						typeof error === "object" ?
+							JSON.stringify(error)
+						:	error
 					}`,
 				);
 				setError(formedError);
@@ -93,7 +93,9 @@ export function reviverCombiner(
 		for (const reviver of revivers) {
 			try {
 				return reviver(key, value);
-			} catch {}
+			} catch {
+				continue;
+			}
 		}
 		return value;
 	}

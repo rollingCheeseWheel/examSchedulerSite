@@ -1,4 +1,3 @@
-import { IconChevronRight } from "@tabler/icons-react";
 import {
 	Box,
 	Collapse,
@@ -7,9 +6,10 @@ import {
 	ThemeIcon,
 	UnstyledButton,
 } from "@mantine/core";
-import classes from "./LinkGroup.module.scss";
+import { IconChevronRight } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
-import { useToggle } from "../../hooks/useToggle";
+import { useToggle } from "../../../hooks/useToggle";
+import classes from "./LinkGroup.module.scss";
 
 export interface NestedLinkProp {
 	label: string;

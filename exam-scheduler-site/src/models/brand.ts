@@ -10,10 +10,11 @@ type ExtractBrand<T> = T extends Brand<never, infer A> ? A : never;
 export type ExtendBrand<
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	T extends Brand<any, string>,
-	B extends string
+	B extends string,
 > = Brand<ExtractBase<T>, `${B}:${ExtractBrand<T>}`>;
 
-export type BrandedId<B extends string> = Brand<string, B>;
+export type BrandedId<B extends string> = BrandedString<B>;
+export type BrandedString<B extends string> = Brand<string, B>;
 
 export type ExtendedBrandedID<
 	T extends BrandedId<string>,

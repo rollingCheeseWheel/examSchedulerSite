@@ -1,6 +1,6 @@
-import { endpoints } from "../../endpoints";
-import { getPost } from "../../hooks/usePost";
-import type { Result } from "../../models/result";
+import { endpoints } from "../../../endpoints";
+import { getPost } from "../../../hooks/usePost";
+import type { Result } from "../../../models/result";
 
 let refreshPromise: Promise<Result<Date>> | null = null;
 

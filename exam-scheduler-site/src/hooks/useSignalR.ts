@@ -1,20 +1,26 @@
-import { useCallback, useEffect, useRef } from "react";
 import { type HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
-import { useScheduleHubConnection } from "../zustand/zustand";
+import { useCallback, useEffect, useRef } from "react";
 import { endpoints } from "../endpoints";
+import type { Classroom } from "../models/classroom";
+import type { Result } from "../models/result";
 import type {
 	ExamSlotId,
 	Schedule,
 	ScheduleCreateRequest,
 	ScheduleId,
 } from "../models/schedule";
-import type { Result } from "../models/result";
-import type { UserProfile } from "../models/user";
 import type { SwapRequestId } from "../models/swapRequest";
+import type { UserProfile } from "../models/user";
+import type { Action } from "../util";
+import { useScheduleHubConnection } from "../zustand/zustand";
 
 export interface ScheduleClient {
-	ReceiveInitial: (schedules: Schedule[]) => void;
-	UpdateSchedule: (scheduleId: ScheduleId, schedule: Schedule) => void;
+	ReceiveInitialSchedules: Action<[Schedule[]]>;
+	UpdateSchedule: Action<[ScheduleId, Schedule]>;
+	RemoveSchedule: Action<[ScheduleId]>;
+
+	ReceiveInitialClassrooms: Action<[Classroom[]]>;
+	UpdateClassroom: Action<[Classroom]>;
 }
 
 export interface ScheduleHub {
@@ -43,7 +49,7 @@ export interface ScheduleHub {
 }
 
 export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
-	const { instance: connection, setData: setConnection } =
+	const { data: connection, setData: setConnection } =
 		useScheduleHubConnection();
 	const handlersRef = useRef<ScheduleClient>(undefined);
 	const connectionRef = useRef<HubConnection>(undefined);
@@ -116,9 +122,9 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 		[hubUrl, connection, setConnection],
 	);
 
-    const rejoin = () => {
-        connectionRef.current?.start()
-    }
+	const rejoin = () => {
+		connectionRef.current?.start();
+	};
 
 	useEffect(() => {
 		return () => {
@@ -132,7 +138,7 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 		};
 	}, [connection]);
 
-	return {init,rejoin};
+	return { init, rejoin };
 }
 
 export function createConnection(hubUrl: string) {

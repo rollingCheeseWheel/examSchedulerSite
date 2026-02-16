@@ -1,15 +1,15 @@
 import { AppShell, Group, LoadingOverlay, Title } from "@mantine/core";
-import { Notifications } from "@mantine/notifications";
-import classes from "./AppShellSpine.module.css";
-import { ThemeButton } from "../ThemeButton";
-import type { ReactNode } from "react";
-import { IconMenu2 } from "@tabler/icons-react";
-import { Swipable } from "../Swipable";
-import type { SwipeableProps } from "react-swipeable";
-import { useIsFirstRender, useMediaQuery } from "@mantine/hooks";
-import { useLoadingOverlay, useNavbarState } from "../../zustand/zustand";
 import "@mantine/core/styles.css";
+import { useIsFirstRender, useMediaQuery } from "@mantine/hooks";
+import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
+import { IconMenu2 } from "@tabler/icons-react";
+import type { ReactNode } from "react";
+import type { SwipeableProps } from "react-swipeable";
+import { useLoadingOverlay, useNavbarState } from "../../../zustand/zustand";
+import { Swipable } from "../../common/Swipable";
+import { ThemeButton } from "../../common/ThemeButton";
+import classes from "./AppShellSpine.module.css";
 
 export interface AppShellSpineProps {
 	children?: React.ReactNode;
@@ -33,7 +33,7 @@ export function AppShellSpine({
 	const isLandscape = useMediaQuery("(orientation: landscape)");
 
 	if (useIsFirstRender()) {
-		// idk why this works
+		// idk what this boolean thing does
 		setNavbarState((opened && disabled) || false);
 	}
 
