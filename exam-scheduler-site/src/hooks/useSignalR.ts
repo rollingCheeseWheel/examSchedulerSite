@@ -10,7 +10,7 @@ import type {
 	ScheduleId,
 } from "../models/schedule";
 import type { SwapRequestId } from "../models/swapRequest";
-import type { UserProfile } from "../models/user";
+import type { UserProfile, UserProfileId } from "../models/user";
 import type { Action } from "../util";
 import { useScheduleHubConnection } from "../zustand/zustand";
 
@@ -44,7 +44,7 @@ export interface ScheduleHub {
 	) => Promise<Result<boolean>> | undefined;
 	ReportStudents: (
 		slotId: ExamSlotId,
-		actualParticipants: UserProfile[],
+		actualParticipants: UserProfileId[],
 	) => Promise<Result<boolean>> | undefined;
 }
 

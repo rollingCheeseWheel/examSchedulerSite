@@ -2,7 +2,7 @@ import type { AuditLog } from "./auditLog";
 import type { Brand, BrandedId } from "./brand";
 import type { Subject, Teacher } from "./calendar";
 import type { ClassroomId } from "./classroom";
-import type { AutoLockIn, SlotFillingBehaviour } from "./enums";
+import type { AutoLockIn, SlotFillingBehaviour, SlotLockState } from "./enums";
 import type { SwapRequest } from "./swapRequest";
 import type { UserProfile } from "./user";
 
@@ -36,7 +36,7 @@ export interface ExamSlot {
 	participants: UserProfile[];
 	maxParticipants: Mininum;
 	minParticipants: Mininum;
-	isLocked: boolean;
+	lockState: SlotLockState;
 }
 
 export interface ScheduleCreateRequest {

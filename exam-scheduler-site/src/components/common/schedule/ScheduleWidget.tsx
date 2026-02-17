@@ -13,36 +13,19 @@ export function ScheduleWidget(props: ScheduleWidgetProps) {
 
 	return (
 		<Grid grow gutter={0}>
-			{...schedules.map((schedule) => {
-				const mappedSlots = schedule.examSlots
-					.sort((a, b) => a.date.getTime() - b.date.getTime())
-					.map<ExamSlot>((s) => {
-						const sorted = s.participants
-							.sort((a, b) => a.name.length - b.name.length)
-							.reverse();
-
-						return { ...s, participants: sorted };
-					});
-
-				const tempSchedule: Schedule = {
-					...schedule,
-					examSlots: mappedSlots,
-				};
-
-				return (
-					<ExamSchedule
-						schedule={tempSchedule}
-						selectedSlotId={
-							schedule.examSlots.find((slot) =>
-								slot.participants.find(
-									(p) => p.id === userProfile?.id,
-								),
-							)?.id
-						}
-						maxwidth={props.maxwidth}
-					/>
-				);
-			})}
+			{...schedules.map((schedule) => (
+				<ExamSchedule
+					schedule={schedule}
+					selectedSlotId={
+						schedule.examSlots.find((slot) =>
+							slot.participants.find(
+								(p) => p.id === userProfile?.id,
+							),
+						)?.id
+					}
+					maxwidth={props.maxwidth}
+				/>
+			))}
 		</Grid>
 	);
 }

@@ -1,41 +1,37 @@
-import { AppShell, Group, LoadingOverlay, Title } from "@mantine/core";
+import {
+	AppShell,
+	Group,
+	LoadingOverlay,
+	Title,
+	type AppShellProps,
+} from "@mantine/core";
 import "@mantine/core/styles.css";
-import { useIsFirstRender, useMediaQuery } from "@mantine/hooks";
+import { useMediaQuery } from "@mantine/hooks";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
 import { IconMenu2 } from "@tabler/icons-react";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import type { SwipeableProps } from "react-swipeable";
 import { useLoadingOverlay, useNavbarState } from "../../../zustand/zustand";
 import { Swipable } from "../../common/Swipable";
 import { ThemeButton } from "../../common/ThemeButton";
 import classes from "./AppShellSpine.module.css";
 
-export interface AppShellSpineProps {
-	children?: React.ReactNode;
-	navbar?: ReactNode;
-	opened?: boolean;
-	disabled?: boolean;
-}
-
-export function AppShellSpine({
-	children,
-	navbar,
-	opened,
-	disabled,
-}: AppShellSpineProps) {
+export function AppShellSpine(props: {
+	children?: ReactNode[];
+	navbarComponent?: ReactNode;
+	navbarOpened?: boolean;
+	navbarDisabled?: boolean;
+}) {
 	const isLoadingOverlayOpen = useLoadingOverlay((s) => s.state);
-	const {
-		state: isNavbarOpen,
-		setState: setNavbarState,
-		toggle,
-	} = useNavbarState();
+	const isNavbarOpen = useNavbarState((s) => s.state);
+	const setNavbarState = useNavbarState((s) => s.setState);
+	const toggleNavbarState = useNavbarState((s) => s.toggle);
 	const isLandscape = useMediaQuery("(orientation: landscape)");
 
-	if (useIsFirstRender()) {
-		// idk what this boolean thing does
-		setNavbarState((opened && disabled) || false);
-	}
+	useEffect(() => {
+		setNavbarState((props.navbarOpened && props.navbarDisabled) || false);
+	}, [props.navbarDisabled, props.navbarOpened, setNavbarState]);
 
 	const swipeableProps: SwipeableProps = {
 		onSwipedLeft: () => setNavbarState(isLandscape),
@@ -43,16 +39,16 @@ export function AppShellSpine({
 	};
 
 	const appShellProps =
-		navbar && !disabled ?
+		props.navbarComponent && !props.navbarDisabled ?
 			{
 				navbar: {
 					breakpoint: "sm",
-					width: 300,
+					width: 250,
 					collapsed: {
 						desktop: isNavbarOpen,
 						mobile: !isNavbarOpen,
 					},
-				},
+				}
 			}
 		:	{};
 
@@ -65,7 +61,9 @@ export function AppShellSpine({
 						style={{ margin: "0.2rem", paddingLeft: "0.4rem" }}>
 						<Group justify="space-between">
 							<Group>
-								{navbar && <IconMenu2 onClick={toggle} />}
+								{props.navbarComponent && (
+									<IconMenu2 onClick={toggleNavbarState} />
+								)}
 								<Title className={classes.title}>
 									Exam Scheduler
 								</Title>
@@ -77,9 +75,13 @@ export function AppShellSpine({
 					</AppShell.Header>
 					<AppShell.Main>
 						<Notifications />
-						{children}
+						{...props.children ?? []}
 					</AppShell.Main>
-					{navbar && <AppShell.Navbar>{navbar}</AppShell.Navbar>}
+					{props.navbarComponent && (
+						<AppShell.Navbar>
+							{props.navbarComponent}
+						</AppShell.Navbar>
+					)}
 				</AppShell>
 			</Swipable>
 		</>

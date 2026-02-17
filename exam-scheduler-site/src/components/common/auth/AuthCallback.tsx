@@ -13,7 +13,7 @@ import {
 	useUserProfile,
 } from "../../../zustand/zustand";
 
-export function AuthCallback({ enabled }: { enabled?: boolean }) {
+export function AuthCallback(props: { disabled?: boolean }) {
 	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
 	const setUserProfile = useUserProfile((s) => s.setData);
 	const setCrossSiteError = useCrossSiteError((s) => s.setData);
@@ -33,16 +33,18 @@ export function AuthCallback({ enabled }: { enabled?: boolean }) {
 
 		if (!authCode || !schoolId) {
 			terminate();
-		} else if (enabled) {
+		} else if (!props.disabled) {
 			post({ authCode, schoolId });
 		}
 
 		return terminate;
-	}, [enabled, post, terminate]);
+	}, [props, post, terminate]);
 
 	useEffect(() => {
-		setLoadingOverlayState(loading && !terminated && !!enabled);
-	}, [enabled, loading, setLoadingOverlayState, terminated]);
+		setLoadingOverlayState(
+			loading && !terminated && (props.disabled ?? false),
+		);
+	}, [props, loading, setLoadingOverlayState, terminated]);
 
 	useEffect(() => {
 		if (data && data.data) {
@@ -95,7 +97,7 @@ export function AuthCallback({ enabled }: { enabled?: boolean }) {
 
 	if (loading && !terminated) {
 		return;
-	} else if (data && data.data) {
+	} else if ((data && data.data) || props.disabled) {
 		return <Navigate to={{ pathname: "/", search: "" }} replace />;
 	} else {
 		return <Navigate to={{ pathname: "/auth", search: "" }} replace />;

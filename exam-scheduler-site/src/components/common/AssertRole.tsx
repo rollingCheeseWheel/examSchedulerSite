@@ -3,11 +3,11 @@ import type { UserRole } from "../../models/enums";
 import { useUserProfile } from "../../zustand/zustand";
 
 export function AssertRole(props: { role: UserRole }) {
-	const userprofile = useUserProfile((s) => s.data);
+	const userRole = useUserProfile((s) => s.data?.role);
 
-	if (!userprofile) {
+	if (!userRole) {
 		return <Navigate to="/" />;
-	} else if (userprofile.role !== props.role) {
+	} else if (userRole !== props.role) {
 		return <Navigate to="/" />;
 	} else {
 		return;

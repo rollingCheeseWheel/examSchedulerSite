@@ -1,5 +1,4 @@
 import {
-	Alert,
 	Button,
 	Center,
 	Collapse,
@@ -9,6 +8,7 @@ import {
 	Group,
 	Kbd,
 	LoadingOverlay,
+	Notification,
 	Paper,
 	Stack,
 	Text,
@@ -25,28 +25,27 @@ import { useTranslation } from "react-i18next";
 import { useIgnoredSwapRequests } from "../../../hooks/useIgnoredSwapRequests";
 import { usePromise } from "../../../hooks/usePromise";
 import { useToggle } from "../../../hooks/useToggle";
-import { UserRole } from "../../../models/enums";
 import type { Result } from "../../../models/result";
 import type { ExamSlot, ExamSlotId, Schedule } from "../../../models/schedule";
 import type { SwapRequest, SwapRequestId } from "../../../models/swapRequest";
-import type { UserProfile } from "../../../models/user";
+import type { UserProfile, UserProfileId } from "../../../models/user";
 import { formatDateTime, type Action } from "../../../util";
 import {
+	useIsTeacher,
 	useScheduleHubConnection,
 	useUserProfile,
 } from "../../../zustand/zustand";
 import { ScheduleProgress } from "./ExtendedProgessbar";
+import { ReportStudentModal } from "../../teacher/report-actual-students/StudentReportPopOver";
+import { useDisclosure } from "@mantine/hooks";
 
 export function ExamSchedule(props: {
 	schedule: Schedule;
 	selectedSlotId?: ExamSlotId;
 	maxwidth?: StyleProp<string | number>;
 }) {
-	const isTeacher =
-		useUserProfile((s) => s.data?.role) === UserRole.Teacher;
-
 	const hubConnection = useScheduleHubConnection((s) => s.data);
-	const { loading, error, resolve } = usePromise<Result<boolean>>();
+	const { loading, resolve } = usePromise<Result<boolean>>();
 
 	const joinSlot = (id: ExamSlotId) =>
 		resolve(hubConnection?.RegisterForSlot(id));
@@ -124,13 +123,6 @@ function ScheduleDate(props: {
 						size="xl"
 					/>
 				</Grid.Col>
-			</Grid>
-			<Grid>
-				<Grid.Col span="auto">
-					<Group gap="xs">
-						{...props.slot.participants.map(ScheduleParticipant)}
-					</Group>
-				</Grid.Col>
 				<Grid.Col span="content">
 					{props.slot.id !== props.selectedSlotId && (
 						<SlotSelectButton
@@ -142,14 +134,18 @@ function ScheduleDate(props: {
 					)}
 				</Grid.Col>
 			</Grid>
-			{thisSlotsSwapRequest.length != 0 && !props.slot.isLocked && (
-				<SwapRequestDrawer
-					swaprequests={thisSlotsSwapRequest}
-					accept={props.acceptSwapRequest}
-					delete={props.deleteSwapRequest}
-					ignore={ignore}
-				/>
-			)}
+			<Group gap="xs">
+				{...props.slot.participants.map(ScheduleParticipant)}
+			</Group>
+			{thisSlotsSwapRequest.length != 0 &&
+				props.slot.lockState === "open" && (
+					<SwapRequestDrawer
+						swaprequests={thisSlotsSwapRequest}
+						accept={props.acceptSwapRequest}
+						delete={props.deleteSwapRequest}
+						ignore={ignore}
+					/>
+				)}
 		</>
 	);
 }
@@ -161,13 +157,34 @@ function ScheduleParticipant(user: UserProfile) {
 function SlotSelectButton(props: {
 	slot: ExamSlot;
 	currentSelectedSlotId?: ExamSlotId;
-	select: (id: ExamSlotId) => void;
-	createSwap: (id: ExamSlotId) => void;
+	select: Action<[ExamSlotId]>;
+	createSwap: Action<[ExamSlotId]>;
 }) {
 	const { t } = useTranslation();
+	const isTeacher = useIsTeacher();
+	const canActualStudentsBeReported = props.slot.lockState === "locked";
+	const [
+		studentModalOpen,
+		{ open: openStudentModal, close: closeStudentModal },
+	] = useDisclosure(false);
 
 	const isInSwapState =
 		props.slot.participants.length >= props.slot.maxParticipants;
+
+	if (isTeacher && canActualStudentsBeReported) {
+		return (
+			<>
+				<ReportStudentModal
+					slotId={props.slot.id}
+					opened={studentModalOpen}
+					onClose={closeStudentModal}
+				/>
+				<Button onClick={openStudentModal}>
+					{t("schedule.reportactual")}
+				</Button>
+			</>
+		);
+	}
 
 	return (
 		<Button
@@ -187,27 +204,31 @@ function SwapRequestDrawer(props: {
 	delete: Action<[SwapRequestId]>;
 	ignore: Action<[SwapRequestId]>;
 }) {
+	const isTeacher = useIsTeacher();
 	const { state, toggle } = useToggle(false);
 	const { t } = useTranslation();
 
+	if (isTeacher) {
+		return;
+	}
+
 	return (
-		<Alert
-			variant="outline"
+		<Notification
+			onClick={toggle}
+			withCloseButton={false}
 			title={
-				<Group justify="space-between" onClick={toggle}>
-					<Center>
-						<Title order={4}>{t("swaprequests.title")}</Title>
-						<IconChevronRight
-							style={{
-								transition: "transform 200ms ease",
-								transform: state ? "rotate(90deg)" : "none",
-							}}
-						/>
-					</Center>
+				<Group>
+					<Title order={4}>{t("swaprequests.title")}</Title>
+					<IconChevronRight
+						style={{
+							transition: "transform 200ms ease",
+							transform: state ? "rotate(90deg)" : "none",
+						}}
+					/>
 				</Group>
 			}>
 			<Collapse in={state}>
-				<Flex gap="md">
+				<Flex gap="md" wrap="wrap">
 					{...props.swaprequests.map((sr) => (
 						<SwapRequestItem
 							swapRequest={sr}
@@ -217,7 +238,7 @@ function SwapRequestDrawer(props: {
 					))}
 				</Flex>
 			</Collapse>
-		</Alert>
+		</Notification>
 	);
 }
 
@@ -238,11 +259,12 @@ function SwapRequestItem(props: {
 						"default"
 					:	"light"
 				}
-				onClick={() =>
+				onClick={(e) => {
+					e.stopPropagation();
 					(userId === props.swapRequest.requestingStudentId ?
 						props.delete
-					:	props.accept)(props.swapRequest.id)
-				}
+					:	props.accept)(props.swapRequest.id);
+				}}
 				leftSection={
 					<Center>
 						<Text size="md">

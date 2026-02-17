@@ -1,4 +1,4 @@
-import { Center, MantineProvider } from "@mantine/core";
+import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import axios from "axios";
 import i18next from "i18next";
@@ -7,14 +7,11 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { initReactI18next } from "react-i18next";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { AppShellSpine } from "./components/common/appshell/AppShellSpine";
-import { DefaultAppShell } from "./components/common/appshell/DefaultAppShell";
-import { AuthWidget } from "./components/common/auth/AuthWidget";
 import { refreshSession } from "./components/common/auth/refreshSession";
-import { ScheduleWidget } from "./components/common/schedule/ScheduleWidget";
-import { CreateScheduleWidget } from "./components/teacher/schedule-create/CreateScheduleWidget";
 import german from "./locales/de_translation.json";
 import english from "./locales/en_translation.json";
+import { DashboardPage } from "./pages/DashboardPage";
+import { LoginPage } from "./pages/LoginPage";
 
 export const api = axios.create({
 	withCredentials: true,
@@ -54,37 +51,8 @@ createRoot(document.getElementById("root")!).render(
 		<MantineProvider defaultColorScheme="auto">
 			<BrowserRouter>
 				<Routes>
-					<Route
-						path="/auth"
-						element={
-							<AppShellSpine disabled>
-								<Center
-									style={{
-										height: "80dvh",
-										overflow: "hidden",
-									}}>
-									<AuthWidget />
-								</Center>
-							</AppShellSpine>
-						}
-					/>
-					<Route
-						path="*"
-						element={
-							<DefaultAppShell>
-								<Route
-									path="/"
-									element={
-										<ScheduleWidget maxwidth="600px" />
-									}
-								/>
-								<Route
-									path="create"
-									element={<CreateScheduleWidget />}
-								/>
-							</DefaultAppShell>
-						}
-					/>
+					<Route path="/auth" element={<LoginPage />} />
+					<Route path="*" element={<DashboardPage />} />
 				</Routes>
 			</BrowserRouter>
 		</MantineProvider>
