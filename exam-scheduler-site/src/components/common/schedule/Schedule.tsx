@@ -1,7 +1,9 @@
 import {
+	Box,
 	Button,
 	Center,
 	Collapse,
+	Container,
 	Divider,
 	Flex,
 	Grid,
@@ -15,6 +17,7 @@ import {
 	Title,
 	type StyleProp,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import {
 	IconCheck,
 	IconChevronRight,
@@ -28,16 +31,15 @@ import { useToggle } from "../../../hooks/useToggle";
 import type { Result } from "../../../models/result";
 import type { ExamSlot, ExamSlotId, Schedule } from "../../../models/schedule";
 import type { SwapRequest, SwapRequestId } from "../../../models/swapRequest";
-import type { UserProfile, UserProfileId } from "../../../models/user";
-import { formatDateTime, type Action } from "../../../util";
+import type { UserProfile } from "../../../models/user";
+import { formatDateTime, sleep, type Action } from "../../../util";
 import {
 	useIsTeacher,
 	useScheduleHubConnection,
 	useUserProfile,
 } from "../../../zustand/zustand";
+import { ReportStudentModal } from "../../teacher/report-actual-students/StudentReportModal";
 import { ScheduleProgress } from "./ExtendedProgessbar";
-import { ReportStudentModal } from "../../teacher/report-actual-students/StudentReportPopOver";
-import { useDisclosure } from "@mantine/hooks";
 
 export function ExamSchedule(props: {
 	schedule: Schedule;
@@ -48,44 +50,50 @@ export function ExamSchedule(props: {
 	const { loading, resolve } = usePromise<Result<boolean>>();
 
 	const joinSlot = (id: ExamSlotId) =>
-		resolve(hubConnection?.RegisterForSlot(id));
+		resolve(hubConnection?.RegisterForSlot(id) ?? sleep(250));
 	const createSwapRequest = (id: ExamSlotId) =>
-		resolve(hubConnection?.CreateSwapRequest(props.schedule.id, id));
+		resolve(
+			hubConnection?.CreateSwapRequest(props.schedule.id, id) ??
+				sleep(250),
+		);
 	const acceptSwapRequest = (id: SwapRequestId) =>
-		resolve(hubConnection?.AcceptSwapRequest(id));
+		resolve(hubConnection?.AcceptSwapRequest(id) ?? sleep(250));
 	const deleteSwapRequest = (id: SwapRequestId) =>
-		resolve(hubConnection?.DeleteSwapRequest(id));
+		resolve(hubConnection?.DeleteSwapRequest(id) ?? sleep(250));
 
 	return (
 		<Paper
 			maw={props.maxwidth}
 			withBorder
-			p="md"
 			radius="md"
 			key={props.schedule.id}>
-			{loading && <LoadingOverlay />}
-			<Group justify="space-between">
-				<Title order={2}>{props.schedule.subject.name}</Title>
-				{props.schedule.description && (
-					<Text>{props.schedule.description}</Text>
-				)}
-			</Group>
-			<Stack align="stretch" justify="flex-start" gap="xs">
-				{...props.schedule.examSlots.map((s, i, arr) => (
-					<>
-						<ScheduleDate
-							schedule={props.schedule}
-							slot={s}
-							selectedSlotId={props.selectedSlotId}
-							selectSlot={joinSlot}
-							createSwapRequest={createSwapRequest}
-							acceptSwapRequest={acceptSwapRequest}
-							deleteSwapRequest={deleteSwapRequest}
-						/>
-						{i != arr.length - 1 && <Divider />}
-					</>
-				))}
-			</Stack>
+			<Box pos="relative" p="md">
+				<LoadingOverlay visible={loading} />
+
+				<Group justify="space-between">
+					<Title order={2}>{props.schedule.subject.name}</Title>
+					{props.schedule.description && (
+						<Text ta="right">{props.schedule.description}</Text>
+					)}
+				</Group>
+
+				<Stack align="stretch" justify="flex-start" gap="xs">
+					{...props.schedule.examSlots.map((s, i, arr) => (
+						<>
+							<ScheduleDate
+								schedule={props.schedule}
+								slot={s}
+								selectedSlotId={props.selectedSlotId}
+								selectSlot={joinSlot}
+								createSwapRequest={createSwapRequest}
+								acceptSwapRequest={acceptSwapRequest}
+								deleteSwapRequest={deleteSwapRequest}
+							/>
+							{i != arr.length - 1 && <Divider />}
+						</>
+					))}
+				</Stack>
+			</Box>
 		</Paper>
 	);
 }
@@ -162,7 +170,6 @@ function SlotSelectButton(props: {
 }) {
 	const { t } = useTranslation();
 	const isTeacher = useIsTeacher();
-	const canActualStudentsBeReported = props.slot.lockState === "locked";
 	const [
 		studentModalOpen,
 		{ open: openStudentModal, close: closeStudentModal },
@@ -171,7 +178,7 @@ function SlotSelectButton(props: {
 	const isInSwapState =
 		props.slot.participants.length >= props.slot.maxParticipants;
 
-	if (isTeacher && canActualStudentsBeReported) {
+	if (isTeacher && props.slot.lockState === "locked") {
 		return (
 			<>
 				<ReportStudentModal
@@ -184,6 +191,8 @@ function SlotSelectButton(props: {
 				</Button>
 			</>
 		);
+	} else if (isTeacher || props.slot.lockState === "definite") {
+		return;
 	}
 
 	return (
@@ -214,6 +223,7 @@ function SwapRequestDrawer(props: {
 
 	return (
 		<Notification
+			color="gray"
 			onClick={toggle}
 			withCloseButton={false}
 			title={

@@ -6,8 +6,8 @@
 	"scripts": {
 		"dev": "vite",
 		"devhost": "vite --host",
-		"build": "tsc -b && vite build --emptyOutDir",
-		"buildlocal": "tsc -b && vite build ",
+		"build": "echo FIX usePromise.tsx PLEAAAASSSEEEEEE && tsc -b && vite build --emptyOutDir",
+		"buildlocal": "echo FIX usePromise.tsx PLEAAAASSSEEEEEE && tsc -b && vite build ",
 		"lint": "eslint .",
 		"preview": "vite preview",
 		"check": "tsc -b --noEmit",
@@ -50,6 +50,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.36.0",
+		"@faker-js/faker": "^10.3.0",
 		"@types/node": "^24.6.0",
 		"@types/react": "^19.1.16",
 		"@types/react-dom": "^19.1.9",

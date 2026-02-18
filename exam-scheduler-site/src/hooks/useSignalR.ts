@@ -1,4 +1,4 @@
-import { type HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
+import { type HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import { useCallback, useEffect, useRef } from "react";
 import { endpoints } from "../endpoints";
 import type { Classroom } from "../models/classroom";
@@ -10,8 +10,8 @@ import type {
 	ScheduleId,
 } from "../models/schedule";
 import type { SwapRequestId } from "../models/swapRequest";
-import type { UserProfile, UserProfileId } from "../models/user";
-import type { Action } from "../util";
+import type { UserProfileId } from "../models/user";
+import { sleep, type Action } from "../util";
 import { useScheduleHubConnection } from "../zustand/zustand";
 
 export interface ScheduleClient {
@@ -146,6 +146,7 @@ export function createConnection(hubUrl: string) {
 		.withUrl(hubUrl, {
 			withCredentials: true,
 		})
+		.configureLogging(LogLevel.Debug)
 		.withAutomaticReconnect()
 		.build();
 }

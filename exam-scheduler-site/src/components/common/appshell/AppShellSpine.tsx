@@ -38,25 +38,25 @@ export function AppShellSpine(props: {
 		onSwipedRight: () => setNavbarState(!isLandscape),
 	};
 
-	const appShellProps =
-		props.navbarComponent && !props.navbarDisabled ?
-			{
-				navbar: {
-					breakpoint: "sm",
-					width: 250,
-					collapsed: {
-						desktop: isNavbarOpen,
-						mobile: !isNavbarOpen,
-					},
-				}
-			}
-		:	{};
+	const appShellProps = {
+		navbar: {
+			breakpoint: "sm",
+			width: 250,
+			collapsed: {
+				desktop: isNavbarOpen,
+				mobile: !isNavbarOpen,
+			},
+		},
+	};
 
 	return (
 		<>
 			<LoadingOverlay visible={isLoadingOverlayOpen} />
 			<Swipable swipeableProps={swipeableProps}>
-				<AppShell {...appShellProps} header={{ height: "3rem" }}>
+				<AppShell
+					{...appShellProps}
+					header={{ height: "3rem" }}
+					disabled={props.navbarDisabled}>
 					<AppShell.Header
 						style={{ margin: "0.2rem", paddingLeft: "0.4rem" }}>
 						<Group justify="space-between">
@@ -77,11 +77,7 @@ export function AppShellSpine(props: {
 						<Notifications />
 						{...props.children ?? []}
 					</AppShell.Main>
-					{props.navbarComponent && (
-						<AppShell.Navbar>
-							{props.navbarComponent}
-						</AppShell.Navbar>
-					)}
+					<AppShell.Navbar>{props.navbarComponent}</AppShell.Navbar>
 				</AppShell>
 			</Swipable>
 		</>

@@ -12,6 +12,9 @@ import german from "./locales/de_translation.json";
 import english from "./locales/en_translation.json";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
+import { faker } from "@faker-js/faker";
+
+faker.seed(67);
 
 export const api = axios.create({
 	withCredentials: true,

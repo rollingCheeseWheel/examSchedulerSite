@@ -10,7 +10,9 @@ export function usePromise<TResult = never>() {
 
 	useEffect(() => {
 		return () => {
-			mountedRef.current = false;
+		// WARNING + TODO: uncomment when in prod, only prevents un and remount issues from strictmode
+			// mountedRef.current = false;
+			setLoading(false);
 		};
 	}, []);
 
@@ -18,7 +20,6 @@ export function usePromise<TResult = never>() {
 		if (!promise) {
 			return;
 		}
-
 		const callId = ++callIdRef.current;
 
 		setData(undefined);

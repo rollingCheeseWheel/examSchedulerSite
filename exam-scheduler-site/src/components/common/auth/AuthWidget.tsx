@@ -40,8 +40,8 @@ export function AuthWidget() {
 						(crossSiteError ?? schoolFetchError) ?
 							t("auth.school.error")
 						:	undefined
-					} // Failed to load schools, please try again
-					label={t("auth.school.select")} // "Select your school"
+					}
+					label={t("auth.school.select")}
 					data={
 						data ?
 							data.map((school) => {

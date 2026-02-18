@@ -9,19 +9,23 @@ import {
 	Tooltip,
 } from "@mantine/core";
 import { IconArrowBigLeft, IconArrowBigRight } from "@tabler/icons-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { usePromise } from "../../../hooks/usePromise";
 import type { Lesson } from "../../../models/calendar";
 import type { ClassroomId } from "../../../models/classroom";
+import type { Result } from "../../../models/result";
 import {
 	getColorsForLessons,
 	groupBy,
 	mapMap,
+	sleep,
 	type Action,
 	type LessonColors,
 } from "../../../util";
 import {
 	useClassrooms,
+	useLoadingOverlay,
 	useScheduleHubConnection,
 } from "../../../zustand/zustand";
 
@@ -30,8 +34,18 @@ export function CreateScheduleWidget({
 }: {
 	classroomId?: ClassroomId;
 }) {
-	const scheduleHub = useScheduleHubConnection((s) => s.data);
 	const { t } = useTranslation();
+	const scheduleHub = useScheduleHubConnection((s) => s.data);
+	const setLoadingOverlay = useLoadingOverlay((s) => s.setState);
+	const { loading, resolve } = usePromise<Result<boolean>>();
+
+	useEffect(() => {
+		setLoadingOverlay(loading);
+	}, [loading, setLoadingOverlay]);
+
+	function handleClick() {
+		resolve(/* scheduleHub?.CreateSchedule() */ sleep(250));
+	}
 
 	const classrooms = useClassrooms((s) => s.data);
 	const [selectedWeek, setSelectedWeek] = useState(new Date());
@@ -47,10 +61,6 @@ export function CreateScheduleWidget({
 		calendar?.lessons ?? [],
 		(i) => i.occurances.at(0)?.getDay() ?? Number.MIN_SAFE_INTEGER,
 	);
-
-	function handleClick() {
-		// scheduleHub?.CreateSchedule()
-	}
 
 	return (
 		<>

@@ -72,6 +72,7 @@ function getLinksForRole(
 				},
 			];
 		default:
+			// testing only
 			return [
 				{
 					label: t("navbar.overview"),

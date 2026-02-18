@@ -4,7 +4,15 @@ import type { ScheduleHub } from "../hooks/useSignalR";
 import type { Classroom } from "../models/classroom";
 import type { Schedule } from "../models/schedule";
 import type { UserProfile } from "../models/user";
-import type { Action, Func } from "../util";
+import {
+	classroomSorter,
+	examSlotSorter,
+	scheduleSorter,
+	swapRequestSorter,
+	userProfileSorter,
+	type Action,
+	type Func,
+} from "../util";
 
 interface DisclosureStore {
 	state: boolean;
@@ -119,28 +127,19 @@ export const useLoadingOverlay = createDisclosureStore();
 export const useNavbarState = createDisclosureStore();
 
 export const useNavbarLinks = createListStore<LinkGroupProp>();
-export const useSchedules = createListStore<Schedule>(
-	(a, b) => a.startDate.getTime() - b.startDate.getTime(),
-	(x) => ({
-		...x,
-		examSlots: x.examSlots
-			.sort((a, b) => a.date.getTime() - b.date.getTime())
-			.map((s) => ({
-				...s,
-				participants: s.participants.sort((a, b) =>
-					a.name.localeCompare(b.name),
-				),
-			})),
-	}),
-);
-export const useClassrooms = createListStore<Classroom>((a, b) =>
-	a.name.localeCompare(b.name),
-);
+export const useSchedules = createListStore<Schedule>(scheduleSorter, (x) => ({
+	...x,
+	examSlots: x.examSlots.sort(examSlotSorter).map((s) => ({
+		...s,
+		participants: s.participants.sort(userProfileSorter),
+	})),
+	swapRequests: x.swapRequests.sort(swapRequestSorter),
+}));
+export const useClassrooms = createListStore<Classroom>(classroomSorter);
 
 export const useUserProfile = createSingletonStore<UserProfile>();
-export function useIsTeacher() {
-	return useUserProfile((s) => s.data)?.role === "teacher";
-}
+export const useIsTeacher = () =>
+	useUserProfile((s) => s.data)?.role === "teacher";
 
 export const useCrossSiteError = createSingletonStore<string>();
 export const useScheduleHubConnection = createSingletonStore<ScheduleHub>();

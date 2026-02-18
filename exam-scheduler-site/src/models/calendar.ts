@@ -9,6 +9,7 @@ export type LessonName = BrandedString<"lessonname">;
 
 export type FromHour = Brand<number, "fromhour">;
 export type ToHour = Brand<number, "tohour">;
+export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface Calendar {
 	id: CalendarId;
@@ -18,6 +19,7 @@ export interface Calendar {
 
 export interface Lesson {
 	id: LessonId;
+	dayOfWeek: DayOfWeek;
 	occurances: Date[];
 	fromHour: FromHour;
 	toHour: ToHour;

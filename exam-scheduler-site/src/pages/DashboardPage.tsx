@@ -4,6 +4,8 @@ import { DefaultAppShell } from "../components/common/appshell/DefaultAppShell";
 import { ScheduleWidget } from "../components/common/schedule/ScheduleWidget";
 import { CreateScheduleWidget } from "../components/teacher/schedule-create/CreateScheduleWidget";
 import { useSchedules, useUserProfile } from "../zustand/zustand";
+import { randomId } from "../util";
+import { faker } from "@faker-js/faker";
 
 export function DashboardPage() {
 	useInitMockUpData();
@@ -22,160 +24,160 @@ function useInitMockUpData() {
 
 	useEffect(() => {
 		setUserProfile({
-			id: "676767",
-			name: "Laurin Feichter",
-			role: "student",
+			id: randomId("user"),
+			name: faker.person.fullName(),
+			role: "teacher",
 		});
 
 		setSchedules([
 			{
-				id: "sadfasdf",
+				id: randomId(),
 				startDate: new Date("2026-01-01"),
 				endDate: new Date("2026-02-01"),
-				lockInOffset: new Date("0000-00-01"),
+				lockInOffset: new Date("1970-01-01"),
 				autoLockIn: "fixedDate",
 				subject: { name: "Rechtskunde" },
 				teachers: [{ name: "Brigitta Niederkofler" }],
 				description: "Handelsrecht und Arbeitsrecht",
 				examSlots: [
 					{
-						id: "asdfasdfasdf",
+						id: randomId(),
 						date: new Date("2026-01-01"),
 						minParticipants: 10,
 						maxParticipants: 10,
-						isLocked: false,
+						lockState: "definite",
 						participants: [
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Lauasdfasdfasdfrin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 						],
 					},
 					{
-						id: "sdfghdfghdfgh",
+						id: randomId(),
 						date: new Date("2026-01-02"),
 						minParticipants: 1,
 						maxParticipants: 4,
-						isLocked: false,
+						lockState: "locked",
 						participants: [
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 						],
 					},
 					{
-						id: "QWAERASDFF",
+						id: randomId("swaponly"),
 						date: new Date("2026-01-03"),
 						minParticipants: 1,
 						maxParticipants: 4,
-						isLocked: false,
+						lockState: "open",
 						participants: [
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 							{
-								id: "676767",
-								name: "Laurin Feichter",
+								id: randomId(),
+								name: faker.person.fullName(),
 								role: "student",
 							},
 						],
@@ -183,16 +185,16 @@ function useInitMockUpData() {
 				],
 				swapRequests: [
 					{
-						id: "aölkjklöasdhf",
-						requestedSlotId: "asdfasdfasdf",
-						requestingStudentId: "676767",
-						requestingStudentName: "Laurin Feichter",
+						id: randomId(),
+						requestedSlotId: randomId("swaponly"),
+						requestingStudentId: randomId("user"),
+						requestingStudentName: faker.person.fullName(),
 					},
 					{
-						id: "aölkjklöasdhf",
-						requestedSlotId: "asdfasdfasdf",
-						requestingStudentId: "asdfasdfasdf",
-						requestingStudentName: "Laurin Feichter",
+						id: randomId(),
+						requestedSlotId: randomId("swaponly"),
+						requestingStudentId: randomId(),
+						requestingStudentName: faker.person.fullName(),
 					},
 				],
 				auditLogs: [],
