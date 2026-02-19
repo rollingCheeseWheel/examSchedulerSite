@@ -4,7 +4,7 @@ import { AuthWidget } from "../components/common/auth/AuthWidget";
 
 export function LoginPage() {
 	return (
-		<AppShellSpine navbarDisabled>
+		<AppShellSpine>
 			<></>
 			<Center
 				style={{

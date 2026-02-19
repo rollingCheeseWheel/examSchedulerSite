@@ -1,4 +1,4 @@
-import { MantineProvider } from "@mantine/core";
+import { createTheme, MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import axios from "axios";
 import i18next from "i18next";
@@ -49,9 +49,26 @@ i18next
 i18next.addResourceBundle("en", "translation", english, true);
 i18next.addResourceBundle("de", "translation", german, true);
 
+const theme = createTheme({
+	colors: {
+		paleBlue: [
+  "#ecf4ff",
+  "#dce4f5",
+  "#b9c7e2",
+  "#94a8d0",
+  "#748dc0",
+  "#5f7cb7",
+  "#5474b4",
+  "#44639f",
+  "#3a5890",
+  "#2c4b80"
+]},
+	primaryColor: "paleBlue"
+})
+
 createRoot(document.getElementById("root")!).render(
 	<StrictMode>
-		<MantineProvider defaultColorScheme="auto">
+		<MantineProvider defaultColorScheme="auto" /* theme={theme} */>
 			<BrowserRouter>
 				<Routes>
 					<Route path="/auth" element={<LoginPage />} />

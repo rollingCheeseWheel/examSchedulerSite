@@ -1,21 +1,39 @@
-import { useEffect, useEffectEvent, type ReactNode } from "react";
+import { Button, Group } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { Routes } from "react-router-dom";
-import { useNavbarLinksForUser } from "../../../hooks/useNavbarLinksForUser";
-import { NestedNavbar } from "../../common/navbar-link-group/NestedNavbar";
+import { useIsTeacher } from "../../../zustand/zustand";
+import { ScheduleCreateModal } from "../../teacher/schedule-create/ScheduleCreateModal";
 import { AuthCallback } from "../auth/AuthCallback";
 import { AppShellSpine } from "./AppShellSpine";
+import { IconPlus } from "@tabler/icons-react";
 
 export function DefaultAppShell(props: {
 	children: ReactNode[];
 	authDisabled?: boolean;
 }) {
-	const updateNavbar = useNavbarLinksForUser().updateNavbar;
-	useEffect(updateNavbar, [updateNavbar]);
+	const { t } = useTranslation();
+	const isTeacher = useIsTeacher();
+	const [modalOpen, { open, close }] = useDisclosure(false);
 
 	return (
-		<AppShellSpine navbarComponent={<NestedNavbar />} navbarOpened>
-			<AuthCallback disabled={props.authDisabled}></AuthCallback>
-			<Routes>{...props.children}</Routes>
-		</AppShellSpine>
+		<>
+			<AppShellSpine>
+				<AuthCallback disabled={props.authDisabled}></AuthCallback>
+				<Routes>{...props.children}</Routes>
+			</AppShellSpine>
+			{isTeacher && (
+				<>
+					<ScheduleCreateModal opened={modalOpen} close={close} />
+					<Group onClick={open}>
+						<Button size="lg" pos="fixed" bottom={16} right={16}>
+							{t("schedule.create.createbutton")}
+						</Button>
+						<IconPlus />
+					</Group>
+				</>
+			)}
+		</>
 	);
 }

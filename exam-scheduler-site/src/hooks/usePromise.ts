@@ -10,7 +10,7 @@ export function usePromise<TResult = never>() {
 
 	useEffect(() => {
 		return () => {
-		// WARNING + TODO: uncomment when in prod, only prevents un and remount issues from strictmode
+			// WARNING + TODO: uncomment when in prod, only prevents un and remount issues from strictmode
 			// mountedRef.current = false;
 			setLoading(false);
 		};
@@ -41,5 +41,11 @@ export function usePromise<TResult = never>() {
 			});
 	}, []);
 
-	return { data, error, loading, resolve };
+	const abort = useCallback(() => {
+		mountedRef.current = false;
+		callIdRef.current++;
+		setLoading(false);
+	}, []);
+
+	return { data, error, loading, resolve, abort };
 }

@@ -5,6 +5,7 @@ import type { Classroom } from "./models/classroom";
 import type { ExamSlot, Schedule } from "./models/schedule";
 import type { SwapRequest } from "./models/swapRequest";
 import type { UserProfile } from "./models/user";
+import { init } from "i18next";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Func<Args extends any[], TResult> = (...args: Args) => TResult;
@@ -27,31 +28,43 @@ export function formatDateTime(
 	return new Intl.DateTimeFormat(locale, format).format(date);
 }
 
-export function groupBy<T, TKey extends string | number | symbol>(
-	data: T[],
-	selector: (item: T) => TKey,
-): Record<TKey, T[]> {
-	const map: Record<TKey, T[]> = {} as Record<TKey, T[]>;
+export function groupBy<TKey, TValue>(
+	data: TValue[],
+	selector: (item: TValue) => TKey,
+): Map<TKey, TValue[]> {
+	const result = new Map<TKey, TValue[]>();
 	for (const item of data) {
 		const key = selector(item);
-		const existing = map[key];
+		const existing = result.get(key);
 		if (existing) {
 			existing.push(item);
-			map[key] = existing;
+			result.set(key, existing);
 		} else {
-			map[key] = [item];
+			result.set(key, [item]);
 		}
 	}
-	return map;
+	return result;
 }
 
-export function mapMap<T, TKey extends string | symbol | number, TResult>(
-	data: Record<TKey, T[]>,
-	selector: Func<[TKey, T[], Record<TKey, T[]>], TResult>,
-): TResult[] {
-	const result: TResult[] = [];
-	for (const key in data) {
-		result.push(selector(key, data[key], data));
+export function mapKVPs<TKey, TValue, TResult>(
+	data: Map<TKey, TValue>,
+	selector: Func<[TValue, TKey, Map<TKey, TValue>], TResult>,
+): Map<TKey, TResult> {
+	const result = new Map<TKey, TResult>();
+	for (const key of data.keys()) {
+		result.set(key, selector(data.get(key)!, key, data));
+	}
+	return result;
+}
+
+export function reduceMap<TKey, TValue, TReturn>(
+	data: Map<TKey, TValue[]>,
+	reducer: Func<[TReturn, TValue, number, TValue[]], TReturn>,
+	initialValue: TReturn,
+): Map<TKey, TReturn> {
+	const result = new Map<TKey, TReturn>();
+	for (const key of data.keys()) {
+		result.set(key, data.get(key)!.reduce(reducer, initialValue));
 	}
 	return result;
 }
@@ -140,8 +153,6 @@ export const lessonSorter = compoundSort<Lesson>(
 
 export const subjectSorter = sort<Subject>((x) => x.name);
 
-export type LessonColors = Record<SubjectName, MantineColor>;
-
 export const lessonColors: MantineColor[] = [
 	"gray",
 	"red",
@@ -171,7 +182,7 @@ export const lessonColors: MantineColor[] = [
 
 export function getColorsForLessons(calendar: Calendar | Lesson[]) {
 	const lessons = Array.isArray(calendar) ? calendar : calendar.lessons;
-	const res: LessonColors = {};
+	const res: Record<SubjectName, MantineColor> = {};
 	const subjectNames = Array.from(
 		new Set(lessons.map((l) => l.subject.name)),
 	).sort();

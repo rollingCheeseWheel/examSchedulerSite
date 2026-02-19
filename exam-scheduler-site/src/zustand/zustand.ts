@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import type { LinkGroupProp } from "../components/common/navbar-link-group/LinkGroup";
 import type { ScheduleHub } from "../hooks/useSignalR";
 import type { Classroom } from "../models/classroom";
 import type { Schedule } from "../models/schedule";
@@ -7,6 +6,7 @@ import type { UserProfile } from "../models/user";
 import {
 	classroomSorter,
 	examSlotSorter,
+	lessonSorter,
 	scheduleSorter,
 	swapRequestSorter,
 	userProfileSorter,
@@ -124,18 +124,28 @@ function createSingletonStore<T>(
 }
 
 export const useLoadingOverlay = createDisclosureStore();
-export const useNavbarState = createDisclosureStore();
 
-export const useNavbarLinks = createListStore<LinkGroupProp>();
-export const useSchedules = createListStore<Schedule>(scheduleSorter, (x) => ({
-	...x,
-	examSlots: x.examSlots.sort(examSlotSorter).map((s) => ({
-		...s,
-		participants: s.participants.sort(userProfileSorter),
-	})),
-	swapRequests: x.swapRequests.sort(swapRequestSorter),
-}));
-export const useClassrooms = createListStore<Classroom>(classroomSorter);
+export const useSchedules = createListStore<Schedule>(
+	scheduleSorter,
+	(schedule) => ({
+		...schedule,
+		examSlots: schedule.examSlots.sort(examSlotSorter).map((slot) => ({
+			...slot,
+			participants: slot.participants.sort(userProfileSorter),
+		})),
+		swapRequests: schedule.swapRequests.sort(swapRequestSorter),
+	}),
+);
+export const useClassrooms = createListStore<Classroom>(
+	classroomSorter,
+	(classroom) => ({
+		...classroom,
+		calendar: {
+			...classroom.calendar,
+			lessons: classroom.calendar.lessons.sort(lessonSorter),
+		},
+	}),
+);
 
 export const useUserProfile = createSingletonStore<UserProfile>();
 export const useIsTeacher = () =>

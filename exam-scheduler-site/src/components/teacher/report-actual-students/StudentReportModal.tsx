@@ -29,9 +29,15 @@ export function ReportStudentModal(props: {
 	onClose: Action<[]>;
 }) {
 	const { t } = useTranslation();
+
 	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
+	const { loading, resolve, abort } = usePromise<Result<boolean>>();
+	useEffect(() => {
+		setLoadingOverlayState(loading);
+		return abort;
+	}, [abort, loading, setLoadingOverlayState]);
+
 	const scheduleHub = useScheduleHubConnection((s) => s.data);
-	const { loading, resolve } = usePromise<Result<boolean>>();
 	const [checkedStudents, setCheckedStudents] = useState<UserProfileId[]>([]);
 
 	const schedule = useSchedules((s) => s.data).find((s) =>
@@ -50,11 +56,6 @@ export function ReportStudentModal(props: {
 		.flatMap((s) => s.participants)
 		.filter((p) => !examslot?.participants?.map((x) => x.id).includes(p.id))
 		.filter((p) => !studentsInLockedSlots?.map((x) => x.id).includes(p.id));
-
-	useEffect(
-		() => setLoadingOverlayState(loading),
-		[loading, setLoadingOverlayState],
-	);
 
 	if (!schedule || !examslot || !availableStudents) {
 		return;
