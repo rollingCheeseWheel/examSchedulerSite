@@ -1,11 +1,10 @@
+import { faker } from "@faker-js/faker";
 import { useEffect } from "react";
 import { Route } from "react-router-dom";
 import { DefaultAppShell } from "../components/common/appshell/DefaultAppShell";
 import { ScheduleWidget } from "../components/common/schedule/ScheduleWidget";
-import { CreateScheduleWidget } from "../components/teacher/schedule-create/CreateScheduleWidget";
-import { useSchedules, useUserProfile } from "../zustand/zustand";
 import { randomId } from "../util";
-import { faker } from "@faker-js/faker";
+import { useSchedules, useUserProfile } from "../zustand/zustand";
 
 export function DashboardPage() {
 	useInitMockUpData();
@@ -13,7 +12,8 @@ export function DashboardPage() {
 	return (
 		<DefaultAppShell authDisabled={true}>
 			<Route path="/" element={<ScheduleWidget maxwidth="600px" />} />
-			<Route path="create" element={<CreateScheduleWidget />} />
+			<></>
+			{/* <Route path="create" element={<CreateScheduleWidget />} /> */}
 		</DefaultAppShell>
 	);
 }

@@ -1,5 +1,4 @@
 import { Grid, type StyleProp } from "@mantine/core";
-import type { ExamSlot, Schedule } from "../../../models/schedule";
 import { useSchedules, useUserProfile } from "../../../zustand/zustand";
 import { ExamSchedule } from "./Schedule";
 

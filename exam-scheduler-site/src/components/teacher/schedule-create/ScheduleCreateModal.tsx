@@ -11,11 +11,13 @@ import {
 	Text,
 	type MantineColor,
 } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { DatePickerInput, type DayOfWeek } from "@mantine/dates";
+import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useCalendar } from "../../../hooks/useCalendar";
 import { usePromise } from "../../../hooks/usePromise";
-import type { DayOfWeek } from "../../../models/calendar";
+import type { Lesson } from "../../../models/calendar";
 import type { ClassroomId } from "../../../models/classroom";
 import {
 	compoundSort,
@@ -27,7 +29,6 @@ import {
 	type Action,
 } from "../../../util";
 import {
-	useCalendarWeeks,
 	useClassrooms,
 	useLoadingOverlay,
 	useScheduleHubConnection,
@@ -40,34 +41,52 @@ export function ScheduleCreateModal(props: {
 	const { t } = useTranslation();
 	const scheduleHub = useScheduleHubConnection((s) => s.data);
 
-	const { loading, resolve, abort } = usePromise();
+	const {
+		loading: lessonFetchLoading,
+		resolve: resolveLessonPromise,
+		abort: abortLessonFetch,
+		data: lessons,
+		getSignal,
+	} = usePromise<Lesson[]>();
 	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
 	useEffect(() => {
-		setLoadingOverlayState(loading);
-		return abort;
-	}, [abort, loading, setLoadingOverlayState]);
+		setLoadingOverlayState(lessonFetchLoading);
+		return abortLessonFetch;
+	}, [abortLessonFetch, lessonFetchLoading, setLoadingOverlayState]);
 
 	const [selectedWeek, setSelectedWeek] = useState<Date>();
-	const incrementDate = () => setSelectedWeek
+	function incrementDate() {
+		setSelectedWeek(
+			selectedWeek ? new Date(selectedWeek.getDate() + 7) : undefined,
+		);
+		resolveLessonPromise(
+			fetchWeek(selectedClassroomId, selectedWeek, getSignal()),
+		);
+	}
+	function decrementDate() {
+		setSelectedWeek(
+			selectedWeek ? new Date(selectedWeek.getDate() - 7) : undefined,
+		);
+		resolveLessonPromise(
+			fetchWeek(selectedClassroomId, selectedWeek, getSignal()),
+		);
+	}
 
 	const classrooms = useClassrooms((s) => s.data);
 	const [selectedClassroomId, setSelectedClassroom] = useState<ClassroomId>();
-	const { data: calendarWeek, append: appendWeek } = useCalendarWeeks();
+	const { fetchWeek } = useCalendar();
 
 	const calendar = classrooms.find(
 		(c) => c.id == selectedClassroomId,
-	)?.calendar;
-	const lessonColors = getColorsForLessons(calendar);
-	const slots = calendarWeek
-		.filter((w) => w.date.getTime() == selectedWeek?.getTime())
-		.flatMap((w) => w.lessons)
-		.map<TimeTableSlot>((l) => ({
-			name: l.subject.name,
-			dayOfWeek: l.dayOfWeek,
-			start: l.fromHour,
-			duration: l.toHour - l.fromHour,
-			color: lessonColors[l.subject.name],
-		}));
+	);
+	const lessonColors = getColorsForLessons(lessons ?? []);
+	const slots = (lessons ?? []).map<TimeTableSlot>((l) => ({
+		name: l.subject.name,
+		dayOfWeek: new Date(l.date).getDate() as DayOfWeek,
+		start: l.fromHour,
+		duration: l.toHour - l.fromHour,
+		color: lessonColors[l.subject.name],
+	}));
 
 	function handleSubmit() {}
 
@@ -81,8 +100,7 @@ export function ScheduleCreateModal(props: {
 				<Text fw={700} size="xl">
 					{t("schedule.create.title")}
 				</Text>
-			}
-		>
+			}>
 			<Stack>
 				<NativeSelect
 					required
@@ -109,7 +127,11 @@ export function ScheduleCreateModal(props: {
 						<Grid>
 							<Grid.Col>
 								<Center>
-									<ActionIcon />
+									<ActionIcon
+										variant="default"
+										onClick={decrementDate}>
+										<IconChevronLeft />
+									</ActionIcon>
 								</Center>
 							</Grid.Col>
 							<Grid.Col>
@@ -117,7 +139,11 @@ export function ScheduleCreateModal(props: {
 							</Grid.Col>
 							<Grid.Col>
 								<Center>
-									<ActionIcon />
+									<ActionIcon
+										variant="default"
+										onClick={incrementDate}>
+										<IconChevronRight />
+									</ActionIcon>
 								</Center>
 							</Grid.Col>
 						</Grid>
@@ -172,10 +198,10 @@ function TimeTable(props: { slots: TimeTableSlot[] }) {
 					<Grid.Col>
 						{slots.map((s) => (
 							<Container
+								pos="absolute"
 								top={`${s.start * percentHeightPerHour}%`}
 								bg={s.color}
-								mah={`${s.duration * percentHeightPerHour}%`}
-							>
+								h={`${s.duration * percentHeightPerHour}%`}>
 								<Text>{s.name}</Text>
 							</Container>
 						))}

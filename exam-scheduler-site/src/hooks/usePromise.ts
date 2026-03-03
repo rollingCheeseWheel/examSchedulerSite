@@ -7,6 +7,7 @@ export function usePromise<TResult = never>() {
 
 	const callIdRef = useRef(0);
 	const mountedRef = useRef(true);
+	const abortControllersRef = useRef<AbortController[]>([]);
 
 	useEffect(() => {
 		return () => {
@@ -45,7 +46,18 @@ export function usePromise<TResult = never>() {
 		mountedRef.current = false;
 		callIdRef.current++;
 		setLoading(false);
+		const localCopy = abortControllersRef.current;
+		abortControllersRef.current = [];
+		for (const abortController of localCopy) {
+			abortController.abort();
+		}
 	}, []);
 
-	return { data, error, loading, resolve, abort };
+	const getSignal = useCallback(() => {
+		const controller = new AbortController();
+		abortControllersRef.current.push(controller);
+		return controller.signal;
+	}, []);
+
+	return { data, error, loading, resolve, abort, getSignal };
 }

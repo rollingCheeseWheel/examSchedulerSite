@@ -1,4 +1,4 @@
-import { type HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
+import { HubConnectionBuilder, LogLevel, type HubConnection } from "@microsoft/signalr";
 import { useCallback, useEffect, useRef } from "react";
 import { endpoints } from "../endpoints";
 import type { Classroom } from "../models/classroom";
@@ -11,7 +11,7 @@ import type {
 } from "../models/schedule";
 import type { SwapRequestId } from "../models/swapRequest";
 import type { UserProfileId } from "../models/user";
-import { sleep, type Action } from "../util";
+import { type Action } from "../util";
 import { useScheduleHubConnection } from "../zustand/zustand";
 
 export interface ScheduleClient {

@@ -6,15 +6,12 @@ import type { UserProfile } from "../models/user";
 import {
 	classroomSorter,
 	examSlotSorter,
-	lessonSorter,
 	scheduleSorter,
 	swapRequestSorter,
 	userProfileSorter,
-	weekSorter,
 	type Action,
-	type Func,
+	type Func
 } from "../util";
-import type { Week } from "../models/calendar";
 
 export interface DisclosureStore {
 	state: boolean;
@@ -127,16 +124,7 @@ export function createSingletonStore<T>(
 
 export const useLoadingOverlay = createDisclosureStore();
 
-export const useClassrooms = createListStore<Classroom>(
-	classroomSorter,
-	(classroom) => ({
-		...classroom,
-		calendar: {
-			...classroom.calendar,
-			lessons: classroom.calendar.lessons.sort(lessonSorter),
-		},
-	}),
-);
+export const useClassrooms = createListStore<Classroom>(classroomSorter);
 export const useSchedules = createListStore<Schedule>(
 	scheduleSorter,
 	(schedule) => ({

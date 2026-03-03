@@ -3,7 +3,6 @@ import {
 	Button,
 	Center,
 	Collapse,
-	Container,
 	Divider,
 	Flex,
 	Grid,
@@ -15,7 +14,7 @@ import {
 	Stack,
 	Text,
 	Title,
-	type StyleProp,
+	type StyleProp
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
