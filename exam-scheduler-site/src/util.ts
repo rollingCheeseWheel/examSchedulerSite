@@ -1,11 +1,13 @@
-import { createTheme, type MantineColor } from "@mantine/core";
+import { ActionIcon, createTheme, type MantineColor } from "@mantine/core";
 import type { AuditLog } from "./models/auditLog";
-import type { Calendar, Lesson, Subject, SubjectName } from "./models/calendar";
+import type { Lesson, Subject, SubjectName, Week } from "./models/calendar";
 import type { Classroom } from "./models/classroom";
 import type { ExamSlot, Schedule } from "./models/schedule";
 import type { SwapRequest } from "./models/swapRequest";
 import type { UserProfile } from "./models/user";
 import { init } from "i18next";
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { IconAdjustmentsExclamation } from "@tabler/icons-react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Func<Args extends any[], TResult> = (...args: Args) => TResult;
@@ -151,6 +153,10 @@ export const lessonSorter = compoundSort<Lesson>(
 	sort((x) => x.id),
 );
 
+export const weekSorter = compoundSort<Week>(
+	sort((x) => x.date.getTime())
+)
+
 export const subjectSorter = sort<Subject>((x) => x.name);
 
 export const lessonColors: MantineColor[] = [
@@ -180,8 +186,7 @@ export const lessonColors: MantineColor[] = [
 	"orange.4",
 ];
 
-export function getColorsForLessons(calendar: Calendar | Lesson[]) {
-	const lessons = Array.isArray(calendar) ? calendar : calendar.lessons;
+export function getColorsForLessons(lessons: Lesson[]) {
 	const res: Record<SubjectName, MantineColor> = {};
 	const subjectNames = Array.from(
 		new Set(lessons.map((l) => l.subject.name)),

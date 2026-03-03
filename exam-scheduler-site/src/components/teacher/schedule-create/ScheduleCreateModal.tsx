@@ -1,5 +1,7 @@
 import {
+	ActionIcon,
 	Button,
+	Center,
 	Container,
 	Grid,
 	Group,
@@ -25,6 +27,7 @@ import {
 	type Action,
 } from "../../../util";
 import {
+	useCalendarWeeks,
 	useClassrooms,
 	useLoadingOverlay,
 	useScheduleHubConnection,
@@ -44,22 +47,27 @@ export function ScheduleCreateModal(props: {
 		return abort;
 	}, [abort, loading, setLoadingOverlayState]);
 
-	const [startDate, setStartDate] = useState<string | null>();
+	const [selectedWeek, setSelectedWeek] = useState<Date>();
+	const incrementDate = () => setSelectedWeek
 
 	const classrooms = useClassrooms((s) => s.data);
 	const [selectedClassroomId, setSelectedClassroom] = useState<ClassroomId>();
+	const { data: calendarWeek, append: appendWeek } = useCalendarWeeks();
 
 	const calendar = classrooms.find(
 		(c) => c.id == selectedClassroomId,
 	)?.calendar;
-	const lessonColors = getColorsForLessons(calendar?.lessons ?? []);
-	const slots = (calendar?.lessons ?? []).map<TimeTableSlot>((l) => ({
-		name: l.subject.name,
-		dayOfWeek: l.dayOfWeek,
-		start: l.fromHour,
-		duration: l.toHour - l.fromHour,
-		color: lessonColors[l.subject.name],
-	}));
+	const lessonColors = getColorsForLessons(calendar);
+	const slots = calendarWeek
+		.filter((w) => w.date.getTime() == selectedWeek?.getTime())
+		.flatMap((w) => w.lessons)
+		.map<TimeTableSlot>((l) => ({
+			name: l.subject.name,
+			dayOfWeek: l.dayOfWeek,
+			start: l.fromHour,
+			duration: l.toHour - l.fromHour,
+			color: lessonColors[l.subject.name],
+		}));
 
 	function handleSubmit() {}
 
@@ -73,7 +81,8 @@ export function ScheduleCreateModal(props: {
 				<Text fw={700} size="xl">
 					{t("schedule.create.title")}
 				</Text>
-			}>
+			}
+		>
 			<Stack>
 				<NativeSelect
 					required
@@ -92,10 +101,26 @@ export function ScheduleCreateModal(props: {
 						<DatePickerInput
 							required
 							label={t("schedule.create.datepick")}
-							value={startDate}
-							onChange={setStartDate}
+							value={selectedWeek}
+							onChange={(e) =>
+								setSelectedWeek(e ? new Date(e) : undefined)
+							}
 						/>
-						<TimeTable slots={slots} />
+						<Grid>
+							<Grid.Col>
+								<Center>
+									<ActionIcon />
+								</Center>
+							</Grid.Col>
+							<Grid.Col>
+								<TimeTable slots={slots} />
+							</Grid.Col>
+							<Grid.Col>
+								<Center>
+									<ActionIcon />
+								</Center>
+							</Grid.Col>
+						</Grid>
 					</>
 				)}
 				<Group>
@@ -149,7 +174,8 @@ function TimeTable(props: { slots: TimeTableSlot[] }) {
 							<Container
 								top={`${s.start * percentHeightPerHour}%`}
 								bg={s.color}
-								mah={`${s.duration * percentHeightPerHour}%`}>
+								mah={`${s.duration * percentHeightPerHour}%`}
+							>
 								<Text>{s.name}</Text>
 							</Container>
 						))}

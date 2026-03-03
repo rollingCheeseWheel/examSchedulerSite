@@ -10,11 +10,13 @@ import {
 	scheduleSorter,
 	swapRequestSorter,
 	userProfileSorter,
+	weekSorter,
 	type Action,
 	type Func,
 } from "../util";
+import type { Week } from "../models/calendar";
 
-interface DisclosureStore {
+export interface DisclosureStore {
 	state: boolean;
 	hasChanged: boolean;
 	open: Action<[]>;
@@ -24,7 +26,7 @@ interface DisclosureStore {
 	reset: Action<[]>;
 }
 
-function createDisclosureStore(initialState: boolean = false) {
+export function createDisclosureStore(initialState: boolean = false) {
 	return create<DisclosureStore>((set) => ({
 		state: initialState,
 		hasChanged: false,
@@ -46,7 +48,7 @@ function createDisclosureStore(initialState: boolean = false) {
 	}));
 }
 
-interface ListStore<T> {
+export interface ListStore<T> {
 	data: T[];
 	hasChanged: boolean;
 	setData: Action<[T[]]>;
@@ -55,7 +57,7 @@ interface ListStore<T> {
 	clear: Action<[]>;
 }
 
-function createListStore<T>(
+export function createListStore<T>(
 	sortFunction?: Func<[T, T], number>,
 	postProcessor?: Func<[T], T>,
 	initialState: T[] = [],
@@ -92,7 +94,7 @@ function createListStore<T>(
 	}));
 }
 
-interface SingletonStore<T> {
+export interface SingletonStore<T> {
 	data?: T;
 	hasChanged: boolean;
 	setData: Action<[T?]>;
@@ -100,7 +102,7 @@ interface SingletonStore<T> {
 	clear: Action<[]>;
 }
 
-function createSingletonStore<T>(
+export function createSingletonStore<T>(
 	postProcessor?: Func<[T | undefined], T | undefined>,
 	initialInstance?: T,
 ) {
@@ -125,6 +127,16 @@ function createSingletonStore<T>(
 
 export const useLoadingOverlay = createDisclosureStore();
 
+export const useClassrooms = createListStore<Classroom>(
+	classroomSorter,
+	(classroom) => ({
+		...classroom,
+		calendar: {
+			...classroom.calendar,
+			lessons: classroom.calendar.lessons.sort(lessonSorter),
+		},
+	}),
+);
 export const useSchedules = createListStore<Schedule>(
 	scheduleSorter,
 	(schedule) => ({
@@ -134,16 +146,6 @@ export const useSchedules = createListStore<Schedule>(
 			participants: slot.participants.sort(userProfileSorter),
 		})),
 		swapRequests: schedule.swapRequests.sort(swapRequestSorter),
-	}),
-);
-export const useClassrooms = createListStore<Classroom>(
-	classroomSorter,
-	(classroom) => ({
-		...classroom,
-		calendar: {
-			...classroom.calendar,
-			lessons: classroom.calendar.lessons.sort(lessonSorter),
-		},
 	}),
 );
 
