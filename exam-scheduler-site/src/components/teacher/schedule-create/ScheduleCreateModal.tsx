@@ -26,6 +26,7 @@ import {
 	groupBy,
 	mapKVPs,
 	reduceMap,
+	sleep,
 	timeTableSlotSorter,
 	type Action,
 } from "../../../util";
@@ -34,6 +35,7 @@ import {
 	useLoadingOverlay,
 	useScheduleHubConnection,
 } from "../../../zustand/zustand";
+import { TimeTable, type TimeTableSlot } from "./TimeTable";
 
 export function ScheduleCreateModal(props: {
 	opened: boolean;
@@ -41,6 +43,10 @@ export function ScheduleCreateModal(props: {
 }) {
 	const { t } = useTranslation();
 	const scheduleHub = useScheduleHubConnection((s) => s.data);
+	const { fetchWeek } = useCalendar();
+
+	const classrooms = useClassrooms((s) => s.data);
+	const [selectedClassroomId, setSelectedClassroom] = useState<ClassroomId>();
 
 	const {
 		loading: lessonFetchLoading,
@@ -55,8 +61,24 @@ export function ScheduleCreateModal(props: {
 		return abortLessonFetch;
 	}, [abortLessonFetch, lessonFetchLoading, setLoadingOverlayState]);
 
+	useEffect(() => {
+		console.log("fetching calendar");
+
+		resolveLessonPromise(
+			sleep(250),
+			// fetchWeek(selectedClassroomId, new Date(Date.now())),
+		);
+		return abortLessonFetch;
+	}, [
+		abortLessonFetch,
+		fetchWeek,
+		resolveLessonPromise,
+		selectedClassroomId,
+	]);
+
 	const [selectedWeek, setSelectedWeek] = useState<Date>();
 	function incrementDate() {
+		console.log("fetching calendar");
 		setSelectedWeek(
 			selectedWeek ? new Date(selectedWeek.getDate() + 7) : undefined,
 		);
@@ -65,6 +87,7 @@ export function ScheduleCreateModal(props: {
 		);
 	}
 	function decrementDate() {
+		console.log("fetching calendar");
 		setSelectedWeek(
 			selectedWeek ? new Date(selectedWeek.getDate() - 7) : undefined,
 		);
@@ -72,10 +95,6 @@ export function ScheduleCreateModal(props: {
 			fetchWeek(selectedClassroomId, selectedWeek, getSignal()),
 		);
 	}
-
-	const classrooms = useClassrooms((s) => s.data);
-	const [selectedClassroomId, setSelectedClassroom] = useState<ClassroomId>();
-	const { fetchWeek } = useCalendar();
 
 	const lessonColors = getColorsForLessons(lessons ?? []);
 	const slots = (lessons ?? []).map<TimeTableSlot>((l) => ({
@@ -98,8 +117,7 @@ export function ScheduleCreateModal(props: {
 				<Text fw={700} size="xl">
 					{t("schedule.create.title")}
 				</Text>
-			}
-		>
+			}>
 			<Stack>
 				<NativeSelect
 					required
@@ -108,10 +126,16 @@ export function ScheduleCreateModal(props: {
 					onChange={(e) =>
 						setSelectedClassroom(e.currentTarget.value)
 					}
-					data={classrooms.map((c) => ({
-						value: c.id,
-						label: c.name,
-					}))}
+					data={[
+						{
+							value: "",
+							label: "",
+						},
+						...classrooms.map((c) => ({
+							value: c.id,
+							label: c.name,
+						})),
+					]}
 				/>
 				{selectedClassroomId && (
 					<>
@@ -128,8 +152,7 @@ export function ScheduleCreateModal(props: {
 								<Center>
 									<ActionIcon
 										variant="default"
-										onClick={decrementDate}
-									>
+										onClick={decrementDate}>
 										<IconChevronLeft />
 									</ActionIcon>
 								</Center>
@@ -141,8 +164,7 @@ export function ScheduleCreateModal(props: {
 								<Center>
 									<ActionIcon
 										variant="default"
-										onClick={incrementDate}
-									>
+										onClick={incrementDate}>
 										<IconChevronRight />
 									</ActionIcon>
 								</Center>
@@ -160,50 +182,5 @@ export function ScheduleCreateModal(props: {
 				</Group>
 			</Stack>
 		</Modal>
-	);
-}
-
-export interface TimeTableSlot {
-	dayOfWeek: DayOfWeek;
-	start: number;
-	duration: number;
-	name: string;
-	color: MantineColor;
-}
-
-export function TimeTable(props: { slots: TimeTableSlot[] }) {
-	const groupedDays = mapKVPs(
-		groupBy(props.slots, (s) => s.dayOfWeek),
-		(slots) => slots.sort(timeTableSlotSorter),
-	);
-	const longestDay = Math.max(
-		...reduceMap(
-			groupedDays,
-			(acc, curr) => acc + curr.duration,
-			0,
-		).values(),
-	);
-	const percentHeightPerHour = 100 / longestDay;
-	const percentWidthPerDay = 100 / groupedDays.size;
-
-	return (
-		<SimpleGrid cols={groupedDays.size} h="500px" pos="relative" spacing={0}>
-			{Array.from(
-				mapKVPs(groupedDays, (slots) => (
-					<Box p="lg">
-						{slots.map((s) => (
-							<Box
-								pos="absolute"
-								top={`${s.start * percentHeightPerHour}%`}
-								bg={s.color}
-								h={`${s.duration * percentHeightPerHour}%`}
-							>
-								<Text>{s.name}</Text>
-							</Box>
-						))}
-					</Box>
-				)).values(),
-			)}
-		</SimpleGrid>
 	);
 }

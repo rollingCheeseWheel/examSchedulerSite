@@ -1,27 +1,29 @@
 import { faker } from "@faker-js/faker";
-import { Box } from "@mantine/core";
 import { useEffect } from "react";
 import { Route } from "react-router-dom";
 import { DefaultAppShell } from "../components/common/appshell/DefaultAppShell";
-import { TimeTable } from "../components/teacher/schedule-create/ScheduleCreateModal";
-import { timeTableSlots } from "../main";
+import { ScheduleWidget } from "../components/common/schedule/ScheduleWidget";
 import { randomId } from "../util";
-import { useSchedules, useUserProfile } from "../zustand/zustand";
+import {
+	useClassrooms,
+	useSchedules,
+	useUserProfile,
+} from "../zustand/zustand";
 
 export function DashboardPage() {
 	useInitMockUpData();
 
 	return (
 		<DefaultAppShell authDisabled={true}>
-			{/* <Route path="/" element={<ScheduleWidget maxwidth="600px" />} /> */}
-			<Route
+			<Route path="/" element={<ScheduleWidget maxwidth="600px" />} />
+			{/* <Route
 				path="/"
 				element={
 					<Box h="600px" w="400px">
 						<TimeTable slots={timeTableSlots} />
 					</Box>
 				}
-			/>
+			/> */}
 			{/* <Route path="create" element={<CreateScheduleWidget />} /> */}
 		</DefaultAppShell>
 	);
@@ -30,6 +32,7 @@ export function DashboardPage() {
 function useInitMockUpData() {
 	const setUserProfile = useUserProfile((s) => s.setData);
 	const setSchedules = useSchedules((s) => s.setData);
+	const setClassrooms = useClassrooms((s) => s.setData);
 
 	useEffect(() => {
 		setUserProfile({
@@ -209,5 +212,13 @@ function useInitMockUpData() {
 				auditLogs: [],
 			},
 		]);
-	}, [setSchedules, setUserProfile]);
+
+		setClassrooms([
+			{
+				name: "4E WI",
+				id: "asdöflkjasdf",
+				studentCount: 67,
+			},
+		]);
+	}, [setClassrooms, setSchedules, setUserProfile]);
 }

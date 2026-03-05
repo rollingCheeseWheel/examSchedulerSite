@@ -1,6 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { createTheme, MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
+import type { DayOfWeek } from "@mantine/dates";
 import axios from "axios";
 import i18next from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
@@ -9,6 +10,7 @@ import { createRoot } from "react-dom/client";
 import { initReactI18next } from "react-i18next";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { refreshSession } from "./components/common/auth/refreshSession";
+import type { TimeTableSlot } from "./components/teacher/schedule-create/TimeTable";
 import german from "./locales/de_translation.json";
 import english from "./locales/en_translation.json";
 import { DashboardPage } from "./pages/DashboardPage";
@@ -20,38 +22,36 @@ import {
 	lessonColors,
 	randomFromRange,
 } from "./util";
-import type { DayOfWeek } from "@mantine/dates";
-import type { TimeTableSlot } from "./components/teacher/schedule-create/ScheduleCreateModal";
 
 faker.seed(67);
 
 export const timeTableSlots: TimeTableSlot[] =
-	// generateCollection<TimeTableSlot>(2, () => ({
-	// 	color: chooseRandom(lessonColors),
-	// 	dayOfWeek: randomFromRange<DayOfWeek>(2),
-	// 	duration: randomFromRange(3),
-	// 	name: faker.person.jobArea(),
-	// 	start: randomFromRange(2),
-	// })); 
-	[{
-		color: "blue",
-		dayOfWeek: 0,
-		duration: 2,
-		name: "niddie",
-		start: 0
-	},{
-		color: "green",
-		dayOfWeek: 1,
-		duration: 2,
-		name: "kuenzer",
-		start: 0
-	},{
-		color: "yellow",
-		dayOfWeek: 0,
-		duration: 2,
-		name: "lampi",
-		start: 3
-	}]
+	generateCollection<TimeTableSlot>(60, () => ({
+		color: chooseRandom(lessonColors),
+		dayOfWeek: randomFromRange<DayOfWeek>(4),
+		duration: randomFromRange(3),
+		name: faker.person.jobArea(),
+		start: randomFromRange(10),
+	}));
+// [{
+// 	color: "blue",
+// 	dayOfWeek: 0,
+// 	duration: 2,
+// 	name: "niddie",
+// 	start: 0
+// },{
+// 	color: "green",
+// 	dayOfWeek: 1,
+// 	duration: 2,
+// 	name: "kuenzer",
+// 	start: 0
+// },{
+// 	color: "yellow",
+// 	dayOfWeek: 0,
+// 	duration: 2,
+// 	name: "lampi",
+// 	start: 3
+// }]
 
 export const api = axios.create({
 	withCredentials: true,
@@ -108,6 +108,7 @@ const theme = createTheme({
 
 createRoot(document.getElementById("root")!).render(
 	<StrictMode>
+		<script src="http://localhost:8097"></script>
 		<MantineProvider defaultColorScheme="auto" /* theme={theme} */>
 			<BrowserRouter>
 				<Routes>

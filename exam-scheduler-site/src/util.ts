@@ -1,13 +1,13 @@
 import { createTheme, type MantineColor } from "@mantine/core";
 import type axios from "axios";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
-import type { TimeTableSlot } from "./components/teacher/schedule-create/ScheduleCreateModal";
 import type { AuditLog } from "./models/auditLog";
 import type { Lesson, Subject, SubjectName } from "./models/calendar";
 import type { Classroom } from "./models/classroom";
 import type { ExamSlot, Schedule } from "./models/schedule";
 import type { SwapRequest } from "./models/swapRequest";
 import type { UserProfile } from "./models/user";
+import type { TimeTableSlot } from "./components/teacher/schedule-create/TimeTable";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Func<Args extends any[], TResult> = (...args: Args) => TResult;
