@@ -65,8 +65,7 @@ export function ScheduleCreateModal(props: {
 		console.log("fetching calendar");
 
 		resolveLessonPromise(
-			sleep(250),
-			// fetchWeek(selectedClassroomId, new Date(Date.now())),
+			fetchWeek(selectedClassroomId, new Date(Date.now())),
 		);
 		return abortLessonFetch;
 	}, [
