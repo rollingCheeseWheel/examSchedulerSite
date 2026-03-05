@@ -84,7 +84,7 @@ export function getPost<TResponse, TBody = unknown>(url: string | URL) {
 	};
 }
 
-export const jsonReviver = reviverCombiner(dateReviver);
+export const jsonReviver = reviverCombiner(/* dateReviver */);
 
 export function reviverCombiner(
 	...revivers: ((key: string, value: unknown) => unknown)[]

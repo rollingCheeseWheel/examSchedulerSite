@@ -10,7 +10,7 @@ import { AuthCallback } from "../auth/AuthCallback";
 import { AppShellSpine } from "./AppShellSpine";
 
 export function DefaultAppShell(props: {
-	children: ReactNode[];
+	children: ReactNode;
 	authDisabled?: boolean;
 }) {
 	const { t } = useTranslation();
@@ -21,7 +21,7 @@ export function DefaultAppShell(props: {
 		<>
 			<AppShellSpine>
 				<AuthCallback disabled={props.authDisabled}></AuthCallback>
-				<Routes>{...props.children}</Routes>
+				<Routes>{props.children}</Routes>
 			</AppShellSpine>
 			{isTeacher && (
 				<>

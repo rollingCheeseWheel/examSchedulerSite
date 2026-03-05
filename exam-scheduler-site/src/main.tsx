@@ -13,9 +13,45 @@ import german from "./locales/de_translation.json";
 import english from "./locales/en_translation.json";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
-import { attachAxiosCache } from "./util";
+import {
+	attachAxiosCache,
+	chooseRandom,
+	generateCollection,
+	lessonColors,
+	randomFromRange,
+} from "./util";
+import type { DayOfWeek } from "@mantine/dates";
+import type { TimeTableSlot } from "./components/teacher/schedule-create/ScheduleCreateModal";
 
 faker.seed(67);
+
+export const timeTableSlots: TimeTableSlot[] =
+	// generateCollection<TimeTableSlot>(2, () => ({
+	// 	color: chooseRandom(lessonColors),
+	// 	dayOfWeek: randomFromRange<DayOfWeek>(2),
+	// 	duration: randomFromRange(3),
+	// 	name: faker.person.jobArea(),
+	// 	start: randomFromRange(2),
+	// })); 
+	[{
+		color: "blue",
+		dayOfWeek: 0,
+		duration: 2,
+		name: "niddie",
+		start: 0
+	},{
+		color: "green",
+		dayOfWeek: 1,
+		duration: 2,
+		name: "kuenzer",
+		start: 0
+	},{
+		color: "yellow",
+		dayOfWeek: 0,
+		duration: 2,
+		name: "lampi",
+		start: 3
+	}]
 
 export const api = axios.create({
 	withCredentials: true,

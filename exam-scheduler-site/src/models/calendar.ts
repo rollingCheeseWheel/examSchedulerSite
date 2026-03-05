@@ -1,4 +1,4 @@
-import type { Brand, BrandedId, BrandedString } from "./brand";
+import type { Brand, BrandedId, BrandedString, DateOnlyString } from "./brand";
 
 export type CalendarId = BrandedId<"calendar">;
 export type LessonId = BrandedId<"lesson">;
@@ -9,11 +9,10 @@ export type LessonName = BrandedString<"lessonname">;
 
 export type FromHour = Brand<number, "fromhour">;
 export type ToHour = Brand<number, "tohour">;
-export type DateOnly = BrandedString<"dateonly">;
 
 export interface Lesson {
 	id: LessonId;
-	date: DateOnly;
+	date: DateOnlyString;
 	fromHour: FromHour;
 	toHour: ToHour;
 	lessonName: LessonName;

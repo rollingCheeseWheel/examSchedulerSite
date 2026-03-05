@@ -1,15 +1,17 @@
 import {
 	ActionIcon,
+	Box,
 	Button,
 	Center,
-	Container,
 	Grid,
 	Group,
 	Modal,
 	NativeSelect,
+	SimpleGrid,
 	Stack,
 	Text,
 	type MantineColor,
+	type StyleProp,
 } from "@mantine/core";
 import { DatePickerInput, type DayOfWeek } from "@mantine/dates";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
@@ -20,12 +22,11 @@ import { usePromise } from "../../../hooks/usePromise";
 import type { Lesson } from "../../../models/calendar";
 import type { ClassroomId } from "../../../models/classroom";
 import {
-	compoundSort,
 	getColorsForLessons,
 	groupBy,
 	mapKVPs,
 	reduceMap,
-	sort,
+	timeTableSlotSorter,
 	type Action,
 } from "../../../util";
 import {
@@ -76,9 +77,6 @@ export function ScheduleCreateModal(props: {
 	const [selectedClassroomId, setSelectedClassroom] = useState<ClassroomId>();
 	const { fetchWeek } = useCalendar();
 
-	const calendar = classrooms.find(
-		(c) => c.id == selectedClassroomId,
-	);
 	const lessonColors = getColorsForLessons(lessons ?? []);
 	const slots = (lessons ?? []).map<TimeTableSlot>((l) => ({
 		name: l.subject.name,
@@ -100,7 +98,8 @@ export function ScheduleCreateModal(props: {
 				<Text fw={700} size="xl">
 					{t("schedule.create.title")}
 				</Text>
-			}>
+			}
+		>
 			<Stack>
 				<NativeSelect
 					required
@@ -129,7 +128,8 @@ export function ScheduleCreateModal(props: {
 								<Center>
 									<ActionIcon
 										variant="default"
-										onClick={decrementDate}>
+										onClick={decrementDate}
+									>
 										<IconChevronLeft />
 									</ActionIcon>
 								</Center>
@@ -141,7 +141,8 @@ export function ScheduleCreateModal(props: {
 								<Center>
 									<ActionIcon
 										variant="default"
-										onClick={incrementDate}>
+										onClick={incrementDate}
+									>
 										<IconChevronRight />
 									</ActionIcon>
 								</Center>
@@ -162,7 +163,7 @@ export function ScheduleCreateModal(props: {
 	);
 }
 
-interface TimeTableSlot {
+export interface TimeTableSlot {
 	dayOfWeek: DayOfWeek;
 	start: number;
 	duration: number;
@@ -170,14 +171,7 @@ interface TimeTableSlot {
 	color: MantineColor;
 }
 
-const timeTableSlotSorter = compoundSort<TimeTableSlot>(
-	sort((x) => x.dayOfWeek),
-	sort((x) => x.start),
-	sort((x) => x.duration),
-	sort((x) => x.name),
-);
-
-function TimeTable(props: { slots: TimeTableSlot[] }) {
+export function TimeTable(props: { slots: TimeTableSlot[] }) {
 	const groupedDays = mapKVPs(
 		groupBy(props.slots, (s) => s.dayOfWeek),
 		(slots) => slots.sort(timeTableSlotSorter),
@@ -190,24 +184,26 @@ function TimeTable(props: { slots: TimeTableSlot[] }) {
 		).values(),
 	);
 	const percentHeightPerHour = 100 / longestDay;
+	const percentWidthPerDay = 100 / groupedDays.size;
 
 	return (
-		<Grid>
+		<SimpleGrid cols={groupedDays.size} h="500px" pos="relative" spacing={0}>
 			{Array.from(
 				mapKVPs(groupedDays, (slots) => (
-					<Grid.Col>
+					<Box p="lg">
 						{slots.map((s) => (
-							<Container
+							<Box
 								pos="absolute"
 								top={`${s.start * percentHeightPerHour}%`}
 								bg={s.color}
-								h={`${s.duration * percentHeightPerHour}%`}>
+								h={`${s.duration * percentHeightPerHour}%`}
+							>
 								<Text>{s.name}</Text>
-							</Container>
+							</Box>
 						))}
-					</Grid.Col>
+					</Box>
 				)).values(),
 			)}
-		</Grid>
+		</SimpleGrid>
 	);
 }

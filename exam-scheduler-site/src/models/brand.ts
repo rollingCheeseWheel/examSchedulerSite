@@ -22,3 +22,6 @@ export type ExtendedBrandedID<
 > = ExtendBrand<T, B>;
 
 export type Guid = BrandedId<"guid">;
+
+export type DateString = BrandedString<"date">;
+export type DateOnlyString = BrandedString<"dateonly">;

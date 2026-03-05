@@ -1,6 +1,7 @@
 import { createTheme, type MantineColor } from "@mantine/core";
 import type axios from "axios";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
+import type { TimeTableSlot } from "./components/teacher/schedule-create/ScheduleCreateModal";
 import type { AuditLog } from "./models/auditLog";
 import type { Lesson, Subject, SubjectName } from "./models/calendar";
 import type { Classroom } from "./models/classroom";
@@ -113,14 +114,14 @@ export const userProfileSorter = compoundSort<UserProfile>(
 );
 
 export const scheduleSorter = compoundSort<Schedule>(
-	sort((x) => x.startDate.getTime()),
-	sort((x) => x.endDate.getTime()),
+	sort((x) => new Date(x.startDate).getTime()),
+	sort((x) => new Date(x.endDate).getTime()),
 	sort((x) => x.subject.name),
 	sort((x) => x.id),
 );
 
 export const examSlotSorter = compoundSort<ExamSlot>(
-	sort((x) => x.date.getTime()),
+	sort((x) => new Date(x.date).getTime()),
 	sort((x) => x.participants.length),
 	sort((x) => x.minParticipants),
 	sort((x) => x.maxParticipants),
@@ -133,7 +134,7 @@ export const swapRequestSorter = compoundSort<SwapRequest>(
 );
 
 export const auditLogSorter = compoundSort<AuditLog>(
-	sort((x) => x.timestamp.getTime()),
+	sort((x) => new Date(x.timestamp).getTime()),
 	sort((x) => x.originName),
 	sort((x) => x.targetName),
 );
@@ -150,6 +151,13 @@ export const lessonSorter = compoundSort<Lesson>(
 	sort((x) => x.toHour),
 	sort((x) => x.subject.name),
 	sort((x) => x.id),
+);
+
+export const timeTableSlotSorter = compoundSort<TimeTableSlot>(
+	sort((x) => x.dayOfWeek),
+	sort((x) => x.start),
+	sort((x) => x.duration),
+	sort((x) => x.name),
 );
 
 export const subjectSorter = sort<Subject>((x) => x.name);
@@ -250,4 +258,24 @@ export function attachAxiosCache(
 
 		return response;
 	});
+}
+
+export function generateCollection<T>(
+	count: number,
+	instantiator: Func<[number], T>,
+) {
+	const res = [];
+	for (let i = 0; i < count; i++) {
+		res.push(instantiator(i));
+	}
+	return res;
+}
+
+export function randomFromRange<T = number>(end: number) {
+	return Math.round(Math.random() * end) as T;
+}
+
+export function chooseRandom<T>(data: T[]) {
+	const index = Math.round(Math.random() * data.length);
+	return data[index];
 }

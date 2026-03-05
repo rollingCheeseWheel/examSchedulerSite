@@ -119,7 +119,7 @@ function ScheduleDate(props: {
 			<Grid align="center">
 				<Grid.Col span={4}>
 					<Text>
-						{formatDateTime(props.slot.date, i18n.language)}
+						{formatDateTime(new Date(props.slot.date), i18n.language)}
 					</Text>
 				</Grid.Col>
 				<Grid.Col span="auto">

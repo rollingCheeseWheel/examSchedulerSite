@@ -1,8 +1,10 @@
 import { faker } from "@faker-js/faker";
+import { Box } from "@mantine/core";
 import { useEffect } from "react";
 import { Route } from "react-router-dom";
 import { DefaultAppShell } from "../components/common/appshell/DefaultAppShell";
-import { ScheduleWidget } from "../components/common/schedule/ScheduleWidget";
+import { TimeTable } from "../components/teacher/schedule-create/ScheduleCreateModal";
+import { timeTableSlots } from "../main";
 import { randomId } from "../util";
 import { useSchedules, useUserProfile } from "../zustand/zustand";
 
@@ -11,8 +13,15 @@ export function DashboardPage() {
 
 	return (
 		<DefaultAppShell authDisabled={true}>
-			<Route path="/" element={<ScheduleWidget maxwidth="600px" />} />
-			<></>
+			{/* <Route path="/" element={<ScheduleWidget maxwidth="600px" />} /> */}
+			<Route
+				path="/"
+				element={
+					<Box h="600px" w="400px">
+						<TimeTable slots={timeTableSlots} />
+					</Box>
+				}
+			/>
 			{/* <Route path="create" element={<CreateScheduleWidget />} /> */}
 		</DefaultAppShell>
 	);
@@ -32,9 +41,9 @@ function useInitMockUpData() {
 		setSchedules([
 			{
 				id: randomId(),
-				startDate: new Date("2026-01-01"),
-				endDate: new Date("2026-02-01"),
-				lockInOffset: new Date("1970-01-01"),
+				startDate: "2026-01-01",
+				endDate: "2026-02-01",
+				lockInOffset: "1970-01-01",
 				autoLockIn: "fixedDate",
 				subject: { name: "Rechtskunde" },
 				teachers: [{ name: "Brigitta Niederkofler" }],
@@ -42,7 +51,7 @@ function useInitMockUpData() {
 				examSlots: [
 					{
 						id: randomId(),
-						date: new Date("2026-01-01"),
+						date: "2026-01-01",
 						minParticipants: 10,
 						maxParticipants: 10,
 						lockState: "definite",
@@ -96,7 +105,7 @@ function useInitMockUpData() {
 					},
 					{
 						id: randomId(),
-						date: new Date("2026-01-02"),
+						date: "2026-01-02",
 						minParticipants: 1,
 						maxParticipants: 4,
 						lockState: "locked",
@@ -120,7 +129,7 @@ function useInitMockUpData() {
 					},
 					{
 						id: randomId("swaponly"),
-						date: new Date("2026-01-03"),
+						date: "2026-01-03",
 						minParticipants: 1,
 						maxParticipants: 4,
 						lockState: "open",
