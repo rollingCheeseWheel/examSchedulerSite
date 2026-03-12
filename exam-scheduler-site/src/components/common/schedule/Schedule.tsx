@@ -49,16 +49,16 @@ export function ExamSchedule(props: {
 	const { loading, resolve } = usePromise<Result<boolean>>();
 
 	const joinSlot = (id: ExamSlotId) =>
-		resolve(hubConnection?.RegisterForSlot(id) ?? sleep(250));
+		resolve(hubConnection?.registerForSlot(id) ?? sleep(250));
 	const createSwapRequest = (id: ExamSlotId) =>
 		resolve(
-			hubConnection?.CreateSwapRequest(props.schedule.id, id) ??
+			hubConnection?.createSwapRequest(props.schedule.id, id) ??
 				sleep(250),
 		);
 	const acceptSwapRequest = (id: SwapRequestId) =>
-		resolve(hubConnection?.AcceptSwapRequest(id) ?? sleep(250));
+		resolve(hubConnection?.acceptSwapRequest(id) ?? sleep(250));
 	const deleteSwapRequest = (id: SwapRequestId) =>
-		resolve(hubConnection?.DeleteSwapRequest(id) ?? sleep(250));
+		resolve(hubConnection?.deleteSwapRequest(id) ?? sleep(250));
 
 	return (
 		<Paper

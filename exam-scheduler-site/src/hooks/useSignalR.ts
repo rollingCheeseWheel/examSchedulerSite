@@ -1,4 +1,8 @@
-import { HubConnectionBuilder, LogLevel, type HubConnection } from "@microsoft/signalr";
+import {
+	HubConnectionBuilder,
+	LogLevel,
+	type HubConnection,
+} from "@microsoft/signalr";
 import { useCallback, useEffect, useRef } from "react";
 import { endpoints } from "../endpoints";
 import type { Classroom } from "../models/classroom";
@@ -11,41 +15,32 @@ import type {
 } from "../models/schedule";
 import type { SwapRequestId } from "../models/swapRequest";
 import type { UserProfileId } from "../models/user";
-import { type Action } from "../util";
+import { type Action, type Func } from "../util";
 import { useScheduleHubConnection } from "../zustand/zustand";
 
 export interface ScheduleClient {
-	ReceiveInitialSchedules: Action<[Schedule[]]>;
-	UpdateSchedule: Action<[ScheduleId, Schedule]>;
-	RemoveSchedule: Action<[ScheduleId]>;
+	onReceiveInitialSchedules: Action<[Schedule[]]>;
+	onUpdateSchedule: Action<[ScheduleId, Schedule]>;
+	onRemoveSchedule: Action<[ScheduleId]>;
 
-	ReceiveInitialClassrooms: Action<[Classroom[]]>;
-	UpdateClassroom: Action<[Classroom]>;
+	onReceiveInitialClassrooms: Action<[Classroom[]]>;
+	onUpdateClassroom: Action<[Classroom]>;
 }
 
 export interface ScheduleHub {
-	RegisterForSlot: (
-		slotId: ExamSlotId,
-	) => Promise<Result<boolean>> | undefined;
+	registerForSlot: Func<[ExamSlotId], Promise<Result<boolean>>>;
 
-	CreateSwapRequest: (
-		scheduleId: ScheduleId,
-		examSlotId: ExamSlotId,
-	) => Promise<Result<boolean>> | undefined;
-	AcceptSwapRequest: (
-		swaprequestId: SwapRequestId,
-	) => Promise<Result<boolean>> | undefined;
-	DeleteSwapRequest: (
-		swaprequestId: SwapRequestId,
-	) => Promise<Result<boolean>> | undefined;
+	createSwapRequest: Func<[ScheduleId, ExamSlotId], Promise<Result<boolean>>>;
+	acceptSwapRequest: Func<[SwapRequestId], Promise<Result<boolean>>>;
+	deleteSwapRequest: Func<[SwapRequestId], Promise<Result<boolean>>>;
 
-	CreateSchedule: (
-		request: ScheduleCreateRequest,
-	) => Promise<Result<boolean>> | undefined;
-	ReportStudents: (
-		slotId: ExamSlotId,
-		actualParticipants: UserProfileId[],
-	) => Promise<Result<boolean>> | undefined;
+	createSchedule: Func<[ScheduleCreateRequest], Promise<Result<boolean>>>;
+	reportStudents: Func<
+		[ExamSlotId, UserProfileId[]],
+		Promise<Result<boolean>>
+	>;
+
+	connect: Func<[], Promise<void>>;
 }
 
 export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
@@ -62,42 +57,78 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 				connectionRef.current = createConnection(hubUrl);
 				await connectionRef.current.start();
 				conn = {
-					AcceptSwapRequest(swaprequestId) {
-						return connectionRef.current?.invoke<Result<boolean>>(
-							"AcceptSwapRequest",
-							swaprequestId,
+					acceptSwapRequest(swaprequestId) {
+						return (
+							connectionRef.current?.invoke<Result<boolean>>(
+								"AcceptSwapRequest",
+								swaprequestId,
+							) ??
+							Promise.reject(
+								new Error("Connection not initialized"),
+							)
 						);
 					},
-					CreateSchedule(request) {
-						return connectionRef.current?.invoke<Result<boolean>>(
-							"CreateSchedule",
-							request,
+					createSchedule(request) {
+						return (
+							connectionRef.current?.invoke<Result<boolean>>(
+								"CreateSchedule",
+								request,
+							) ??
+							Promise.reject(
+								new Error("Connection not initialized"),
+							)
 						);
 					},
-					CreateSwapRequest(scheduleId, userId) {
-						return connectionRef.current?.invoke<Result<boolean>>(
-							"CreateSwapRequest",
-							scheduleId,
-							userId,
+					createSwapRequest(scheduleId, userId) {
+						return (
+							connectionRef.current?.invoke<Result<boolean>>(
+								"CreateSwapRequest",
+								scheduleId,
+								userId,
+							) ??
+							Promise.reject(
+								new Error("Connection not initialized"),
+							)
 						);
 					},
-					DeleteSwapRequest(swaprequestId) {
-						return connectionRef.current?.invoke<Result<boolean>>(
-							"DeleteSwapRequest",
-							swaprequestId,
+					deleteSwapRequest(swaprequestId) {
+						return (
+							connectionRef.current?.invoke<Result<boolean>>(
+								"DeleteSwapRequest",
+								swaprequestId,
+							) ??
+							Promise.reject(
+								new Error("Connection not initialized"),
+							)
 						);
 					},
-					RegisterForSlot(slotId) {
-						return connectionRef.current?.invoke<Result<boolean>>(
-							"RegisterForSlot",
-							slotId,
+					registerForSlot(slotId) {
+						return (
+							connectionRef.current?.invoke<Result<boolean>>(
+								"RegisterForSlot",
+								slotId,
+							) ??
+							Promise.reject(
+								new Error("Connection not initialized"),
+							)
 						);
 					},
-					ReportStudents(slotId, actualParticipants) {
-						return connectionRef.current?.invoke<Result<boolean>>(
-							"ReportStudents",
-							slotId,
-							actualParticipants,
+					reportStudents(slotId, actualParticipants) {
+						return (
+							connectionRef.current?.invoke<Result<boolean>>(
+								"ReportStudents",
+								slotId,
+								actualParticipants,
+							) ??
+							Promise.reject(
+								new Error("Connection not initialized"),
+							)
+						);
+					},
+					connect() {
+						return (
+							connectionRef.current?.start() ??
+							Promise.reject("Connection not initialized")
 						);
 					},
 				};
@@ -122,10 +153,6 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 		[hubUrl, connection, setConnection],
 	);
 
-	const rejoin = () => {
-		connectionRef.current?.start();
-	};
-
 	useEffect(() => {
 		return () => {
 			if (!connection || !handlersRef.current) return;
@@ -138,7 +165,7 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 		};
 	}, [connection]);
 
-	return { init, rejoin };
+	return init;
 }
 
 export function createConnection(hubUrl: string) {

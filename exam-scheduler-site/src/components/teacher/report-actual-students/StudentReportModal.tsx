@@ -118,7 +118,7 @@ export function ReportStudentModal(props: {
 					<Button
 						onClick={() =>
 							resolve(
-								scheduleHub?.ReportStudents(
+								scheduleHub?.reportStudents(
 									props.slotId,
 									checkedStudents,
 								) ?? sleep(250),

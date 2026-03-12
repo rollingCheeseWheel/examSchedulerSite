@@ -24,7 +24,7 @@ export function AuthCallback(props: { disabled?: boolean }) {
 
 	const { data: schedules, setData: setSchedules } = useSchedules();
 	const { data: classrooms, setData: setClassrooms } = useClassrooms();
-	const { init } = useSignalRInit();
+	const initSignalR = useSignalRInit();
 
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
@@ -50,27 +50,27 @@ export function AuthCallback(props: { disabled?: boolean }) {
 		if (data && data.data) {
 			setUserProfile(data.data);
 
-			init({
-				ReceiveInitialSchedules(schedules) {
+			initSignalR({
+				onReceiveInitialSchedules(schedules) {
 					console.debug("received initial schedules", schedules);
 					setSchedules(schedules);
 				},
-				UpdateSchedule(scheduleId, schedule) {
+				onUpdateSchedule(scheduleId, schedule) {
 					console.debug("updating schedule", schedule);
 					setSchedules([
 						...schedules.filter((s) => s.id !== scheduleId),
 						schedule,
 					]);
 				},
-				RemoveSchedule(scheduleId) {
+				onRemoveSchedule(scheduleId) {
 					console.debug("removing scheudule", scheduleId);
 					setSchedules(schedules.filter((s) => s.id !== scheduleId));
 				},
-				ReceiveInitialClassrooms(classrooms) {
+				onReceiveInitialClassrooms(classrooms) {
 					console.debug("received initial classrooms", classrooms);
 					setClassrooms(classrooms);
 				},
-				UpdateClassroom(classroom) {
+				onUpdateClassroom(classroom) {
 					console.debug("updating classroom", classroom);
 					setClassrooms([
 						...classrooms.filter((c) => c.id !== classroom.id),
@@ -82,7 +82,7 @@ export function AuthCallback(props: { disabled?: boolean }) {
 	}, [
 		classrooms,
 		data,
-		init,
+		initSignalR,
 		schedules,
 		setClassrooms,
 		setSchedules,
