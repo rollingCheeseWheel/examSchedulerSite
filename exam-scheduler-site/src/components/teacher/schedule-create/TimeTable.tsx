@@ -29,11 +29,7 @@ export function TimeTable(props: { slots: TimeTableSlot[] }) {
 		(slots) => slots.sort(timeTableSlotSorter),
 	);
 	const longestDay = Math.max(
-		...reduceMap(
-			groupedDays,
-			(acc, curr) => acc + curr.duration,
-			0,
-		).values(),
+		...reduceMap(groupedDays, (acc, curr) => acc + curr.duration, 0).values(),
 	);
 	const percentHeightPerHour = 100 / longestDay;
 	const percentWidthPerDay = `${100 / groupedDays.size}%`;

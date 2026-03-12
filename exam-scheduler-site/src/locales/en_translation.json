@@ -5,18 +5,15 @@
             "select": "Select your school"
         }
     },
-    "navbar": {
-        "createforclassroom": "Create",
-        "overview": "Overview",
-        "swaprequests": "Swap Requests"
+    "common": {
+        "cancel": "MISSING",
+        "submit": "MISSING"
     },
     "schedule": {
         "create": {
-            "calendar": {
-                "decrement": "Previous week",
-                "increment": "Next week"
-            },
-            "submit": "Create"
+            "classroomselect": "MISSING",
+            "createbutton": "MISSING",
+            "title": "MISSING"
         },
         "progess": {
             "tooltip": "{{curr}} out of {{max}} - {{min}} needed"

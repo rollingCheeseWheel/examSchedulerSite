@@ -14,13 +14,10 @@ export function AppShellSpine(props: { children?: ReactNode[] }) {
 		<>
 			<LoadingOverlay visible={isLoadingOverlayOpen} />
 			<AppShell header={{ height: "3rem" }}>
-				<AppShell.Header
-					style={{ margin: "0.2rem", paddingLeft: "0.4rem" }}>
+				<AppShell.Header style={{ margin: "0.2rem", paddingLeft: "0.4rem" }}>
 					<Group justify="space-between">
 						<Group>
-							<Title className={classes.title}>
-								Exam Scheduler
-							</Title>
+							<Title className={classes.title}>Exam Scheduler</Title>
 						</Group>
 						<Group>
 							<ThemeButton />

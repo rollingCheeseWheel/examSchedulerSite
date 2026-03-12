@@ -10,7 +10,7 @@ import {
 	swapRequestSorter,
 	userProfileSorter,
 	type Action,
-	type Func
+	type Func,
 } from "../util";
 
 export interface DisclosureStore {

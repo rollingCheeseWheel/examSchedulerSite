@@ -49,10 +49,7 @@ export function AuthWidget() {
 									"/v2/login/",
 									new URL(school.registerUri).origin,
 								);
-								url.searchParams.set(
-									"client_id",
-									school.clientId,
-								);
+								url.searchParams.set("client_id", school.clientId);
 
 								return {
 									label: school.name,

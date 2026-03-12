@@ -9,9 +9,7 @@ interface ExtendedProgressbarProps extends ProgressRootProps {
 
 export function ExtendedProgressbar(props: ExtendedProgressbarProps) {
 	const { participants, max, min } = props;
-	const participantsValue = Math.round(
-		(participants * 100) / Math.max(1, max),
-	);
+	const participantsValue = Math.round((participants * 100) / Math.max(1, max));
 	const minValue = Math.round((min * 100) / Math.max(1, max));
 
 	return (

@@ -14,7 +14,7 @@ import {
 	Stack,
 	Text,
 	Title,
-	type StyleProp
+	type StyleProp,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
@@ -52,8 +52,7 @@ export function ExamSchedule(props: {
 		resolve(hubConnection?.registerForSlot(id) ?? sleep(250));
 	const createSwapRequest = (id: ExamSlotId) =>
 		resolve(
-			hubConnection?.createSwapRequest(props.schedule.id, id) ??
-				sleep(250),
+			hubConnection?.createSwapRequest(props.schedule.id, id) ?? sleep(250),
 		);
 	const acceptSwapRequest = (id: SwapRequestId) =>
 		resolve(hubConnection?.acceptSwapRequest(id) ?? sleep(250));
@@ -61,11 +60,7 @@ export function ExamSchedule(props: {
 		resolve(hubConnection?.deleteSwapRequest(id) ?? sleep(250));
 
 	return (
-		<Paper
-			maw={props.maxwidth}
-			withBorder
-			radius="md"
-			key={props.schedule.id}>
+		<Paper maw={props.maxwidth} withBorder radius="md" key={props.schedule.id}>
 			<Box pos="relative" p="md">
 				<LoadingOverlay visible={loading} />
 
@@ -110,8 +105,7 @@ function ScheduleDate(props: {
 	const { ignoredIds, ignore } = useIgnoredSwapRequests();
 
 	const thisSlotsSwapRequest = props.schedule.swapRequests.filter(
-		(sr) =>
-			sr.requestedSlotId === props.slot.id && !ignoredIds.includes(sr.id),
+		(sr) => sr.requestedSlotId === props.slot.id && !ignoredIds.includes(sr.id),
 	);
 
 	return (
@@ -144,15 +138,14 @@ function ScheduleDate(props: {
 			<Group gap="xs">
 				{...props.slot.participants.map(ScheduleParticipant)}
 			</Group>
-			{thisSlotsSwapRequest.length != 0 &&
-				props.slot.lockState === "open" && (
-					<SwapRequestDrawer
-						swaprequests={thisSlotsSwapRequest}
-						accept={props.acceptSwapRequest}
-						delete={props.deleteSwapRequest}
-						ignore={ignore}
-					/>
-				)}
+			{thisSlotsSwapRequest.length != 0 && props.slot.lockState === "open" && (
+				<SwapRequestDrawer
+					swaprequests={thisSlotsSwapRequest}
+					accept={props.acceptSwapRequest}
+					delete={props.deleteSwapRequest}
+					ignore={ignore}
+				/>
+			)}
 		</>
 	);
 }
@@ -185,9 +178,7 @@ function SlotSelectButton(props: {
 					opened={studentModalOpen}
 					onClose={closeStudentModal}
 				/>
-				<Button onClick={openStudentModal}>
-					{t("schedule.reportactual")}
-				</Button>
+				<Button onClick={openStudentModal}>{t("schedule.reportactual")}</Button>
 			</>
 		);
 	} else if (isTeacher || props.slot.lockState === "definite") {
@@ -264,9 +255,7 @@ function SwapRequestItem(props: {
 			<Button
 				// size="compact-sm"
 				variant={
-					userId === props.swapRequest.requestingStudentId ?
-						"default"
-					:	"light"
+					userId === props.swapRequest.requestingStudentId ? "default" : "light"
 				}
 				onClick={(e) => {
 					e.stopPropagation();
@@ -276,9 +265,7 @@ function SwapRequestItem(props: {
 				}}
 				leftSection={
 					<Center>
-						<Text size="md">
-							{props.swapRequest.requestingStudentName}
-						</Text>
+						<Text size="md">{props.swapRequest.requestingStudentName}</Text>
 					</Center>
 				}
 				rightSection={

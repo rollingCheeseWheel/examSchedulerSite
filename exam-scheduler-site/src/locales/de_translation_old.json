@@ -1,0 +1,16 @@
+{
+    "navbar": {
+        "createforclassroom": "Erstellen",
+        "overview": "Übersicht",
+        "swaprequests": "Tauschanfragen"
+    },
+    "schedule": {
+        "create": {
+            "calendar": {
+                "decrement": "Vorherige Woche",
+                "increment": "Nächste Woche"
+            },
+            "submit": "Erstellen"
+        }
+    }
+}

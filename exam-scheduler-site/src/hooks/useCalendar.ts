@@ -6,11 +6,7 @@ import type { Result } from "../models/result";
 
 export function useCalendar() {
 	const fetchWeek = useCallback(
-		async (
-			classroomId?: ClassroomId,
-			date?: Date,
-			signal?: AbortSignal,
-		) => {
+		async (classroomId?: ClassroomId, date?: Date, signal?: AbortSignal) => {
 			if (!date || !classroomId) {
 				return [];
 			}

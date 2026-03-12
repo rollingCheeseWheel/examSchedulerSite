@@ -34,9 +34,7 @@ export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 				}
 				const formedError = new Error(
 					`Non Error value was thrown: ${
-						typeof error === "object" ?
-							JSON.stringify(error)
-						:	error
+						typeof error === "object" ? JSON.stringify(error) : error
 					}`,
 				);
 				setError(formedError);

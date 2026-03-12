@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { Action, Func } from "../util";
 
-export function usePromise<TResult = never>() {
+export function usePromise<TResult = never>(...callbacks: Action<[]>[]) {
 	const [data, setData] = useState<TResult | undefined | null>();
 	const [error, setError] = useState<unknown>();
 	const [loading, setLoading] = useState(false);
@@ -15,31 +16,6 @@ export function usePromise<TResult = never>() {
 			// mountedRef.current = false;
 			setLoading(false);
 		};
-	}, []);
-
-	const resolve = useCallback((promise?: Promise<TResult>) => {
-		if (!promise) {
-			return;
-		}
-		const callId = ++callIdRef.current;
-
-		setData(undefined);
-		setError(undefined);
-		setLoading(true);
-
-		promise
-			.then((result) => {
-				if (!mountedRef.current || callId !== callIdRef.current) return;
-				setData(result);
-			})
-			.catch((err) => {
-				if (!mountedRef.current || callId !== callIdRef.current) return;
-				setError(err);
-			})
-			.finally(() => {
-				if (!mountedRef.current || callId !== callIdRef.current) return;
-				setLoading(false);
-			});
 	}, []);
 
 	const abort = useCallback(() => {
@@ -58,6 +34,39 @@ export function usePromise<TResult = never>() {
 		abortControllersRef.current.push(controller);
 		return controller.signal;
 	}, []);
+
+	const resolve = useCallback(
+		(promise?: Promise<TResult> | Func<[AbortSignal], Promise<TResult>>) => {
+			if (!promise) {
+				return;
+			}
+			if (typeof promise === "function") {
+				promise = promise(getSignal());
+			}
+
+			const callId = ++callIdRef.current;
+
+			setData(undefined);
+			setError(undefined);
+			setLoading(true);
+
+			promise
+				.then((result) => {
+					if (!mountedRef.current || callId !== callIdRef.current) return;
+					setData(result);
+					callbacks.forEach((x) => x);
+				})
+				.catch((err) => {
+					if (!mountedRef.current || callId !== callIdRef.current) return;
+					setError(err);
+				})
+				.finally(() => {
+					if (!mountedRef.current || callId !== callIdRef.current) return;
+					setLoading(false);
+				});
+		},
+		[callbacks, getSignal],
+	);
 
 	return { data, error, loading, resolve, abort, getSignal };
 }

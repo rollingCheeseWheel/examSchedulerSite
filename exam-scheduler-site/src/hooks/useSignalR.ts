@@ -35,10 +35,7 @@ export interface ScheduleHub {
 	deleteSwapRequest: Func<[SwapRequestId], Promise<Result<boolean>>>;
 
 	createSchedule: Func<[ScheduleCreateRequest], Promise<Result<boolean>>>;
-	reportStudents: Func<
-		[ExamSlotId, UserProfileId[]],
-		Promise<Result<boolean>>
-	>;
+	reportStudents: Func<[ExamSlotId, UserProfileId[]], Promise<Result<boolean>>>;
 
 	connect: Func<[], Promise<void>>;
 }
@@ -55,6 +52,7 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 
 			if (!connection) {
 				connectionRef.current = createConnection(hubUrl);
+				console.debug("Connecting to hub");
 				await connectionRef.current.start();
 				conn = {
 					acceptSwapRequest(swaprequestId) {
@@ -62,10 +60,7 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 							connectionRef.current?.invoke<Result<boolean>>(
 								"AcceptSwapRequest",
 								swaprequestId,
-							) ??
-							Promise.reject(
-								new Error("Connection not initialized"),
-							)
+							) ?? Promise.reject(new Error("Connection not initialized"))
 						);
 					},
 					createSchedule(request) {
@@ -73,10 +68,7 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 							connectionRef.current?.invoke<Result<boolean>>(
 								"CreateSchedule",
 								request,
-							) ??
-							Promise.reject(
-								new Error("Connection not initialized"),
-							)
+							) ?? Promise.reject(new Error("Connection not initialized"))
 						);
 					},
 					createSwapRequest(scheduleId, userId) {
@@ -85,10 +77,7 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 								"CreateSwapRequest",
 								scheduleId,
 								userId,
-							) ??
-							Promise.reject(
-								new Error("Connection not initialized"),
-							)
+							) ?? Promise.reject(new Error("Connection not initialized"))
 						);
 					},
 					deleteSwapRequest(swaprequestId) {
@@ -96,10 +85,7 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 							connectionRef.current?.invoke<Result<boolean>>(
 								"DeleteSwapRequest",
 								swaprequestId,
-							) ??
-							Promise.reject(
-								new Error("Connection not initialized"),
-							)
+							) ?? Promise.reject(new Error("Connection not initialized"))
 						);
 					},
 					registerForSlot(slotId) {
@@ -107,10 +93,7 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 							connectionRef.current?.invoke<Result<boolean>>(
 								"RegisterForSlot",
 								slotId,
-							) ??
-							Promise.reject(
-								new Error("Connection not initialized"),
-							)
+							) ?? Promise.reject(new Error("Connection not initialized"))
 						);
 					},
 					reportStudents(slotId, actualParticipants) {
@@ -119,10 +102,7 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 								"ReportStudents",
 								slotId,
 								actualParticipants,
-							) ??
-							Promise.reject(
-								new Error("Connection not initialized"),
-							)
+							) ?? Promise.reject(new Error("Connection not initialized"))
 						);
 					},
 					connect() {
@@ -137,11 +117,9 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 			}
 
 			if (handlersRef.current) {
-				Object.entries(handlersRef.current).forEach(
-					([eventName, handler]) => {
-						connectionRef.current?.off(eventName, handler);
-					},
-				);
+				Object.entries(handlersRef.current).forEach(([eventName, handler]) => {
+					connectionRef.current?.off(eventName, handler);
+				});
 			}
 
 			Object.entries(handlers).forEach(([eventName, handler]) => {
@@ -156,11 +134,9 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 	useEffect(() => {
 		return () => {
 			if (!connection || !handlersRef.current) return;
-			Object.entries(handlersRef.current).forEach(
-				([eventName, handler]) => {
-					connectionRef.current?.off(eventName, handler);
-				},
-			);
+			Object.entries(handlersRef.current).forEach(([eventName, handler]) => {
+				connectionRef.current?.off(eventName, handler);
+			});
 			handlersRef.current = undefined;
 		};
 	}, [connection]);

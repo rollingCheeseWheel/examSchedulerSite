@@ -1,40 +1,36 @@
 import {
 	ActionIcon,
-	Box,
 	Button,
 	Center,
+	Flex,
 	Grid,
 	Group,
+	LoadingOverlay,
 	Modal,
 	NativeSelect,
-	SimpleGrid,
 	Stack,
 	Text,
-	type MantineColor,
-	type StyleProp,
 } from "@mantine/core";
-import { DatePickerInput, type DayOfWeek } from "@mantine/dates";
+import { type DayOfWeek } from "@mantine/dates";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useCalendar } from "../../../hooks/useCalendar";
 import { usePromise } from "../../../hooks/usePromise";
+import { useToggle } from "../../../hooks/useToggle";
 import type { Lesson } from "../../../models/calendar";
 import type { ClassroomId } from "../../../models/classroom";
 import {
+	addDaysToDate,
+	floorDateToMonday,
 	getColorsForLessons,
-	groupBy,
-	mapKVPs,
-	reduceMap,
-	sleep,
-	timeTableSlotSorter,
 	type Action,
 } from "../../../util";
 import {
 	useClassrooms,
-	useLoadingOverlay,
 	useScheduleHubConnection,
 } from "../../../zustand/zustand";
+import { TimeRangeDisplay } from "../../common/TimeRangeDisplay";
 import { TimeTable, type TimeTableSlot } from "./TimeTable";
 
 export function ScheduleCreateModal(props: {
@@ -55,41 +51,48 @@ export function ScheduleCreateModal(props: {
 		data: lessons,
 		getSignal,
 	} = usePromise<Lesson[]>();
-	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
+	const {
+		state: loadingOverlayState,
+		setToggle: setLoadingOverlayState,
+		reset: resetLoadingOverlayState,
+	} = useToggle(false);
 	useEffect(() => {
 		setLoadingOverlayState(lessonFetchLoading);
-		return abortLessonFetch;
-	}, [abortLessonFetch, lessonFetchLoading, setLoadingOverlayState]);
-
-	useEffect(() => {
-		console.log("fetching calendar");
-
-		resolveLessonPromise(
-			fetchWeek(selectedClassroomId, new Date(Date.now())),
-		);
-		return abortLessonFetch;
+		return () => {
+			abortLessonFetch();
+			resetLoadingOverlayState();
+		};
 	}, [
 		abortLessonFetch,
-		fetchWeek,
-		resolveLessonPromise,
-		selectedClassroomId,
+		lessonFetchLoading,
+		resetLoadingOverlayState,
+		setLoadingOverlayState,
 	]);
 
-	const [selectedWeek, setSelectedWeek] = useState<Date>();
+	useEffect(() => {
+		if (!selectedClassroomId) return;
+		console.log("fetching calendar");
+		resolveLessonPromise(fetchWeek(selectedClassroomId, new Date(Date.now())));
+		return abortLessonFetch;
+	}, [abortLessonFetch, fetchWeek, resolveLessonPromise, selectedClassroomId]);
+
+	const minDate = floorDateToMonday(new Date(Date.now()));
+	const [selectedWeek, setSelectedWeek] = useState<Date>(
+		floorDateToMonday(new Date(Date.now())),
+	);
 	function incrementDate() {
 		console.log("fetching calendar");
-		setSelectedWeek(
-			selectedWeek ? new Date(selectedWeek.getDate() + 7) : undefined,
-		);
+		setSelectedWeek(addDaysToDate(selectedWeek, 7));
 		resolveLessonPromise(
 			fetchWeek(selectedClassroomId, selectedWeek, getSignal()),
 		);
 	}
 	function decrementDate() {
+		if (selectedWeek.getTime() <= minDate.getTime()) {
+			return;
+		}
 		console.log("fetching calendar");
-		setSelectedWeek(
-			selectedWeek ? new Date(selectedWeek.getDate() - 7) : undefined,
-		);
+		setSelectedWeek(addDaysToDate(selectedWeek, -7));
 		resolveLessonPromise(
 			fetchWeek(selectedClassroomId, selectedWeek, getSignal()),
 		);
@@ -122,9 +125,7 @@ export function ScheduleCreateModal(props: {
 					required
 					label={t("schedule.create.classroomselect")}
 					value={selectedClassroomId}
-					onChange={(e) =>
-						setSelectedClassroom(e.currentTarget.value)
-					}
+					onChange={(e) => setSelectedClassroom(e.currentTarget.value)}
 					data={[
 						{
 							value: "",
@@ -138,48 +139,29 @@ export function ScheduleCreateModal(props: {
 				/>
 				{selectedClassroomId && (
 					<>
-						<DatePickerInput
-							required
-							label={t("schedule.create.datepick")}
-							value={selectedWeek}
-							onChange={(e) =>
-								setSelectedWeek(e ? new Date(e) : undefined)
-							}
+						<TimeRangeDisplay
+							startDate={selectedWeek}
+							endDate={addDaysToDate(selectedWeek, 7)}
 						/>
-						<Grid>
-							<Grid.Col>
-								<Center>
-									<ActionIcon
-										variant="default"
-										onClick={decrementDate}>
-										<IconChevronLeft />
-									</ActionIcon>
-								</Center>
-							</Grid.Col>
-							<Grid.Col>
-								<TimeTable slots={slots} />
-							</Grid.Col>
-							<Grid.Col>
-								<Center>
-									<ActionIcon
-										variant="default"
-										onClick={incrementDate}>
-										<IconChevronRight />
-									</ActionIcon>
-								</Center>
-							</Grid.Col>
-						</Grid>
+						<Flex align="center" justify="center">
+							<ActionIcon variant="default" onClick={decrementDate}>
+								<IconChevronLeft />
+							</ActionIcon>
+							<TimeTable slots={slots} />
+							<ActionIcon variant="default" onClick={incrementDate}>
+								<IconChevronRight />
+							</ActionIcon>
+						</Flex>
 					</>
 				)}
 				<Group>
 					<Button onClick={props.close}>{t("common.cancel")}</Button>
 					{selectedClassroomId && (
-						<Button onClick={handleSubmit}>
-							{t("common.submit")}
-						</Button>
+						<Button onClick={handleSubmit}>{t("common.submit")}</Button>
 					)}
 				</Group>
 			</Stack>
+			<LoadingOverlay visible={loadingOverlayState} zIndex={6767} />
 		</Modal>
 	);
 }

@@ -17,9 +17,7 @@ export function ScheduleWidget(props: ScheduleWidgetProps) {
 					schedule={schedule}
 					selectedSlotId={
 						schedule.examSlots.find((slot) =>
-							slot.participants.find(
-								(p) => p.id === userProfile?.id,
-							),
+							slot.participants.find((p) => p.id === userProfile?.id),
 						)?.id
 					}
 					maxwidth={props.maxwidth}

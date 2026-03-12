@@ -30,6 +30,19 @@ export function formatDateTime(
 	return new Intl.DateTimeFormat(locale, format).format(date);
 }
 
+export function floorDateToMonday(date: string | Date) {
+	const d = new Date(date);
+	const day = d.getDay();
+	const diff = (day + 6) % 7;
+	d.setDate(d.getDate() - diff);
+	return d;
+}
+
+export function addDaysToDate(date: string | Date, days: number) {
+	const d = new Date(date);
+	return new Date(d.getTime() + days * 24 * 60 * 60 * 1000);
+}
+
 export function groupBy<TKey, TValue>(
 	data: TValue[],
 	selector: (item: TValue) => TKey,

@@ -91,16 +91,11 @@ export function ReportStudentModal(props: {
 				<Text>{t("studentmodal.usage")}</Text>
 
 				<MantineProvider theme={pointerCursorTheme}>
-					<ScrollArea
-						type="auto"
-						h="100vh"
-						overscrollBehavior="contain">
+					<ScrollArea type="auto" h="100vh" overscrollBehavior="contain">
 						<CheckboxGroup
 							value={checkedStudents}
 							onChange={setCheckedStudents}
-							defaultValue={examslot.participants.map(
-								(p) => p.id,
-							)}>
+							defaultValue={examslot.participants.map((p) => p.id)}>
 							<Stack>
 								{...examslot.participants.map((p) => (
 									<Checkbox value={p.id} label={p.name} />
@@ -118,10 +113,8 @@ export function ReportStudentModal(props: {
 					<Button
 						onClick={() =>
 							resolve(
-								scheduleHub?.reportStudents(
-									props.slotId,
-									checkedStudents,
-								) ?? sleep(250),
+								scheduleHub?.reportStudents(props.slotId, checkedStudents) ??
+									sleep(250),
 							)
 						}>
 						<Text>{t("studentmodal.submit")}</Text>

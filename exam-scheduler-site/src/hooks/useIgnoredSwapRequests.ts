@@ -6,16 +6,13 @@ export function useIgnoredSwapRequests() {
 		key: "ignoredSwapRequestIds",
 		defaultValue: [],
 		sync: true,
-		deserialize: (value) =>
-			(value ? JSON.parse(value) : []) as SwapRequestId[],
+		deserialize: (value) => (value ? JSON.parse(value) : []) as SwapRequestId[],
 		serialize: (value) => JSON.stringify(value),
 	});
 
 	function ignore(...requests: SwapRequest[] | SwapRequestId[]) {
 		setValues((p) =>
-			p.concat(
-				requests.map((sr) => (typeof sr === "string" ? sr : sr.id)),
-			),
+			p.concat(requests.map((sr) => (typeof sr === "string" ? sr : sr.id))),
 		);
 	}
 

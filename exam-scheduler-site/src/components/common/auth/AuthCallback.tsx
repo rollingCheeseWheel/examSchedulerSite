@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { endpoints } from "../../../endpoints";
 import { usePost } from "../../../hooks/usePost";
+import { usePromise } from "../../../hooks/usePromise";
 import { useSignalRInit } from "../../../hooks/useSignalR";
 import type { OAuthRequest } from "../../../models/auth";
 import type { UserProfile } from "../../../models/user";
@@ -24,6 +25,11 @@ export function AuthCallback(props: { disabled?: boolean }) {
 
 	const { data: schedules, setData: setSchedules } = useSchedules();
 	const { data: classrooms, setData: setClassrooms } = useClassrooms();
+	const {
+		resolve: resolveSignalRInit,
+		loading: signalRInitLoading,
+		abort: abortSignalRInit,
+	} = usePromise<void>();
 	const initSignalR = useSignalRInit();
 
 	useEffect(() => {
@@ -41,48 +47,51 @@ export function AuthCallback(props: { disabled?: boolean }) {
 	}, [props, post, terminate]);
 
 	useEffect(() => {
-		setLoadingOverlayState(
-			loading && !terminated && (props.disabled ?? false),
-		);
+		setLoadingOverlayState(loading && !terminated && (props.disabled ?? false));
 	}, [props, loading, setLoadingOverlayState, terminated]);
 
 	useEffect(() => {
 		if (data && data.data) {
 			setUserProfile(data.data);
 
-			initSignalR({
-				onReceiveInitialSchedules(schedules) {
-					console.debug("received initial schedules", schedules);
-					setSchedules(schedules);
-				},
-				onUpdateSchedule(scheduleId, schedule) {
-					console.debug("updating schedule", schedule);
-					setSchedules([
-						...schedules.filter((s) => s.id !== scheduleId),
-						schedule,
-					]);
-				},
-				onRemoveSchedule(scheduleId) {
-					console.debug("removing scheudule", scheduleId);
-					setSchedules(schedules.filter((s) => s.id !== scheduleId));
-				},
-				onReceiveInitialClassrooms(classrooms) {
-					console.debug("received initial classrooms", classrooms);
-					setClassrooms(classrooms);
-				},
-				onUpdateClassroom(classroom) {
-					console.debug("updating classroom", classroom);
-					setClassrooms([
-						...classrooms.filter((c) => c.id !== classroom.id),
-						classroom,
-					]);
-				},
-			});
+			resolveSignalRInit(
+				initSignalR({
+					onReceiveInitialSchedules(schedules) {
+						console.debug("received initial schedules", schedules);
+						setSchedules(schedules);
+					},
+					onUpdateSchedule(scheduleId, schedule) {
+						console.debug("updating schedule", schedule);
+						setSchedules([
+							...schedules.filter((s) => s.id !== scheduleId),
+							schedule,
+						]);
+					},
+					onRemoveSchedule(scheduleId) {
+						console.debug("removing scheudule", scheduleId);
+						setSchedules(schedules.filter((s) => s.id !== scheduleId));
+					},
+					onReceiveInitialClassrooms(classrooms) {
+						console.debug("received initial classrooms", classrooms);
+						setClassrooms(classrooms);
+					},
+					onUpdateClassroom(classroom) {
+						console.debug("updating classroom", classroom);
+						setClassrooms([
+							...classrooms.filter((c) => c.id !== classroom.id),
+							classroom,
+						]);
+					},
+				}),
+			);
 		}
+		return abortSignalRInit;
 	}, [
+		abortSignalRInit,
 		classrooms,
 		data,
 		initSignalR,
+		resolveSignalRInit,
 		schedules,
 		setClassrooms,
 		setSchedules,

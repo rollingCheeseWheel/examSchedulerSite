@@ -27,10 +27,14 @@ export function DefaultAppShell(props: {
 				<>
 					<ScheduleCreateModal opened={modalOpen} close={close} />
 					<Group onClick={open}>
-						<Button size="lg" pos="fixed" bottom={16} right={16}>
+						<Button
+							leftSection={<IconPlus />}
+							size="lg"
+							pos="fixed"
+							bottom={16}
+							right={16}>
 							{t("schedule.create.createbutton")}
 						</Button>
-						<IconPlus />
 					</Group>
 				</>
 			)}
