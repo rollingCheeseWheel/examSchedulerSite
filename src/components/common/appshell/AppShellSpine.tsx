@@ -3,7 +3,7 @@ import "@mantine/core/styles.css";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
 import { type ReactNode } from "react";
-import { useLoadingOverlay } from "../../../zustand/zustand";
+import { useLoadingOverlay } from "../../../zustand";
 import { ThemeButton } from "../../common/ThemeButton";
 import classes from "./AppShellSpine.module.css";
 

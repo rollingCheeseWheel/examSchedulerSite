@@ -16,7 +16,7 @@ import type {
 import type { SwapRequestId } from "../models/swapRequest";
 import type { UserProfileId } from "../models/user";
 import { type Action, type Func } from "../util";
-import { useScheduleHubConnection } from "../zustand/zustand";
+import { useScheduleHubConnection } from "../zustand";
 
 export interface ScheduleClient {
 	onReceiveInitialSchedules: Action<[Schedule[]]>;
@@ -144,7 +144,7 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 	return init;
 }
 
-export function createConnection(hubUrl: string) {
+function createConnection(hubUrl: string) {
 	return new HubConnectionBuilder()
 		.withUrl(hubUrl, {
 			withCredentials: true,

@@ -12,7 +12,7 @@ import {
 	useLoadingOverlay,
 	useSchedules,
 	useUserProfile,
-} from "../../../zustand/zustand";
+} from "../../../zustand";
 
 export function AuthCallback(props: { disabled?: boolean }) {
 	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);

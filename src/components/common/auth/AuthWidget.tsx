@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { endpoints } from "../../../endpoints";
 import type { School } from "../../../models/school";
-import { useCrossSiteError } from "../../../zustand/zustand";
+import { useCrossSiteError } from "../../../zustand";
 
 export function AuthWidget() {
 	const {

@@ -1,6 +1,6 @@
-export const baseApiPath = "api";
+const baseApiPath = "api";
 
-export function join(...parts: string[]) {
+function join(...parts: string[]) {
 	parts = [baseApiPath, ...parts];
 	return parts
 		.map((p) => p.split(/^\/|\/$/g))

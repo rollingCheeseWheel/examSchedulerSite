@@ -21,7 +21,7 @@ import {
 	useLoadingOverlay,
 	useScheduleHubConnection,
 	useSchedules,
-} from "../../../zustand/zustand";
+} from "../../../zustand";
 
 export function ReportStudentModal(props: {
 	slotId: ExamSlotId;

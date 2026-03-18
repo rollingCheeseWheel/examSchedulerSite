@@ -8,7 +8,6 @@ import {
 	Grid,
 	Group,
 	Kbd,
-	LoadingOverlay,
 	Notification,
 	Paper,
 	Stack,
@@ -23,6 +22,7 @@ import {
 	IconReplaceUser,
 	IconX,
 } from "@tabler/icons-react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useIgnoredSwapRequests } from "../../../hooks/useIgnoredSwapRequests";
 import { usePromise } from "../../../hooks/usePromise";
@@ -34,9 +34,10 @@ import type { UserProfile } from "../../../models/user";
 import { formatDateTime, sleep, type Action } from "../../../util";
 import {
 	useIsTeacher,
+	useLoadingOverlay,
 	useScheduleHubConnection,
 	useUserProfile,
-} from "../../../zustand/zustand";
+} from "../../../zustand";
 import { ReportStudentModal } from "../../teacher/report-actual-students/StudentReportModal";
 import { ScheduleProgress } from "./ExtendedProgessbar";
 
@@ -46,7 +47,14 @@ export function ExamSchedule(props: {
 	maxwidth?: StyleProp<string | number>;
 }) {
 	const hubConnection = useScheduleHubConnection((s) => s.data);
+	const { setState: setLoadingOverlayState, reset: resetLoadingOverlayState } =
+		useLoadingOverlay();
 	const { loading, resolve } = usePromise<Result<boolean>>();
+
+	useEffect(() => {
+		setLoadingOverlayState(loading);
+		return resetLoadingOverlayState;
+	}, [loading]);
 
 	const joinSlot = (id: ExamSlotId) =>
 		resolve(hubConnection?.registerForSlot(id) ?? sleep(250));
@@ -62,8 +70,6 @@ export function ExamSchedule(props: {
 	return (
 		<Paper maw={props.maxwidth} withBorder radius="md" key={props.schedule.id}>
 			<Box pos="relative" p="md">
-				<LoadingOverlay visible={loading} />
-
 				<Group justify="space-between">
 					<Title order={2}>{props.schedule.subject.name}</Title>
 					{props.schedule.description && (

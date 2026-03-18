@@ -82,9 +82,9 @@ export function getPost<TResponse, TBody = unknown>(url: string | URL) {
 	};
 }
 
-export const jsonReviver = reviverCombiner(/* dateReviver */);
+const jsonReviver = reviverCombiner(/* dateReviver */);
 
-export function reviverCombiner(
+function reviverCombiner(
 	...revivers: ((key: string, value: unknown) => unknown)[]
 ) {
 	function combinedReviver(key: string, value: unknown) {
@@ -101,7 +101,7 @@ export function reviverCombiner(
 	return combinedReviver;
 }
 
-export function dateReviver(_: string, value: unknown) {
+function dateReviver(_: string, value: unknown) {
 	if (typeof value === "string") {
 		const d = new Date(value);
 		if (!isNaN(d.getTime()) && /^\d{4}-\d{2}-\d{2}T/.test(value)) {

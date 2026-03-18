@@ -84,7 +84,7 @@ export function reduceMap<TKey, TValue, TReturn>(
 	return result;
 }
 
-export function sort<
+function sort<
 	T,
 	TKey extends string | number | null | undefined =
 		| string
@@ -106,7 +106,7 @@ export function sort<
 	};
 }
 
-export function compoundSort<T>(
+function compoundSort<T>(
 	...comparers: Func<[T, T], number>[]
 ): Func<[T, T], number> {
 	return (a, b) => {

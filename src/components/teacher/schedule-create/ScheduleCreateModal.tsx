@@ -1,11 +1,8 @@
 import {
 	ActionIcon,
 	Button,
-	Center,
 	Flex,
-	Grid,
 	Group,
-	LoadingOverlay,
 	Modal,
 	NativeSelect,
 	Stack,
@@ -17,7 +14,6 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useCalendar } from "../../../hooks/useCalendar";
 import { usePromise } from "../../../hooks/usePromise";
-import { useToggle } from "../../../hooks/useToggle";
 import type { Lesson } from "../../../models/calendar";
 import type { ClassroomId } from "../../../models/classroom";
 import {
@@ -28,8 +24,9 @@ import {
 } from "../../../util";
 import {
 	useClassrooms,
+	useLoadingOverlay,
 	useScheduleHubConnection,
-} from "../../../zustand/zustand";
+} from "../../../zustand";
 import { TimeRangeDisplay } from "../../common/TimeRangeDisplay";
 import { TimeTable, type TimeTableSlot } from "./TimeTable";
 
@@ -39,6 +36,8 @@ export function ScheduleCreateModal(props: {
 }) {
 	const { t } = useTranslation();
 	const scheduleHub = useScheduleHubConnection((s) => s.data);
+	const { setState: setLoadingOverlayState, reset: resetLoadingOverlayState } =
+		useLoadingOverlay();
 	const { fetchWeek } = useCalendar();
 
 	const classrooms = useClassrooms((s) => s.data);
@@ -51,11 +50,6 @@ export function ScheduleCreateModal(props: {
 		data: lessons,
 		getSignal,
 	} = usePromise<Lesson[]>();
-	const {
-		state: loadingOverlayState,
-		setToggle: setLoadingOverlayState,
-		reset: resetLoadingOverlayState,
-	} = useToggle(false);
 	useEffect(() => {
 		setLoadingOverlayState(lessonFetchLoading);
 		return () => {
@@ -161,7 +155,6 @@ export function ScheduleCreateModal(props: {
 					)}
 				</Group>
 			</Stack>
-			<LoadingOverlay visible={loadingOverlayState} zIndex={6767} />
 		</Modal>
 	);
 }

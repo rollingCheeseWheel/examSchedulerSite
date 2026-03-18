@@ -1,8 +1,8 @@
 import { create } from "zustand";
-import type { ScheduleHub } from "../hooks/useSignalR";
-import type { Classroom } from "../models/classroom";
-import type { Schedule } from "../models/schedule";
-import type { UserProfile } from "../models/user";
+import type { ScheduleHub } from "./hooks/useSignalR";
+import type { Classroom } from "./models/classroom";
+import type { Schedule } from "./models/schedule";
+import type { UserProfile } from "./models/user";
 import {
 	classroomSorter,
 	examSlotSorter,
@@ -11,9 +11,9 @@ import {
 	userProfileSorter,
 	type Action,
 	type Func,
-} from "../util";
+} from "./util";
 
-export interface DisclosureStore {
+interface DisclosureStore {
 	state: boolean;
 	hasChanged: boolean;
 	open: Action<[]>;
@@ -23,7 +23,7 @@ export interface DisclosureStore {
 	reset: Action<[]>;
 }
 
-export function createDisclosureStore(initialState: boolean = false) {
+function createDisclosureStore(initialState: boolean = false) {
 	return create<DisclosureStore>((set) => ({
 		state: initialState,
 		hasChanged: false,
@@ -45,7 +45,7 @@ export function createDisclosureStore(initialState: boolean = false) {
 	}));
 }
 
-export interface ListStore<T> {
+interface ListStore<T> {
 	data: T[];
 	hasChanged: boolean;
 	setData: Action<[T[]]>;
@@ -54,7 +54,7 @@ export interface ListStore<T> {
 	clear: Action<[]>;
 }
 
-export function createListStore<T>(
+function createListStore<T>(
 	sortFunction?: Func<[T, T], number>,
 	postProcessor?: Func<[T], T>,
 	initialState: T[] = [],
@@ -91,7 +91,7 @@ export function createListStore<T>(
 	}));
 }
 
-export interface SingletonStore<T> {
+interface SingletonStore<T> {
 	data?: T;
 	hasChanged: boolean;
 	setData: Action<[T?]>;
@@ -99,7 +99,7 @@ export interface SingletonStore<T> {
 	clear: Action<[]>;
 }
 
-export function createSingletonStore<T>(
+function createSingletonStore<T>(
 	postProcessor?: Func<[T | undefined], T | undefined>,
 	initialInstance?: T,
 ) {

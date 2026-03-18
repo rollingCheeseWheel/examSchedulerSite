@@ -1,5 +1,5 @@
 import { Grid, type StyleProp } from "@mantine/core";
-import { useSchedules, useUserProfile } from "../../../zustand/zustand";
+import { useSchedules, useUserProfile } from "../../../zustand";
 import { ExamSchedule } from "./Schedule";
 
 interface ScheduleWidgetProps {

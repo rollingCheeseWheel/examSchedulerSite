@@ -4,11 +4,7 @@ import { Route } from "react-router-dom";
 import { DefaultAppShell } from "../components/common/appshell/DefaultAppShell";
 import { ScheduleWidget } from "../components/common/schedule/ScheduleWidget";
 import { randomId } from "../util";
-import {
-	useClassrooms,
-	useSchedules,
-	useUserProfile,
-} from "../zustand/zustand";
+import { useClassrooms, useSchedules, useUserProfile } from "../zustand";
 
 export function DashboardPage() {
 	useInitMockUpData();
