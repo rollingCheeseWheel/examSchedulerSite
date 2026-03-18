@@ -108,6 +108,7 @@ const theme = createTheme({
 
 createRoot(document.getElementById("root")!).render(
 	<StrictMode>
+		{/* react developer tools */}
 		<script src="http://localhost:8097"></script>
 		<MantineProvider defaultColorScheme="auto" /* theme={theme} */>
 			<BrowserRouter>
