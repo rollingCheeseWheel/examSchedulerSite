@@ -10,6 +10,8 @@ export type LessonName = BrandedString<"lessonname">;
 export type FromHour = Brand<number, "fromhour">;
 export type ToHour = Brand<number, "tohour">;
 
+export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
 export interface Lesson {
 	id: LessonId;
 	date: DateOnlyString;

@@ -21,5 +21,5 @@ export function useCalendar() {
 		[],
 	);
 
-	return { fetchWeek };
+	return fetchWeek;
 }

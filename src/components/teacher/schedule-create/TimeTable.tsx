@@ -6,14 +6,13 @@ import {
 	SimpleGrid,
 	Text,
 } from "@mantine/core";
-import type { DayOfWeek } from "@mantine/dates";
 import {
 	groupBy,
 	mapKVPs,
 	reduceMap,
 	timeTableSlotSorter,
 } from "../../../util";
-import { useMemo } from "react";
+import type { DayOfWeek } from "./../../../models/calendar";
 
 export interface TimeTableSlot {
 	dayOfWeek: DayOfWeek;

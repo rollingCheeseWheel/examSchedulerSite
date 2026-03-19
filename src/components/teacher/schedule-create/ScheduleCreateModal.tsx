@@ -38,7 +38,7 @@ export function ScheduleCreateModal(props: {
 	const scheduleHub = useScheduleHubConnection((s) => s.data);
 	const { setState: setLoadingOverlayState, reset: resetLoadingOverlayState } =
 		useLoadingOverlay();
-	const { fetchWeek } = useCalendar();
+	const fetchLessons = useCalendar();
 
 	const classrooms = useClassrooms((s) => s.data);
 	const [selectedClassroomId, setSelectedClassroom] = useState<ClassroomId>();
@@ -66,9 +66,16 @@ export function ScheduleCreateModal(props: {
 	useEffect(() => {
 		if (!selectedClassroomId) return;
 		console.log("fetching calendar");
-		resolveLessonPromise(fetchWeek(selectedClassroomId, new Date(Date.now())));
+		resolveLessonPromise(
+			fetchLessons(selectedClassroomId, new Date(Date.now())),
+		);
 		return abortLessonFetch;
-	}, [abortLessonFetch, fetchWeek, resolveLessonPromise, selectedClassroomId]);
+	}, [
+		abortLessonFetch,
+		fetchLessons,
+		resolveLessonPromise,
+		selectedClassroomId,
+	]);
 
 	const minDate = floorDateToMonday(new Date(Date.now()));
 	const [selectedWeek, setSelectedWeek] = useState<Date>(
@@ -78,7 +85,7 @@ export function ScheduleCreateModal(props: {
 		console.log("fetching calendar");
 		setSelectedWeek(addDaysToDate(selectedWeek, 7));
 		resolveLessonPromise(
-			fetchWeek(selectedClassroomId, selectedWeek, getSignal()),
+			fetchLessons(selectedClassroomId, selectedWeek, getSignal()),
 		);
 	}
 	function decrementDate() {
@@ -88,7 +95,7 @@ export function ScheduleCreateModal(props: {
 		console.log("fetching calendar");
 		setSelectedWeek(addDaysToDate(selectedWeek, -7));
 		resolveLessonPromise(
-			fetchWeek(selectedClassroomId, selectedWeek, getSignal()),
+			fetchLessons(selectedClassroomId, selectedWeek, getSignal()),
 		);
 	}
 
