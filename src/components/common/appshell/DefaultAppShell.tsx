@@ -4,7 +4,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Routes } from "react-router-dom";
-import { useIsTeacher } from "../../../zustand";
+import { useIsTeacher } from "../../../hooks/zustand";
 import { ScheduleCreateModal } from "../../teacher/schedule-create/ScheduleCreateModal";
 import { AuthCallback } from "../auth/AuthCallback";
 import { AppShellSpine } from "./AppShellSpine";

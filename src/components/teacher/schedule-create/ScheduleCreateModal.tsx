@@ -1,3 +1,5 @@
+import "@mantine/dates/styles.css";
+import "@mantine/dates/styles.layer.css";
 import {
 	ActionIcon,
 	Button,
@@ -8,38 +10,60 @@ import {
 	NativeSelect,
 	Stack,
 	Text,
+	TextInput,
 } from "@mantine/core";
-import { type DayOfWeek } from "@mantine/dates";
+import { DatePickerInput, TimePicker } from "@mantine/dates";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useCalendar } from "../../../hooks/useCalendar";
 import { usePromise } from "../../../hooks/usePromise";
-import type { Lesson } from "../../../models/calendar";
+import {
+	useClassrooms,
+	useScheduleHubConnection,
+	useUserProfile,
+} from "../../../hooks/zustand";
+import type {
+	DayOfWeek,
+	Lesson,
+	SubjectName,
+	TeacherName,
+} from "../../../models/calendar";
 import type { ClassroomId } from "../../../models/classroom";
+import type { Result } from "../../../models/result";
+import type { ScheduleGeneratorSlot } from "../../../models/schedule";
 import {
 	addDaysToDate,
 	equals,
 	floorDateToMonday,
-	getColorsForLessons,
+	mapKVPs,
 	type Action,
 } from "../../../util";
-import {
-	useClassrooms,
-	useLoadingOverlay,
-	useScheduleHubConnection,
-} from "../../../zustand";
 import { TimeRangeDisplay } from "../../common/TimeRangeDisplay";
-import { TimeTable, type TimeTableSlot } from "./TimeTable";
+import { TimeTable } from "./TimeTable";
 
 export function ScheduleCreateModal(props: {
 	opened: boolean;
 	close: Action<[]>;
 }) {
 	const { t } = useTranslation();
-	const scheduleHub = useScheduleHubConnection((s) => s.data);
+	const userProfile = useUserProfile((s) => s.data);
 	const [loadingOverlayState, setLoadingOverlayState] = useState(false);
-	const fetchLessons = useCalendar();
+
+	const descriptionRef = useRef<HTMLInputElement>(null);
+	const [startDate, setStartDate] = useState<string | null>();
+	const [lockinOffset, setLockinOffset] = useState<string>();
+
+	const scheduleHub = useScheduleHubConnection((s) => s.data);
+	const {
+		abort: abortScheduleCreate,
+		loading: scheduleCreateLoading,
+		resolve: resolveScheduleCreate,
+	} = usePromise<Result<boolean>>();
+	useEffect(() => {
+		setLoadingOverlayState(scheduleCreateLoading);
+		return abortScheduleCreate;
+	}, [abortScheduleCreate, scheduleCreateLoading]);
 
 	const classrooms = useClassrooms((s) => s.asArray);
 	const [selectedClassroomId, setSelectedClassroom] = useState<ClassroomId>();
@@ -47,13 +71,26 @@ export function ScheduleCreateModal(props: {
 		equals((c) => c.id, selectedClassroomId),
 	);
 
+	const [selectedSubject, setSelectedSubject] = useState<SubjectName>();
+
+	const [occurances, setOccurances] = useState<Map<DayOfWeek, number>>(
+		new Map(),
+	);
+	const setSpecificOccurance = useCallback(
+		(dayOfWeek: DayOfWeek, count: number) => {
+			setOccurances((s) => s.set(dayOfWeek, count));
+		},
+		[setOccurances],
+	);
+
+	const fetchLessons = useCalendar();
 	const {
 		loading: lessonFetchLoading,
 		resolve: resolveLessonPromise,
 		abort: abortLessonFetch,
-		data: lessons,
 		getSignal,
-	} = usePromise<void>();
+		data: lessons,
+	} = usePromise<Lesson[]>();
 	useEffect(() => {
 		setLoadingOverlayState(lessonFetchLoading);
 		return abortLessonFetch;
@@ -62,9 +99,8 @@ export function ScheduleCreateModal(props: {
 	useEffect(() => {
 		if (!selectedClassroomId) return;
 		console.log("fetching calendar");
-		resolveLessonPromise(
-			fetchLessons(selectedClassroomId, new Date(Date.now())),
-		);
+		setOccurances(new Map());
+		setSelectedWeek(floorDateToMonday(Date.now()));
 		return abortLessonFetch;
 	}, [
 		abortLessonFetch,
@@ -77,14 +113,20 @@ export function ScheduleCreateModal(props: {
 	const [selectedWeek, setSelectedWeek] = useState<Date>(
 		floorDateToMonday(new Date(Date.now())),
 	);
-	function incrementDate() {
+	const incrementDate = useCallback(() => {
 		console.log("fetching calendar");
 		setSelectedWeek(addDaysToDate(selectedWeek, 7));
 		resolveLessonPromise(
 			fetchLessons(selectedClassroomId, selectedWeek, getSignal()),
 		);
-	}
-	function decrementDate() {
+	}, [
+		fetchLessons,
+		getSignal,
+		resolveLessonPromise,
+		selectedClassroomId,
+		selectedWeek,
+	]);
+	const decrementDate = useCallback(() => {
 		if (selectedWeek.getTime() <= minDate.getTime()) {
 			return;
 		}
@@ -93,14 +135,50 @@ export function ScheduleCreateModal(props: {
 		resolveLessonPromise(
 			fetchLessons(selectedClassroomId, selectedWeek, getSignal()),
 		);
-	}
+	}, [
+		fetchLessons,
+		getSignal,
+		minDate,
+		resolveLessonPromise,
+		selectedClassroomId,
+		selectedWeek,
+	]);
 
-	function handleSubmit() {}
+	function handleSubmit() {
+		if (
+			!selectedClassroomId ||
+			!selectedSubject ||
+			!startDate ||
+			isNaN(new Date(startDate).getTime())
+		) {
+			return;
+		}
+
+		resolveScheduleCreate(
+			scheduleHub?.createSchedule({
+				classroomId: selectedClassroomId,
+				subjectName: selectedSubject,
+				generatorSlots: Array.from(
+					mapKVPs(
+						occurances,
+						(v, k) =>
+							({ offset: k, maxParticipants: v }) as ScheduleGeneratorSlot,
+					).values(),
+				),
+				description: descriptionRef.current?.value,
+				startDate: new Date(startDate),
+				lockInOffset:
+					!lockinOffset || isNaN(new Date(lockinOffset).getTime()) ?
+						new Date(0)
+					:	new Date(lockinOffset),
+			}),
+		);
+	}
 
 	return (
 		<Modal
 			centered
-			size="lg"
+			size="xl"
 			opened={props.opened}
 			onClose={props.close}
 			title={
@@ -112,7 +190,7 @@ export function ScheduleCreateModal(props: {
 			<Stack>
 				<NativeSelect
 					required
-					label={t("schedule.create.classroomselect")}
+					label={t("schedule.create.classroomSelect")}
 					value={selectedClassroomId}
 					onChange={(e) => setSelectedClassroom(e.currentTarget.value)}
 					data={[
@@ -126,7 +204,46 @@ export function ScheduleCreateModal(props: {
 						})),
 					]}
 				/>
-				{selectedClassroomId && (
+				{selectedClassroom && (
+					<>
+						<Group grow>
+							<NativeSelect
+								required
+								label={t("schedule.create.subjectSelect")}
+								value={selectedSubject}
+								onChange={(e) => setSelectedSubject(e.currentTarget.value)}
+								data={selectedClassroom.teachers
+									.find(
+										equals(
+											(t) => t.name,
+											userProfile?.name as TeacherName | undefined,
+										),
+									)
+									?.subjects.map((s) => ({
+										label: s.name,
+										value: s.name,
+									}))}
+							/>
+							<DatePickerInput
+								required
+								label={t("schedule.create.startDatePicker")}
+								value={startDate}
+								onChange={setStartDate}
+							/>
+							<TimePicker
+								label={t("schedule.create.lockinOffset")}
+								value={lockinOffset}
+								onChange={setLockinOffset}
+							/>
+						</Group>
+						<TextInput
+							label={t("schedule.create.scheduleDescription")}
+							ref={descriptionRef}
+						/>
+					</>
+				)}
+
+				{selectedClassroomId && selectedSubject && lessons && (
 					<>
 						<TimeRangeDisplay
 							startDate={selectedWeek}
@@ -137,7 +254,9 @@ export function ScheduleCreateModal(props: {
 								<IconChevronLeft />
 							</ActionIcon>
 							<TimeTable
-								totalStudentCount={selectedClassroom?.studentCount}
+								lessons={lessons}
+								targetSubject={selectedSubject}
+								setOccurance={setSpecificOccurance}
 							/>
 							<ActionIcon variant="default" onClick={incrementDate}>
 								<IconChevronRight />

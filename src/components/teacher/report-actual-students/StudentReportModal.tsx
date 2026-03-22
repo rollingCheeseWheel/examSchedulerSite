@@ -21,7 +21,7 @@ import {
 	useLoadingOverlay,
 	useScheduleHubConnection,
 	useSchedules,
-} from "../../../zustand";
+} from "../../../hooks/zustand";
 
 export function ReportStudentModal(props: {
 	slotId: ExamSlotId;
@@ -40,7 +40,7 @@ export function ReportStudentModal(props: {
 	const scheduleHub = useScheduleHubConnection((s) => s.data);
 	const [checkedStudents, setCheckedStudents] = useState<UserProfileId[]>([]);
 
-	const schedule = useSchedules((s) => s.data).find((s) =>
+	const schedule = useSchedules((s) => s.asArray).find((s) =>
 		s.examSlots.some((s) => s.id == props.slotId),
 	);
 	const examslot = schedule?.examSlots.find((s) => s.id == props.slotId);

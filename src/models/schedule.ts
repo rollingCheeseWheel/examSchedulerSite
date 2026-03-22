@@ -1,6 +1,6 @@
 import type { AuditLog } from "./auditLog";
 import type { Brand, BrandedId, BrandedString, DateString } from "./brand";
-import type { Subject, Teacher } from "./calendar";
+import type { DayOfWeek, Subject, TeacherWithSubjects } from "./calendar";
 import type { ClassroomId } from "./classroom";
 import type { AutoLockIn, SlotFillingBehaviour, SlotLockState } from "./enums";
 import type { SwapRequest } from "./swapRequest";
@@ -25,7 +25,7 @@ export interface Schedule {
 	lockInOffset: TimeSpanString;
 	description?: string;
 	subject: Subject;
-	teachers: Teacher[];
+	teachers: TeacherWithSubjects[];
 	examSlots: ExamSlot[];
 	auditLogs: AuditLog[];
 	swapRequests: SwapRequest[];
@@ -35,25 +35,21 @@ export interface ExamSlot {
 	id: ExamSlotId;
 	date: DateString;
 	participants: UserProfile[];
-	maxParticipants: Mininum;
-	minParticipants: Mininum;
+	maxParticipants: Maximum;
+	minParticipants?: Mininum;
 	lockState: SlotLockState;
 }
 
 export interface ScheduleCreateRequest {
 	subjectName: string;
 	classroomId: ClassroomId;
-	slotFillingBehaviour: SlotFillingBehaviour;
 	startDate: Date;
-	endDate: Date;
-	autoLockIn: AutoLockIn;
 	lockInOffset: TimeSpan;
 	generatorSlots: ScheduleGeneratorSlot[];
 	description?: string;
 }
 
 export interface ScheduleGeneratorSlot {
-	offset: TimeSpan;
-	minParticipants: Mininum;
+	offset: DayOfWeek;
 	maxParticipants: Maximum;
 }

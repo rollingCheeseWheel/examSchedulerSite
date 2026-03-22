@@ -12,7 +12,7 @@ import {
 	useLoadingOverlay,
 	useSchedules,
 	useUserProfile,
-} from "../../../zustand";
+} from "../../../hooks/zustand";
 
 export function AuthCallback(props: { disabled?: boolean }) {
 	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
@@ -43,7 +43,7 @@ export function AuthCallback(props: { disabled?: boolean }) {
 	useEffect(() => {
 		setLoadingOverlayState(signalRInitLoading);
 		return abortSignalRInit;
-	}, []);
+	}, [abortSignalRInit, setLoadingOverlayState, signalRInitLoading]);
 
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
@@ -81,6 +81,7 @@ export function AuthCallback(props: { disabled?: boolean }) {
 							...schedulesAsArray.filter((s) => s.id !== scheduleId),
 							schedule,
 						]) {
+							setSchedule(iterSchedule);
 						}
 					},
 					onRemoveSchedule(scheduleId) {
@@ -113,10 +114,12 @@ export function AuthCallback(props: { disabled?: boolean }) {
 	}, [
 		abortSignalRInit,
 		classroomMap,
+		classroomsAsArray,
 		data,
 		initSignalR,
 		resolveSignalRInit,
 		scheduleMap,
+		schedulesAsArray,
 		setClassroom,
 		setSchedule,
 		setUserProfile,

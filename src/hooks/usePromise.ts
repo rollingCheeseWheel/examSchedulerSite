@@ -36,7 +36,7 @@ export function usePromise<TResult = never>(...callbacks: Action<[]>[]) {
 	}, []);
 
 	const resolve = useCallback(
-		(promise?: Promise<TResult> | Func<[AbortSignal], Promise<TResult>>) => {
+		(promise?: Promise<TResult | undefined> | Func<[AbortSignal], Promise<TResult>>) => {
 			if (!promise) {
 				return;
 			}
@@ -59,6 +59,7 @@ export function usePromise<TResult = never>(...callbacks: Action<[]>[]) {
 				.catch((err) => {
 					if (!mountedRef.current || callId !== callIdRef.current) return;
 					setError(err);
+					setData(undefined);
 				})
 				.finally(() => {
 					if (!mountedRef.current || callId !== callIdRef.current) return;

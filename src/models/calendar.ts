@@ -18,12 +18,16 @@ export interface Lesson {
 	fromHour: FromHour;
 	toHour: ToHour;
 	lessonName: LessonName;
-	teachers: Teacher[];
+	teachers: TeacherOnly[];
 	subject: Subject;
 }
 
-export interface Teacher {
-	name: TeacherName;
+export interface TeacherOnly {
+	name: TeacherName
+}
+
+export interface TeacherWithSubjects extends TeacherOnly {
+	subjects: Subject[]
 }
 
 export interface Subject {

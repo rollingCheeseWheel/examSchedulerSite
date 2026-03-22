@@ -22,7 +22,6 @@ import type {
 	Lesson,
 	SubjectName,
 } from "./../../../models/calendar";
-import { useLessonWeeks } from "../../../zustand";
 
 export interface TimeTableSlot {
 	dayOfWeek: DayOfWeek;
@@ -33,15 +32,12 @@ export interface TimeTableSlot {
 }
 
 export function TimeTable(props: {
-	date: string | number | Date;
+	lessons: Lesson[];
 	targetSubject: SubjectName;
 	setOccurance: Action<[DayOfWeek, number]>;
-	totalStudentCount?: number;
 }) {
-	const lessons = useLessonWeeks((s) => s.get)(new Date(props.date).getTime()) ?? [];
-
-	const lessonColors = getColorsForLessons(lessons);
-	const slots = lessons.map<TimeTableSlot>((l) => ({
+	const lessonColors = getColorsForLessons(props.lessons);
+	const slots = props.lessons.map<TimeTableSlot>((l) => ({
 		label: l.subject.name,
 		dayOfWeek: new Date(l.date).getDate() as DayOfWeek,
 		start: l.fromHour,
@@ -83,22 +79,22 @@ export function TimeTable(props: {
 								</Box>
 							))}
 						</Container>
-						{slots.some(equals((s) => s.label, props.targetSubject)) && (
-							<NumberInput
-								allowDecimal={false}
-								allowNegative={false}
-								allowLeadingZeros={false}
-								defaultValue={0}
-								min={0}
-								max={props.totalStudentCount}
-								onChange={(value) =>
-									props.setOccurance(
-										dayOfWeek,
-										typeof value == "number" ? value : parseInt(value),
-									)
-								}
-							/>
-						)}
+						<NumberInput
+							disabled={
+								!slots.some(equals((s) => s.label, props.targetSubject))
+							}
+							allowDecimal={false}
+							allowNegative={false}
+							allowLeadingZeros={false}
+							defaultValue={0}
+							min={0}
+							onChange={(value) =>
+								props.setOccurance(
+									dayOfWeek,
+									typeof value == "number" ? value : parseInt(value),
+								)
+							}
+						/>
 					</Stack>
 				)).values(),
 			)}

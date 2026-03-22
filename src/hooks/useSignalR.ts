@@ -16,7 +16,7 @@ import type {
 import type { SwapRequestId } from "../models/swapRequest";
 import type { UserProfileId } from "../models/user";
 import { type Action, type Func } from "../util";
-import { useScheduleHubConnection } from "../zustand";
+import { useScheduleHubConnection } from "./zustand";
 
 export interface ScheduleClient {
 	onReceiveInitialSchedules: Action<[Schedule[]]>;

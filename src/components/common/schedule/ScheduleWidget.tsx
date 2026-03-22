@@ -1,5 +1,5 @@
 import { Grid, type StyleProp } from "@mantine/core";
-import { useSchedules, useUserProfile } from "../../../zustand";
+import { useSchedules, useUserProfile } from "../../../hooks/zustand";
 import { ExamSchedule } from "./Schedule";
 
 interface ScheduleWidgetProps {
@@ -8,7 +8,7 @@ interface ScheduleWidgetProps {
 
 export function ScheduleWidget(props: ScheduleWidgetProps) {
 	const userProfile = useUserProfile((s) => s.data);
-	const schedules = useSchedules((s) => s.data);
+	const schedules = useSchedules((s) => s.asArray);
 
 	return (
 		<Grid grow gutter={0}>

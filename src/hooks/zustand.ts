@@ -1,9 +1,8 @@
 import { create } from "zustand";
-import type { ScheduleHub } from "./hooks/useSignalR";
-import type { SubjectName, Lesson } from "./models/calendar";
-import type { Classroom, ClassroomId } from "./models/classroom";
-import type { Schedule, ScheduleId } from "./models/schedule";
-import type { Username, UserProfile } from "./models/user";
+import type { Lesson, SubjectName } from "../models/calendar";
+import type { Classroom, ClassroomId } from "../models/classroom";
+import type { Schedule, ScheduleId } from "../models/schedule";
+import type { Username, UserProfile } from "../models/user";
 import {
 	equals,
 	examSlotSorter,
@@ -12,7 +11,8 @@ import {
 	userProfileSorter,
 	type Action,
 	type Func,
-} from "./util";
+} from "../util";
+import type { ScheduleHub } from "./useSignalR";
 
 interface DisclosureStore {
 	state: boolean;
@@ -46,56 +46,11 @@ function createDisclosureStore(initialState: boolean = false) {
 	}));
 }
 
-interface ListStore<T> {
-	data: T[];
-	hasChanged: boolean;
-	setData: Action<[T[]]>;
-	append: Action<T[]>;
-	reset: Action<[]>;
-	clear: Action<[]>;
-}
-
-function createListStore<T>(
-	sortFunction?: Func<[T, T], number>,
-	postProcessor?: Func<[T], T>,
-	initialState: T[] = [],
-) {
-	function sortData(data: T[]) {
-		return sortFunction ? data.sort(sortFunction) : data;
-	}
-
-	function process(data: T[]) {
-		return data.map(postProcessor ?? ((x) => x));
-	}
-
-	return create<ListStore<T>>((set) => ({
-		data: initialState,
-		hasChanged: false,
-		setData(data) {
-			set(() => ({ data: process(sortData(data)), hasChanged: true }));
-		},
-		append(...data) {
-			set((prev) => ({
-				data: process(sortData(prev.data.concat(data))),
-				hasChanged: true,
-			}));
-		},
-		reset() {
-			set(() => ({
-				data: process(sortData(initialState)),
-				hasChanged: true,
-			}));
-		},
-		clear() {
-			set(() => ({ data: [], hasChanged: true }));
-		},
-	}));
-}
-
 interface MapStore<K, V> {
-	asArray: V[];
 	asMap: Map<K, V>;
+	asArray: V[];
 	hasChanged: boolean;
+	keySelector: Func<[V], K>;
 	set: Action<V[]>;
 	get: Func<[K], V | undefined>;
 	reset: Action<[]>;
@@ -111,25 +66,28 @@ function createMapStore<K, V>(
 		return (postProcessor ?? ((x) => x))(data);
 	}
 
-	return create<MapStore<K, V>>((set) => ({
+	return create<MapStore<K, V>>((set, get) => ({
 		asMap: new Map(initialState),
-		asArray: [],
+		asArray: Array.from(initialState.values()),
 		hasChanged: false,
+		keySelector,
 		set(...data) {
 			set((prev) => {
 				const temp = new Map(prev.asMap);
 				for (const instance of data) {
 					temp.set(keySelector(instance), process(instance));
 				}
+				console.log(temp, Array.from(temp.values()));
+
 				return {
 					asMap: temp,
-					asArray: Array.from(this.asMap.values()),
+					asArray: Array.from(temp.values()),
 					hasChanged: true,
 				};
 			});
 		},
 		get(key) {
-			return this.asMap.get(key);
+			return get().asMap.get(key);
 		},
 
 		clear() {
@@ -192,31 +150,10 @@ export const useSchedules = createMapStore<ScheduleId, Schedule>(
 		swapRequests: schedule.swapRequests.sort(swapRequestSorter),
 	}),
 );
-export const useLessonWeeks = createMapStore<number, Lesson[]>((l) =>
-	new Date(l.sort(lessonSorter).at(0)?.date ?? 0).getTime(),
-);
 
 export const useUserProfile = createSingletonStore<UserProfile>();
 export const useIsTeacher = () =>
 	useUserProfile((s) => s.data)?.role === "teacher";
-export function useTeacherSubjects() {
-	const userProfile = useUserProfile((s) => s.data);
-	const lessons = useLessonWeeks((s) => s.asArray).flat();
-
-	const res = new Set<SubjectName>();
-	if (userProfile) {
-		for (const lesson of lessons) {
-			if (
-				lesson.teachers.some(
-					equals((t) => t.name as Username, userProfile.name),
-				)
-			) {
-				res.add(lesson.subject.name);
-			}
-		}
-	}
-	return Array.from(res.values());
-}
 
 export const useCrossSiteError = createSingletonStore<string>();
 export const useScheduleHubConnection = createSingletonStore<ScheduleHub>();

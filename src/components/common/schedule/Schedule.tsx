@@ -37,7 +37,7 @@ import {
 	useLoadingOverlay,
 	useScheduleHubConnection,
 	useUserProfile,
-} from "../../../zustand";
+} from "../../../hooks/zustand";
 import { ReportStudentModal } from "../../teacher/report-actual-students/StudentReportModal";
 import { ScheduleProgress } from "./ExtendedProgessbar";
 
@@ -54,7 +54,7 @@ export function ExamSchedule(props: {
 	useEffect(() => {
 		setLoadingOverlayState(loading);
 		return resetLoadingOverlayState;
-	}, [loading]);
+	}, [loading, resetLoadingOverlayState, setLoadingOverlayState]);
 
 	const joinSlot = (id: ExamSlotId) =>
 		resolve(hubConnection?.registerForSlot(id) ?? sleep(250));

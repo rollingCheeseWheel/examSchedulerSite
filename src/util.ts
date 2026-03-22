@@ -9,6 +9,15 @@ import type { SwapRequest } from "./models/swapRequest";
 import type { UserProfile } from "./models/user";
 import type { TimeTableSlot } from "./components/teacher/schedule-create/TimeTable";
 
+export type Primitive =
+	| string
+	| number
+	| bigint
+	| boolean
+	| symbol
+	| undefined
+	| null;
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Func<Args extends any[], TResult> = (...args: Args) => TResult;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,7 +39,7 @@ export function formatDateTime(
 	return new Intl.DateTimeFormat(locale, format).format(date);
 }
 
-export function floorDateToMonday(date: string | Date) {
+export function floorDateToMonday(date: string | number | Date) {
 	const d = new Date(date);
 	const day = d.getDay();
 	const diff = (day + 6) % 7;
@@ -175,7 +184,7 @@ export const timeTableSlotSorter = compoundSort<TimeTableSlot>(
 
 export const subjectSorter = sort<Subject>((x) => x.name);
 
-export function equals<T, TKey>(
+export function equals<T, TKey extends Primitive>(
 	selector: Func<[T], TKey>,
 	value: TKey,
 ): Func<[T], boolean> {
