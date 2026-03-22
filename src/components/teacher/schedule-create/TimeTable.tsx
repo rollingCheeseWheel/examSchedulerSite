@@ -2,29 +2,55 @@ import {
 	Box,
 	Center,
 	Container,
-	type MantineColor,
+	NumberInput,
 	SimpleGrid,
+	Stack,
 	Text,
+	type MantineColor,
 } from "@mantine/core";
 import {
+	equals,
+	getColorsForLessons,
 	groupBy,
 	mapKVPs,
 	reduceMap,
 	timeTableSlotSorter,
+	type Action,
 } from "../../../util";
-import type { DayOfWeek } from "./../../../models/calendar";
+import type {
+	DayOfWeek,
+	Lesson,
+	SubjectName,
+} from "./../../../models/calendar";
+import { useLessonWeeks } from "../../../zustand";
 
 export interface TimeTableSlot {
 	dayOfWeek: DayOfWeek;
 	start: number;
 	duration: number;
-	name: string;
+	label: SubjectName;
 	color: MantineColor;
 }
 
-export function TimeTable(props: { slots: TimeTableSlot[] }) {
+export function TimeTable(props: {
+	date: string | number | Date;
+	targetSubject: SubjectName;
+	setOccurance: Action<[DayOfWeek, number]>;
+	totalStudentCount?: number;
+}) {
+	const lessons = useLessonWeeks((s) => s.get)(new Date(props.date).getTime()) ?? [];
+
+	const lessonColors = getColorsForLessons(lessons);
+	const slots = lessons.map<TimeTableSlot>((l) => ({
+		label: l.subject.name,
+		dayOfWeek: new Date(l.date).getDate() as DayOfWeek,
+		start: l.fromHour,
+		duration: l.toHour - l.fromHour,
+		color: lessonColors[l.subject.name],
+	}));
+
 	const groupedDays = mapKVPs(
-		groupBy(props.slots, (s) => s.dayOfWeek),
+		groupBy(slots, (s) => s.dayOfWeek),
 		(slots) => slots.sort(timeTableSlotSorter),
 	);
 	const longestDay = Math.max(
@@ -41,21 +67,39 @@ export function TimeTable(props: { slots: TimeTableSlot[] }) {
 			pos="relative"
 			spacing={0}>
 			{Array.from(
-				mapKVPs(groupedDays, (slots) => (
-					<Container>
-						{slots.map((s) => (
-							<Box
-								pos="absolute"
-								top={`${s.start * percentHeightPerHour}%`}
-								bg={s.color}
-								h={`${s.duration * percentHeightPerHour}%`}
-								w={percentWidthPerDay}>
-								<Center>
-									<Text truncate="end">{s.name}</Text>
-								</Center>
-							</Box>
-						))}
-					</Container>
+				mapKVPs(groupedDays, (slots, dayOfWeek) => (
+					<Stack>
+						<Container>
+							{slots.map((s) => (
+								<Box
+									pos="absolute"
+									top={`${s.start * percentHeightPerHour}%`}
+									bg={s.color}
+									h={`${s.duration * percentHeightPerHour}%`}
+									w={percentWidthPerDay}>
+									<Center>
+										<Text truncate="end">{s.label}</Text>
+									</Center>
+								</Box>
+							))}
+						</Container>
+						{slots.some(equals((s) => s.label, props.targetSubject)) && (
+							<NumberInput
+								allowDecimal={false}
+								allowNegative={false}
+								allowLeadingZeros={false}
+								defaultValue={0}
+								min={0}
+								max={props.totalStudentCount}
+								onChange={(value) =>
+									props.setOccurance(
+										dayOfWeek,
+										typeof value == "number" ? value : parseInt(value),
+									)
+								}
+							/>
+						)}
+					</Stack>
 				)).values(),
 			)}
 		</SimpleGrid>

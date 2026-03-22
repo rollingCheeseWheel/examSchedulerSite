@@ -27,8 +27,8 @@ export function DashboardPage() {
 
 function useInitMockUpData() {
 	const setUserProfile = useUserProfile((s) => s.setData);
-	const setSchedules = useSchedules((s) => s.setData);
-	const setClassrooms = useClassrooms((s) => s.setData);
+	const setSchedules = useSchedules((s) => s.set);
+	const setClassrooms = useClassrooms((s) => s.set);
 
 	useEffect(() => {
 		setUserProfile({
@@ -37,7 +37,7 @@ function useInitMockUpData() {
 			role: "teacher",
 		});
 
-		setSchedules([
+		setSchedules(
 			{
 				id: randomId(),
 				startDate: "2026-01-01",
@@ -207,14 +207,14 @@ function useInitMockUpData() {
 				],
 				auditLogs: [],
 			},
-		]);
+		);
 
-		setClassrooms([
+		setClassrooms(
 			{
 				name: "4E WI",
 				id: "asdöflkjasdf",
 				studentCount: 67,
 			},
-		]);
+		);
 	}, [setClassrooms, setSchedules, setUserProfile]);
 }

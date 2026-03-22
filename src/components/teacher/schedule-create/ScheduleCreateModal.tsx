@@ -3,6 +3,7 @@ import {
 	Button,
 	Flex,
 	Group,
+	LoadingOverlay,
 	Modal,
 	NativeSelect,
 	Stack,
@@ -18,6 +19,7 @@ import type { Lesson } from "../../../models/calendar";
 import type { ClassroomId } from "../../../models/classroom";
 import {
 	addDaysToDate,
+	equals,
 	floorDateToMonday,
 	getColorsForLessons,
 	type Action,
@@ -36,12 +38,14 @@ export function ScheduleCreateModal(props: {
 }) {
 	const { t } = useTranslation();
 	const scheduleHub = useScheduleHubConnection((s) => s.data);
-	const { setState: setLoadingOverlayState, reset: resetLoadingOverlayState } =
-		useLoadingOverlay();
+	const [loadingOverlayState, setLoadingOverlayState] = useState(false);
 	const fetchLessons = useCalendar();
 
-	const classrooms = useClassrooms((s) => s.data);
+	const classrooms = useClassrooms((s) => s.asArray);
 	const [selectedClassroomId, setSelectedClassroom] = useState<ClassroomId>();
+	const selectedClassroom = classrooms.find(
+		equals((c) => c.id, selectedClassroomId),
+	);
 
 	const {
 		loading: lessonFetchLoading,
@@ -49,19 +53,11 @@ export function ScheduleCreateModal(props: {
 		abort: abortLessonFetch,
 		data: lessons,
 		getSignal,
-	} = usePromise<Lesson[]>();
+	} = usePromise<void>();
 	useEffect(() => {
 		setLoadingOverlayState(lessonFetchLoading);
-		return () => {
-			abortLessonFetch();
-			resetLoadingOverlayState();
-		};
-	}, [
-		abortLessonFetch,
-		lessonFetchLoading,
-		resetLoadingOverlayState,
-		setLoadingOverlayState,
-	]);
+		return abortLessonFetch;
+	}, [abortLessonFetch, lessonFetchLoading, setLoadingOverlayState]);
 
 	useEffect(() => {
 		if (!selectedClassroomId) return;
@@ -99,15 +95,6 @@ export function ScheduleCreateModal(props: {
 		);
 	}
 
-	const lessonColors = getColorsForLessons(lessons ?? []);
-	const slots = (lessons ?? []).map<TimeTableSlot>((l) => ({
-		name: l.subject.name,
-		dayOfWeek: new Date(l.date).getDate() as DayOfWeek,
-		start: l.fromHour,
-		duration: l.toHour - l.fromHour,
-		color: lessonColors[l.subject.name],
-	}));
-
 	function handleSubmit() {}
 
 	return (
@@ -121,6 +108,7 @@ export function ScheduleCreateModal(props: {
 					{t("schedule.create.title")}
 				</Text>
 			}>
+			<LoadingOverlay visible={loadingOverlayState} zIndex={6767} />
 			<Stack>
 				<NativeSelect
 					required
@@ -148,7 +136,9 @@ export function ScheduleCreateModal(props: {
 							<ActionIcon variant="default" onClick={decrementDate}>
 								<IconChevronLeft />
 							</ActionIcon>
-							<TimeTable slots={slots} />
+							<TimeTable
+								totalStudentCount={selectedClassroom?.studentCount}
+							/>
 							<ActionIcon variant="default" onClick={incrementDate}>
 								<IconChevronRight />
 							</ActionIcon>

@@ -3,12 +3,15 @@ import { api } from "../main";
 import type { Lesson } from "../models/calendar";
 import type { ClassroomId } from "../models/classroom";
 import type { Result } from "../models/result";
+import { useLessonWeeks } from "../zustand";
 
 export function useCalendar() {
+	const setLessons = useLessonWeeks((s) => s.set);
+
 	const fetchWeek = useCallback(
 		async (classroomId?: ClassroomId, date?: Date, signal?: AbortSignal) => {
 			if (!date || !classroomId) {
-				return [];
+				return;
 			}
 
 			const res = await api.get<Result<Lesson[]>>(
@@ -16,9 +19,9 @@ export function useCalendar() {
 				{ signal },
 			);
 
-			return res.data.data ?? [];
+			setLessons(res.data.data ?? []);
 		},
-		[],
+		[setLessons],
 	);
 
 	return fetchWeek;

@@ -170,10 +170,17 @@ export const timeTableSlotSorter = compoundSort<TimeTableSlot>(
 	sort((x) => x.dayOfWeek),
 	sort((x) => x.start),
 	sort((x) => x.duration),
-	sort((x) => x.name),
+	sort((x) => x.label),
 );
 
 export const subjectSorter = sort<Subject>((x) => x.name);
+
+export function equals<T, TKey>(
+	selector: Func<[T], TKey>,
+	value: TKey,
+): Func<[T], boolean> {
+	return (x) => selector(x) == value;
+}
 
 export const lessonColors: MantineColor[] = [
 	"gray",

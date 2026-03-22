@@ -23,14 +23,27 @@ export function AuthCallback(props: { disabled?: boolean }) {
 		OAuthRequest
 	>(endpoints.auth.login);
 
-	const { data: schedules, setData: setSchedules } = useSchedules();
-	const { data: classrooms, setData: setClassrooms } = useClassrooms();
+	const {
+		asMap: scheduleMap,
+		set: setSchedule,
+		asArray: schedulesAsArray,
+	} = useSchedules();
+	const {
+		asMap: classroomMap,
+		set: setClassroom,
+		asArray: classroomsAsArray,
+	} = useClassrooms();
 	const {
 		resolve: resolveSignalRInit,
 		loading: signalRInitLoading,
 		abort: abortSignalRInit,
 	} = usePromise<void>();
 	const initSignalR = useSignalRInit();
+
+	useEffect(() => {
+		setLoadingOverlayState(signalRInitLoading);
+		return abortSignalRInit;
+	}, []);
 
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
@@ -58,29 +71,40 @@ export function AuthCallback(props: { disabled?: boolean }) {
 				initSignalR({
 					onReceiveInitialSchedules(schedules) {
 						console.debug("received initial schedules", schedules);
-						setSchedules(schedules);
+						for (const schedule of schedules) {
+							setSchedule(schedule);
+						}
 					},
 					onUpdateSchedule(scheduleId, schedule) {
 						console.debug("updating schedule", schedule);
-						setSchedules([
-							...schedules.filter((s) => s.id !== scheduleId),
+						for (const iterSchedule of [
+							...schedulesAsArray.filter((s) => s.id !== scheduleId),
 							schedule,
-						]);
+						]) {
+						}
 					},
 					onRemoveSchedule(scheduleId) {
 						console.debug("removing scheudule", scheduleId);
-						setSchedules(schedules.filter((s) => s.id !== scheduleId));
+						for (const schedule of schedulesAsArray.filter(
+							(s) => s.id !== scheduleId,
+						)) {
+							setSchedule(schedule);
+						}
 					},
 					onReceiveInitialClassrooms(classrooms) {
 						console.debug("received initial classrooms", classrooms);
-						setClassrooms(classrooms);
+						for (const classroom of classrooms) {
+							setClassroom(classroom);
+						}
 					},
 					onUpdateClassroom(classroom) {
 						console.debug("updating classroom", classroom);
-						setClassrooms([
-							...classrooms.filter((c) => c.id !== classroom.id),
+						for (const iterClassroom of [
+							...classroomsAsArray.filter((c) => c.id !== classroom.id),
 							classroom,
-						]);
+						]) {
+							setClassroom(iterClassroom);
+						}
 					},
 				}),
 			);
@@ -88,13 +112,13 @@ export function AuthCallback(props: { disabled?: boolean }) {
 		return abortSignalRInit;
 	}, [
 		abortSignalRInit,
-		classrooms,
+		classroomMap,
 		data,
 		initSignalR,
 		resolveSignalRInit,
-		schedules,
-		setClassrooms,
-		setSchedules,
+		scheduleMap,
+		setClassroom,
+		setSchedule,
 		setUserProfile,
 	]);
 

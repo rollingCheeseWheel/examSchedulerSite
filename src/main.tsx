@@ -30,7 +30,7 @@ export const timeTableSlots: TimeTableSlot[] =
 		color: chooseRandom(lessonColors),
 		dayOfWeek: randomFromRange<DayOfWeek>(4),
 		duration: randomFromRange(3),
-		name: faker.person.jobArea(),
+		label: faker.person.jobArea(),
 		start: randomFromRange(10),
 	}));
 // [{
