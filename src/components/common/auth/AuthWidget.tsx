@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { endpoints } from "../../../endpoints";
 import type { School } from "../../../models/school";
-import { useCrossSiteError } from "../../../hooks/zustand";
 
 export function AuthWidget() {
 	const {
@@ -13,7 +12,6 @@ export function AuthWidget() {
 		loading,
 		abort: abortSchoolLoad,
 	} = useFetch<School[]>(endpoints.schools);
-	const crossSiteError = useCrossSiteError((s) => s.data);
 	const selectRef = useRef<HTMLSelectElement | null>(null);
 	const { t } = useTranslation();
 
@@ -36,11 +34,7 @@ export function AuthWidget() {
 			<Paper withBorder shadow="sm" p={22} mt="md" radius="md">
 				<NativeSelect
 					ref={selectRef}
-					error={
-						(crossSiteError ?? schoolFetchError) ?
-							t("auth.school.error")
-						:	undefined
-					}
+					error={schoolFetchError ? t("auth.school.error") : undefined}
 					label={t("auth.school.select")}
 					data={
 						data ?

@@ -4,20 +4,18 @@ import { endpoints } from "../../../endpoints";
 import { usePost } from "../../../hooks/usePost";
 import { usePromise } from "../../../hooks/usePromise";
 import { useSignalRInit } from "../../../hooks/useSignalR";
-import type { OAuthRequest } from "../../../models/auth";
-import type { UserProfile } from "../../../models/user";
 import {
 	useClassrooms,
-	useCrossSiteError,
 	useLoadingOverlay,
 	useSchedules,
 	useUserProfile,
 } from "../../../hooks/zustand";
+import type { OAuthRequest } from "../../../models/auth";
+import type { UserProfile } from "../../../models/user";
 
 export function AuthCallback(props: { disabled?: boolean }) {
 	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
 	const setUserProfile = useUserProfile((s) => s.setData);
-	const setCrossSiteError = useCrossSiteError((s) => s.setData);
 	const { data, loading, error, terminated, post, terminate } = usePost<
 		UserProfile,
 		OAuthRequest
@@ -124,12 +122,6 @@ export function AuthCallback(props: { disabled?: boolean }) {
 		setSchedule,
 		setUserProfile,
 	]);
-
-	useEffect(() => {
-		if (error && error.message) {
-			setCrossSiteError(error.message);
-		}
-	}, [error, setCrossSiteError]);
 
 	if (loading && !terminated) {
 		return;

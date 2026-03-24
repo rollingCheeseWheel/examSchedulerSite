@@ -31,6 +31,7 @@ export function usePost<TResponse, TBody = unknown>(url: string | URL) {
 			} catch (error) {
 				if (error instanceof Error) {
 					setError(error);
+					return;
 				}
 				const formedError = new Error(
 					`Non Error value was thrown: ${
