@@ -13,7 +13,7 @@ export function usePromise<TResult = never>(...callbacks: Action<[]>[]) {
 	useEffect(() => {
 		return () => {
 			// WARNING + TODO: uncomment when in prod, only prevents un and remount issues from strictmode
-			// mountedRef.current = false;
+			mountedRef.current = false;
 			setLoading(false);
 		};
 	}, []);

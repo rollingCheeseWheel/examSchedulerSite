@@ -24,8 +24,8 @@ export default defineConfig({
 	],
 	build: {
 		minify: "esbuild",
-		// outDir: "../../../examScheduler/examScheduler/wwwroot",
-		outDir: "./dist/",
+		outDir: "../examScheduler/examScheduler/wwwroot",
+		// outDir: "./dist/",
 		rollupOptions: {
 			external: [],
 		},
