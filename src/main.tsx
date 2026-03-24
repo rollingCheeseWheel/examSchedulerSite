@@ -1,7 +1,5 @@
-import { faker } from "@faker-js/faker";
 import { createTheme, MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
-import type { DayOfWeek } from "@mantine/dates";
 import axios from "axios";
 import i18next from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
@@ -10,29 +8,14 @@ import { createRoot } from "react-dom/client";
 import { initReactI18next } from "react-i18next";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { refreshSession } from "./components/common/auth/refreshSession";
-import type { TimeTableSlot } from "./components/teacher/schedule-create/TimeTable";
 import german from "./locales/de_translation.json";
 import english from "./locales/en_translation.json";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import {
-	attachAxiosCache,
-	chooseRandom,
-	generateCollection,
-	lessonColors,
-	randomFromRange,
+	attachAxiosCache
 } from "./util";
 
-faker.seed(67);
-
-export const timeTableSlots: TimeTableSlot[] =
-	generateCollection<TimeTableSlot>(60, () => ({
-		color: chooseRandom(lessonColors),
-		dayOfWeek: randomFromRange<DayOfWeek>(4),
-		duration: randomFromRange(3),
-		label: faker.person.jobArea(),
-		start: randomFromRange(10),
-	}));
 // [{
 // 	color: "blue",
 // 	dayOfWeek: 0,
@@ -109,7 +92,7 @@ const theme = createTheme({
 createRoot(document.getElementById("root")!).render(
 	<StrictMode>
 		{/* react developer tools */}
-		<script src="http://localhost:8097"></script>
+		{/* <script src="http://localhost:8097"></script> */}
 		<MantineProvider defaultColorScheme="auto" /* theme={theme} */>
 			<BrowserRouter>
 				<Routes>
