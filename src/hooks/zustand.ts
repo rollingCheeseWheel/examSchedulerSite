@@ -156,3 +156,4 @@ export const useIsTeacher = () =>
 	useUserProfile((s) => s.data)?.role === "teacher";
 
 export const useScheduleHubConnection = createSingletonStore<ScheduleHub>();
+export const useLoginError = createSingletonStore<string[]>();

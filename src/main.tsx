@@ -3,7 +3,6 @@ import "@mantine/core/styles.css";
 import axios from "axios";
 import i18next from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { initReactI18next } from "react-i18next";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -12,7 +11,8 @@ import german from "./locales/de_translation.json";
 import english from "./locales/en_translation.json";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
-import { attachAxiosCache } from "./util";
+import { attachAxiosCache, jsonReviver } from "./util";
+import { AuthCallback } from "./components/common/auth/AuthCallback";
 
 // [{
 // 	color: "blue",
@@ -36,6 +36,18 @@ import { attachAxiosCache } from "./util";
 
 export const api = axios.create({
 	withCredentials: true,
+	transformResponse: [
+		(data) => {
+			if (typeof data == "string") {
+				try {
+					return JSON.parse(data, jsonReviver);
+				} catch {
+					return data;
+				}
+			}
+			return data;
+		},
+	],
 });
 
 attachAxiosCache(api, /.*calendar/);
@@ -90,6 +102,7 @@ const theme = createTheme({
 createRoot(document.getElementById("root")!).render(
 	<MantineProvider defaultColorScheme="auto" /* theme={theme} */>
 		<BrowserRouter>
+			<AuthCallback />
 			<Routes>
 				<Route path="/auth" element={<LoginPage />} />
 				<Route path="*" element={<DashboardPage />} />

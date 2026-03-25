@@ -1,7 +1,5 @@
 import { useEffect } from "react";
-import { Navigate } from "react-router-dom";
-import { endpoints } from "../../../endpoints";
-import { usePost } from "../../../hooks/usePost";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { usePromise } from "../../../hooks/usePromise";
 import { useSignalRInit } from "../../../hooks/useSignalR";
 import {
@@ -10,20 +8,16 @@ import {
 	useSchedules,
 	useUserProfile,
 } from "../../../hooks/zustand";
-import type { OAuthRequest } from "../../../models/auth";
+import { apiRequest, type Result } from "../../../models/result";
 import type { UserProfile } from "../../../models/user";
 
 export function AuthCallback(props: { disabled?: boolean }) {
+	const [searchParams] = useSearchParams();
 	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
 	const setUserProfile = useUserProfile((s) => s.setData);
-	const { data, loading, error, terminated, post, terminate } = usePost<
-		UserProfile,
-		OAuthRequest
-	>(endpoints.auth.login);
-
-	useEffect(() => {
-		setLoadingOverlayState(loading && !terminated && (props.disabled ?? false));
-	}, [props, loading, setLoadingOverlayState, terminated]);
+	const { data, loading, resolve, abort } = usePromise<Result<UserProfile>>(
+		setLoadingOverlayState,
+	);
 
 	const {
 		asMap: scheduleMap,
@@ -35,25 +29,31 @@ export function AuthCallback(props: { disabled?: boolean }) {
 		set: setClassroom,
 		asArray: classroomsAsArray,
 	} = useClassrooms();
-	const {
-		resolve: resolveSignalRInit,
-		abort: abortSignalRInit,
-	} = usePromise<void>(setLoadingOverlayState);
+	const { resolve: resolveSignalRInit, abort: abortSignalRInit } =
+		usePromise<void>(setLoadingOverlayState);
 	const initSignalR = useSignalRInit();
 
+	useEffect(abort, [abort]);
+	useEffect(abortSignalRInit, [abortSignalRInit]);
+
 	useEffect(() => {
-		const params = new URLSearchParams(window.location.search);
-		const authCode = params.get("code");
-		const schoolId = params.get("school_id");
+		const authCode = searchParams.get("code");
+		const schoolId = searchParams.get("school_id");
 
 		if (!authCode || !schoolId) {
-			terminate();
+			return;
 		} else if (!props.disabled) {
-			post({ authCode, schoolId });
+			resolve((s) =>
+				apiRequest<UserProfile>({
+					method: "POST",
+					data: { authCode, schoolId },
+					signal: s,
+				}),
+			);
 		}
 
-		return terminate;
-	}, [props, post, terminate]);
+		return;
+	}, [props.disabled, resolve, searchParams]);
 
 	useEffect(() => {
 		if (data && data.data) {
@@ -102,9 +102,7 @@ export function AuthCallback(props: { disabled?: boolean }) {
 				}),
 			);
 		}
-		return abortSignalRInit;
 	}, [
-		abortSignalRInit,
 		classroomMap,
 		classroomsAsArray,
 		data,
@@ -117,7 +115,7 @@ export function AuthCallback(props: { disabled?: boolean }) {
 		setUserProfile,
 	]);
 
-	if (loading && !terminated) {
+	if (loading) {
 		return;
 	} else if ((data && data.data) || props.disabled) {
 		return <Navigate to={{ pathname: "/", search: "" }} replace />;

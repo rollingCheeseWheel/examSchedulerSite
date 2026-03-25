@@ -41,6 +41,7 @@ import {
 } from "../../../util";
 import { TimeRangeDisplay } from "../../common/TimeRangeDisplay";
 import { TimeTable } from "./TimeTable";
+import { isNotEmpty, useForm } from "@mantine/form";
 
 export function ScheduleCreateModal(props: {
 	opened: boolean;
@@ -49,6 +50,20 @@ export function ScheduleCreateModal(props: {
 	const { t } = useTranslation();
 	const userProfile = useUserProfile((s) => s.data);
 	const [loadingOverlayState, setLoadingOverlayState] = useState(false);
+
+	const form = useForm({
+		mode: "controlled",
+		initialValues: {
+			classroom: "",
+			description: "",
+			startDate: "",
+			lockinOffset: "",
+		},
+		validate: {
+			classroom: isNotEmpty(t("schedule.create.error.classroom")),
+			startDate: isNotEmpty(t("schedule.create.error.startdate")),
+		},
+	});
 
 	const descriptionRef = useRef<HTMLInputElement>(null);
 	const [startDate, setStartDate] = useState<string | null>();
@@ -176,90 +191,92 @@ export function ScheduleCreateModal(props: {
 				</Text>
 			}>
 			<LoadingOverlay visible={loadingOverlayState} zIndex={6767} />
-			<Stack>
-				<NativeSelect
-					required
-					label={t("schedule.create.classroomSelect")}
-					value={selectedClassroomId}
-					onChange={(e) => setSelectedClassroom(e.currentTarget.value)}
-					data={[
-						{
-							value: "",
-							label: "",
-						},
-						...classrooms.map((c) => ({
-							value: c.id,
-							label: c.name,
-						})),
-					]}
-				/>
-				{selectedClassroom && (
-					<>
-						<Group grow>
-							<NativeSelect
-								required
-								label={t("schedule.create.subjectSelect")}
-								value={selectedSubject}
-								onChange={(e) => setSelectedSubject(e.currentTarget.value)}
-								data={selectedClassroom.teachers
-									.find(
-										equals(
-											(t) => t.name,
-											userProfile?.name as TeacherName | undefined,
-										),
-									)
-									?.subjects.map((s) => ({
-										label: s.name,
-										value: s.name,
-									}))}
+			<form>
+				<Stack>
+					<NativeSelect
+						required
+						label={t("schedule.create.classroomSelect")}
+						value={selectedClassroomId}
+						onChange={(e) => setSelectedClassroom(e.currentTarget.value)}
+						data={[
+							{
+								value: "",
+								label: "",
+							},
+							...classrooms.map((c) => ({
+								value: c.id,
+								label: c.name,
+							})),
+						]}
+					/>
+					{selectedClassroom && (
+						<>
+							<Group grow>
+								<NativeSelect
+									required
+									label={t("schedule.create.subjectSelect")}
+									value={selectedSubject}
+									onChange={(e) => setSelectedSubject(e.currentTarget.value)}
+									data={selectedClassroom.teachers
+										.find(
+											equals(
+												(t) => t.name,
+												userProfile?.name as TeacherName | undefined,
+											),
+										)
+										?.subjects.map((s) => ({
+											label: s.name,
+											value: s.name,
+										}))}
+								/>
+								<DatePickerInput
+									required
+									label={t("schedule.create.startDatePicker")}
+									value={startDate}
+									onChange={setStartDate}
+								/>
+								<TimePicker
+									label={t("schedule.create.lockinOffset")}
+									value={lockinOffset}
+									onChange={setLockinOffset}
+								/>
+							</Group>
+							<TextInput
+								label={t("schedule.create.scheduleDescription")}
+								ref={descriptionRef}
 							/>
-							<DatePickerInput
-								required
-								label={t("schedule.create.startDatePicker")}
-								value={startDate}
-								onChange={setStartDate}
-							/>
-							<TimePicker
-								label={t("schedule.create.lockinOffset")}
-								value={lockinOffset}
-								onChange={setLockinOffset}
-							/>
-						</Group>
-						<TextInput
-							label={t("schedule.create.scheduleDescription")}
-							ref={descriptionRef}
-						/>
-					</>
-				)}
-
-				{selectedClassroomId && selectedSubject && lessons && (
-					<>
-						<TimeRangeDisplay
-							startDate={selectedWeek}
-							endDate={addDaysToDate(selectedWeek, 7)}
-						/>
-						<Flex align="center" justify="center">
-							<ActionIcon variant="default" onClick={decrementDate}>
-								<IconChevronLeft />
-							</ActionIcon>
-							<TimeTable
-								lessons={lessons}
-								targetSubject={selectedSubject}
-								setOccurance={setSpecificOccurance}
-							/>
-							<ActionIcon variant="default" onClick={incrementDate}>
-								<IconChevronRight />
-							</ActionIcon>
-						</Flex>
-					</>
-				)}
-				<Group>
-					<Button onClick={props.close}>{t("common.cancel")}</Button>
-					{selectedClassroomId && (
-						<Button onClick={handleSubmit}>{t("common.submit")}</Button>
+						</>
 					)}
-				</Group>
-			</Stack>
+
+					{selectedClassroomId && selectedSubject && lessons && (
+						<>
+							<TimeRangeDisplay
+								startDate={selectedWeek}
+								endDate={addDaysToDate(selectedWeek, 7)}
+							/>
+							<Flex align="center" justify="center">
+								<ActionIcon variant="default" onClick={decrementDate}>
+									<IconChevronLeft />
+								</ActionIcon>
+								<TimeTable
+									lessons={lessons}
+									targetSubject={selectedSubject}
+									setOccurance={setSpecificOccurance}
+								/>
+								<ActionIcon variant="default" onClick={incrementDate}>
+									<IconChevronRight />
+								</ActionIcon>
+							</Flex>
+						</>
+					)}
+					<Group>
+						<Button onClick={props.close}>{t("common.cancel")}</Button>
+						{selectedClassroomId && (
+							<Button onClick={handleSubmit}>{t("common.submit")}</Button>
+						)}
+					</Group>
+				</Stack>
+			</form>
 		</Modal>
 	);
 }

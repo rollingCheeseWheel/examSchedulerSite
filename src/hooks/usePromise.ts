@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Action, Func } from "../util";
+import {
+	singleOrList,
+	type Action,
+	type Func,
+	type SingleOrList,
+} from "../util";
 
 export function usePromise<TResult = never>(
-	loadingCallback: Action<[boolean]>,
+	loadingCallback?: SingleOrList<Action<[boolean]>>,
 ) {
 	const [data, setData] = useState<TResult | undefined | null>();
-	const [error, setError] = useState<unknown>();
+	const [errors, setError] = useState<unknown[]>();
 	const [loading, setLoading] = useState(false);
 
 	const callIdRef = useRef(0);
@@ -75,10 +80,11 @@ export function usePromise<TResult = never>(
 	);
 
 	useEffect(() => {
-		if (loadingCallback) {
-			loadingCallback(loading);
+		const callbacks = singleOrList(loadingCallback);
+		for (const callback of callbacks) {
+			callback(loading);
 		}
 	}, [loading, loadingCallback]);
 
-	return { data, error, loading, resolve, abort, getSignal };
+	return { data, errors, loading, resolve, abort, getSignal };
 }

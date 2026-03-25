@@ -1,13 +1,13 @@
 import { createTheme, type MantineColor } from "@mantine/core";
 import type axios from "axios";
-import type { AxiosRequestConfig, AxiosResponse } from "axios";
+import { type AxiosRequestConfig, type AxiosResponse } from "axios";
+import type { TimeTableSlot } from "./components/teacher/schedule-create/TimeTable";
 import type { AuditLog } from "./models/auditLog";
 import type { Lesson, Subject, SubjectName } from "./models/calendar";
 import type { Classroom } from "./models/classroom";
 import type { ExamSlot, Schedule } from "./models/schedule";
 import type { SwapRequest } from "./models/swapRequest";
 import type { UserProfile } from "./models/user";
-import type { TimeTableSlot } from "./components/teacher/schedule-create/TimeTable";
 
 export type Primitive =
 	| string
@@ -307,4 +307,49 @@ export function randomFromRange<T = number>(end: number) {
 export function chooseRandom<T>(data: T[]) {
 	const index = Math.round(Math.random() * data.length);
 	return data[index];
+}
+
+export const jsonReviver = reviverCombiner(/* dateReviver */);
+
+function reviverCombiner(
+	...revivers: ((key: string, value: unknown) => unknown)[]
+) {
+	function combinedReviver(key: string, value: unknown) {
+		for (const reviver of revivers) {
+			try {
+				return reviver(key, value);
+			} catch {
+				continue;
+			}
+		}
+		return value;
+	}
+
+	return combinedReviver;
+}
+
+function dateReviver(_: string, value: unknown) {
+	if (typeof value === "string") {
+		const d = new Date(value);
+		if (!isNaN(d.getTime()) && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
+			return d;
+		}
+	}
+	throw new Error();
+}
+
+export type SingleOrList<T> = T | T[];
+
+export function singleOrList<T>(
+	...singleOrLists: (SingleOrList<T> | undefined)[]
+): T[] {
+	const res: T[] = [];
+	for (const singleOrList of singleOrLists) {
+		if (singleOrList) {
+			res.push(
+				...(Array.isArray(singleOrList) ? singleOrList : [singleOrList]),
+			);
+		}
+	}
+	return res;
 }

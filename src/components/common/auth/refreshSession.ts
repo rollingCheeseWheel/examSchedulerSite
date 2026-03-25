@@ -1,14 +1,17 @@
+import type { AxiosResponse } from "axios";
 import { endpoints } from "../../../endpoints";
-import { getPost } from "../../../hooks/usePost";
+import { api } from "../../../main";
 import type { Result } from "../../../models/result";
 
-let refreshPromise: Promise<Result<Date>> | null = null;
+let refreshPromise: Promise<AxiosResponse<Result<Date>>> | null = null;
 
-export function refreshSession(): Promise<Result<Date>> {
+export function refreshSession() {
 	if (!refreshPromise) {
-		refreshPromise = getPost<Date>(endpoints.auth.refresh)().finally(() => {
-			refreshPromise = null;
-		});
+		refreshPromise = api
+			.post<Result<Date>>(endpoints.auth.refresh)
+			.finally(() => {
+				refreshPromise = null;
+			});
 	}
 	return refreshPromise;
 }

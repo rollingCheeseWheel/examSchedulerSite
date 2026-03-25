@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { Routes } from "react-router-dom";
 import { useIsTeacher } from "../../../hooks/zustand";
 import { ScheduleCreateModal } from "../../teacher/schedule-create/ScheduleCreateModal";
-import { AuthCallback } from "../auth/AuthCallback";
 import { AppShellSpine } from "./AppShellSpine";
 
 export function DefaultAppShell(props: {
@@ -20,7 +19,6 @@ export function DefaultAppShell(props: {
 	return (
 		<>
 			<AppShellSpine>
-				<AuthCallback disabled={props.authDisabled}></AuthCallback>
 				<Routes>{props.children}</Routes>
 			</AppShellSpine>
 			{isTeacher && (

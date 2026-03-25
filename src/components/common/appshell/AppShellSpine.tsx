@@ -7,7 +7,7 @@ import { useLoadingOverlay } from "../../../hooks/zustand";
 import { ThemeButton } from "../../common/ThemeButton";
 import classes from "./AppShellSpine.module.css";
 
-export function AppShellSpine(props: { children?: ReactNode[] }) {
+export function AppShellSpine(props: { children?: ReactNode | ReactNode[] }) {
 	const isLoadingOverlayOpen = useLoadingOverlay((s) => s.state);
 
 	return (
@@ -26,7 +26,9 @@ export function AppShellSpine(props: { children?: ReactNode[] }) {
 				</AppShell.Header>
 				<AppShell.Main>
 					<Notifications />
-					{...props.children ?? []}
+					{...Array.isArray(props.children) ? props.children
+					: props.children ? [props.children]
+					: []}
 				</AppShell.Main>
 			</AppShell>
 		</>
