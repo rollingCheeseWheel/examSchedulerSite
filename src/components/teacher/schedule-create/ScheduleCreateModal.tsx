@@ -55,15 +55,9 @@ export function ScheduleCreateModal(props: {
 	const [lockinOffset, setLockinOffset] = useState<string>();
 
 	const scheduleHub = useScheduleHubConnection((s) => s.data);
-	const {
-		abort: abortScheduleCreate,
-		loading: scheduleCreateLoading,
-		resolve: resolveScheduleCreate,
-	} = usePromise<Result<boolean>>();
-	useEffect(() => {
-		setLoadingOverlayState(scheduleCreateLoading);
-		return abortScheduleCreate;
-	}, [abortScheduleCreate, scheduleCreateLoading]);
+	const { resolve: resolveScheduleCreate } = usePromise<Result<boolean>>(
+		setLoadingOverlayState,
+	);
 
 	const classrooms = useClassrooms((s) => s.asArray);
 	const [selectedClassroomId, setSelectedClassroom] = useState<ClassroomId>();
@@ -85,16 +79,11 @@ export function ScheduleCreateModal(props: {
 
 	const fetchLessons = useCalendar();
 	const {
-		loading: lessonFetchLoading,
 		resolve: resolveLessonPromise,
 		abort: abortLessonFetch,
 		getSignal,
 		data: lessons,
-	} = usePromise<Lesson[]>();
-	useEffect(() => {
-		setLoadingOverlayState(lessonFetchLoading);
-		return abortLessonFetch;
-	}, [abortLessonFetch, lessonFetchLoading, setLoadingOverlayState]);
+	} = usePromise<Lesson[]>(setLoadingOverlayState);
 
 	useEffect(() => {
 		if (!selectedClassroomId) return;

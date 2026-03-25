@@ -31,11 +31,7 @@ export function ReportStudentModal(props: {
 	const { t } = useTranslation();
 
 	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
-	const { loading, resolve, abort } = usePromise<Result<boolean>>();
-	useEffect(() => {
-		setLoadingOverlayState(loading);
-		return abort;
-	}, [abort, loading, setLoadingOverlayState]);
+	const { resolve } = usePromise<Result<boolean>>(setLoadingOverlayState);
 
 	const scheduleHub = useScheduleHubConnection((s) => s.data);
 	const [checkedStudents, setCheckedStudents] = useState<UserProfileId[]>([]);

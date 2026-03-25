@@ -12,9 +12,7 @@ import german from "./locales/de_translation.json";
 import english from "./locales/en_translation.json";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
-import {
-	attachAxiosCache
-} from "./util";
+import { attachAxiosCache } from "./util";
 
 // [{
 // 	color: "blue",
@@ -90,16 +88,12 @@ const theme = createTheme({
 });
 
 createRoot(document.getElementById("root")!).render(
-	<StrictMode>
-		{/* react developer tools */}
-		{/* <script src="http://localhost:8097"></script> */}
-		<MantineProvider defaultColorScheme="auto" /* theme={theme} */>
-			<BrowserRouter>
-				<Routes>
-					<Route path="/auth" element={<LoginPage />} />
-					<Route path="*" element={<DashboardPage />} />
-				</Routes>
-			</BrowserRouter>
-		</MantineProvider>
-	</StrictMode>,
+	<MantineProvider defaultColorScheme="auto" /* theme={theme} */>
+		<BrowserRouter>
+			<Routes>
+				<Route path="/auth" element={<LoginPage />} />
+				<Route path="*" element={<DashboardPage />} />
+			</Routes>
+		</BrowserRouter>
+	</MantineProvider>,
 );

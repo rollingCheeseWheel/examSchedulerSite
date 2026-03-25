@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Action, Func } from "../util";
 
-export function usePromise<TResult = never>(...callbacks: Action<[]>[]) {
+export function usePromise<TResult = never>(
+	loadingCallback: Action<[boolean]>,
+) {
 	const [data, setData] = useState<TResult | undefined | null>();
 	const [error, setError] = useState<unknown>();
 	const [loading, setLoading] = useState(false);
@@ -36,7 +38,11 @@ export function usePromise<TResult = never>(...callbacks: Action<[]>[]) {
 	}, []);
 
 	const resolve = useCallback(
-		(promise?: Promise<TResult | undefined> | Func<[AbortSignal], Promise<TResult>>) => {
+		(
+			promise?:
+				| Promise<TResult | undefined>
+				| Func<[AbortSignal], Promise<TResult>>,
+		) => {
 			if (!promise) {
 				return;
 			}
@@ -54,7 +60,6 @@ export function usePromise<TResult = never>(...callbacks: Action<[]>[]) {
 				.then((result) => {
 					if (!mountedRef.current || callId !== callIdRef.current) return;
 					setData(result);
-					callbacks.forEach((x) => x);
 				})
 				.catch((err) => {
 					if (!mountedRef.current || callId !== callIdRef.current) return;
@@ -66,8 +71,14 @@ export function usePromise<TResult = never>(...callbacks: Action<[]>[]) {
 					setLoading(false);
 				});
 		},
-		[callbacks, getSignal],
+		[setLoading, getSignal],
 	);
+
+	useEffect(() => {
+		if (loadingCallback) {
+			loadingCallback(loading);
+		}
+	}, [loading, loadingCallback]);
 
 	return { data, error, loading, resolve, abort, getSignal };
 }

@@ -21,6 +21,10 @@ export function AuthCallback(props: { disabled?: boolean }) {
 		OAuthRequest
 	>(endpoints.auth.login);
 
+	useEffect(() => {
+		setLoadingOverlayState(loading && !terminated && (props.disabled ?? false));
+	}, [props, loading, setLoadingOverlayState, terminated]);
+
 	const {
 		asMap: scheduleMap,
 		set: setSchedule,
@@ -33,15 +37,9 @@ export function AuthCallback(props: { disabled?: boolean }) {
 	} = useClassrooms();
 	const {
 		resolve: resolveSignalRInit,
-		loading: signalRInitLoading,
 		abort: abortSignalRInit,
-	} = usePromise<void>();
+	} = usePromise<void>(setLoadingOverlayState);
 	const initSignalR = useSignalRInit();
-
-	useEffect(() => {
-		setLoadingOverlayState(signalRInitLoading);
-		return abortSignalRInit;
-	}, [abortSignalRInit, setLoadingOverlayState, signalRInitLoading]);
 
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
@@ -56,10 +54,6 @@ export function AuthCallback(props: { disabled?: boolean }) {
 
 		return terminate;
 	}, [props, post, terminate]);
-
-	useEffect(() => {
-		setLoadingOverlayState(loading && !terminated && (props.disabled ?? false));
-	}, [props, loading, setLoadingOverlayState, terminated]);
 
 	useEffect(() => {
 		if (data && data.data) {

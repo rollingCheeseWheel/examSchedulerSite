@@ -49,12 +49,7 @@ export function ExamSchedule(props: {
 	const hubConnection = useScheduleHubConnection((s) => s.data);
 	const { setState: setLoadingOverlayState, reset: resetLoadingOverlayState } =
 		useLoadingOverlay();
-	const { loading, resolve } = usePromise<Result<boolean>>();
-
-	useEffect(() => {
-		setLoadingOverlayState(loading);
-		return resetLoadingOverlayState;
-	}, [loading, resetLoadingOverlayState, setLoadingOverlayState]);
+	const { loading, resolve } = usePromise<Result<boolean>>(setLoadingOverlayState);
 
 	const joinSlot = (id: ExamSlotId) =>
 		resolve(hubConnection?.registerForSlot(id) ?? sleep(250));
