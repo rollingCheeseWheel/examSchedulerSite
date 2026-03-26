@@ -5,12 +5,19 @@ import {
 	type Func,
 	type SingleOrList,
 } from "../util";
+import type { ActionIconCssVariables } from "@mantine/core";
 
-export function usePromise<TResult = never>(
-	loadingCallback?: SingleOrList<Action<[boolean]>>,
+interface UsePromiseCallbacks<TResult, TError = unknown> {
+	loadingCallbacks?: SingleOrList<Action<[boolean]>>;
+	errorCallbacks?: SingleOrList<Action<[TError]>>;
+	successCallbacks?: SingleOrList<Action<[TResult]>>;
+}
+
+export function usePromise<TResult, TError = unknown>(
+	callbacks?: UsePromiseCallbacks<TResult, TError>,
 ) {
 	const [data, setData] = useState<TResult | undefined | null>();
-	const [errors, setError] = useState<unknown[]>();
+	const [error, setError] = useState<TError>();
 	const [loading, setLoading] = useState(false);
 
 	const callIdRef = useRef(0);
@@ -55,24 +62,19 @@ export function usePromise<TResult = never>(
 				promise = promise(getSignal());
 			}
 
-			const callId = ++callIdRef.current;
-
 			setData(undefined);
 			setError(undefined);
 			setLoading(true);
 
 			promise
 				.then((result) => {
-					if (!mountedRef.current || callId !== callIdRef.current) return;
 					setData(result);
 				})
 				.catch((err) => {
-					if (!mountedRef.current || callId !== callIdRef.current) return;
 					setError(err);
 					setData(undefined);
 				})
 				.finally(() => {
-					if (!mountedRef.current || callId !== callIdRef.current) return;
 					setLoading(false);
 				});
 		},
@@ -80,11 +82,31 @@ export function usePromise<TResult = never>(
 	);
 
 	useEffect(() => {
-		const callbacks = singleOrList(loadingCallback);
-		for (const callback of callbacks) {
+		const loadingCallbacks = singleOrList(callbacks?.loadingCallbacks);
+		for (const callback of loadingCallbacks) {
 			callback(loading);
 		}
-	}, [loading, loadingCallback]);
+	}, [callbacks?.loadingCallbacks, loading]);
 
-	return { data, errors, loading, resolve, abort, getSignal };
+	useEffect(() => {
+		if (!error) {
+			return;
+		}
+		const errorCallbacks = singleOrList(callbacks?.errorCallbacks);
+		for (const callback of errorCallbacks) {
+			callback(error);
+		}
+	}, [callbacks?.errorCallbacks, error, loading]);
+
+	useEffect(() => {
+		if (!data) {
+			return;
+		}
+		const successCallbacks = singleOrList(callbacks?.successCallbacks);
+		for (const callback of successCallbacks) {
+			callback(data);
+		}
+	}, [callbacks?.successCallbacks, data, loading]);
+
+	return { data, error, loading, resolve, abort, getSignal };
 }

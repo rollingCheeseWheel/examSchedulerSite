@@ -1,5 +1,3 @@
-import "@mantine/dates/styles.css";
-import "@mantine/dates/styles.layer.css";
 import {
 	ActionIcon,
 	Button,
@@ -13,6 +11,9 @@ import {
 	TextInput,
 } from "@mantine/core";
 import { DatePickerInput, TimePicker } from "@mantine/dates";
+import "@mantine/dates/styles.css";
+import "@mantine/dates/styles.layer.css";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -41,7 +42,6 @@ import {
 } from "../../../util";
 import { TimeRangeDisplay } from "../../common/TimeRangeDisplay";
 import { TimeTable } from "./TimeTable";
-import { isNotEmpty, useForm } from "@mantine/form";
 
 export function ScheduleCreateModal(props: {
 	opened: boolean;
@@ -70,9 +70,9 @@ export function ScheduleCreateModal(props: {
 	const [lockinOffset, setLockinOffset] = useState<string>();
 
 	const scheduleHub = useScheduleHubConnection((s) => s.data);
-	const { resolve: resolveScheduleCreate } = usePromise<Result<boolean>>(
-		setLoadingOverlayState,
-	);
+	const { resolve: resolveScheduleCreate } = usePromise<Result<boolean>>({
+		loadingCallbacks: setLoadingOverlayState,
+	});
 
 	const classrooms = useClassrooms((s) => s.asArray);
 	const [selectedClassroomId, setSelectedClassroom] = useState<ClassroomId>();
@@ -98,7 +98,7 @@ export function ScheduleCreateModal(props: {
 		abort: abortLessonFetch,
 		getSignal,
 		data: lessons,
-	} = usePromise<Lesson[]>(setLoadingOverlayState);
+	} = usePromise<Lesson[]>({ loadingCallbacks: setLoadingOverlayState });
 
 	useEffect(() => {
 		if (!selectedClassroomId) return;

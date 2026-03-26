@@ -49,7 +49,9 @@ export function ExamSchedule(props: {
 	const hubConnection = useScheduleHubConnection((s) => s.data);
 	const { setState: setLoadingOverlayState, reset: resetLoadingOverlayState } =
 		useLoadingOverlay();
-	const { loading, resolve } = usePromise<Result<boolean>>(setLoadingOverlayState);
+	const { loading, resolve } = usePromise<Result<boolean>>({
+		loadingCallbacks: setLoadingOverlayState,
+	});
 
 	const joinSlot = (id: ExamSlotId) =>
 		resolve(hubConnection?.registerForSlot(id) ?? sleep(250));

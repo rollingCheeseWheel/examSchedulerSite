@@ -1,5 +1,8 @@
-import { useEffect } from "react";
-import { Navigate, useSearchParams } from "react-router-dom";
+import { type AxiosResponse } from "axios";
+import { useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { endpoints } from "../../../endpoints";
+import { useGenericError } from "../../../hooks/useGenericError";
 import { usePromise } from "../../../hooks/usePromise";
 import { useSignalRInit } from "../../../hooks/useSignalR";
 import {
@@ -15,9 +18,15 @@ export function AuthCallback(props: { disabled?: boolean }) {
 	const [searchParams] = useSearchParams();
 	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
 	const setUserProfile = useUserProfile((s) => s.setData);
-	const { data, loading, resolve, abort } = usePromise<Result<UserProfile>>(
-		setLoadingOverlayState,
-	);
+	const { data, loading, resolve, abort, error } = usePromise<
+		AxiosResponse<Result<UserProfile>>
+	>({
+		loadingCallbacks: setLoadingOverlayState,
+		errorCallbacks: useGenericError(),
+	});
+	const navigate = useNavigate();
+
+	const authenticatedRef = useRef(false);
 
 	const {
 		asMap: scheduleMap,
@@ -30,7 +39,10 @@ export function AuthCallback(props: { disabled?: boolean }) {
 		asArray: classroomsAsArray,
 	} = useClassrooms();
 	const { resolve: resolveSignalRInit, abort: abortSignalRInit } =
-		usePromise<void>(setLoadingOverlayState);
+		usePromise<void>({
+			loadingCallbacks: setLoadingOverlayState,
+			errorCallbacks: useGenericError(),
+		});
 	const initSignalR = useSignalRInit();
 
 	useEffect(abort, [abort]);
@@ -40,24 +52,40 @@ export function AuthCallback(props: { disabled?: boolean }) {
 		const authCode = searchParams.get("code");
 		const schoolId = searchParams.get("school_id");
 
-		if (!authCode || !schoolId) {
+		if (!authCode || !schoolId || authenticatedRef.current) {
 			return;
 		} else if (!props.disabled) {
-			resolve((s) =>
-				apiRequest<UserProfile>({
+			authenticatedRef.current = true;
+			resolve((s) => {
+				const promise = apiRequest<UserProfile>({
+					url: endpoints.auth.login,
 					method: "POST",
 					data: { authCode, schoolId },
 					signal: s,
-				}),
-			);
+				});
+				console.log("authenticating...", promise);
+				return promise;
+			});
 		}
 
 		return;
 	}, [props.disabled, resolve, searchParams]);
 
 	useEffect(() => {
-		if (data && data.data) {
-			setUserProfile(data.data);
+		if (loading) {
+			return;
+		}
+
+		if (data?.data.data) {
+			navigate({ pathname: "/", search: "" }, { replace: true });
+		} else {
+			navigate({ pathname: "/auth", search: "" }, { replace: true });
+		}
+	}, [data, error, loading, navigate]);
+
+	useEffect(() => {
+		if (data && data.data && data.data.data) {
+			setUserProfile(data.data.data);
 
 			resolveSignalRInit(
 				initSignalR({
@@ -115,11 +143,7 @@ export function AuthCallback(props: { disabled?: boolean }) {
 		setUserProfile,
 	]);
 
-	if (loading) {
-		return;
-	} else if ((data && data.data) || props.disabled) {
-		return <Navigate to={{ pathname: "/", search: "" }} replace />;
-	} else {
-		return <Navigate to={{ pathname: "/auth", search: "" }} replace />;
-	}
+	console.log({ loading, data, error });
+
+	return <></>;
 }
