@@ -1,29 +1,26 @@
 import { Button, Container, NativeSelect, Paper, Title } from "@mantine/core";
 import { useFetch } from "@mantine/hooks";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { endpoints } from "../../../endpoints";
 import type { School } from "../../../models/school";
+import { useLocalStorage } from "../../../hooks/useLocalStorage";
 
 export function AuthWidget() {
+	const { t } = useTranslation();
 	const {
 		data,
 		error: schoolFetchError,
 		loading,
 		abort: abortSchoolLoad,
 	} = useFetch<School[]>(endpoints.schools);
-	const selectRef = useRef<HTMLSelectElement | null>(null);
-	const { t } = useTranslation();
 
 	useEffect(() => {
 		return abortSchoolLoad;
 	}, [abortSchoolLoad]);
 
-	function navigate() {
-		if (selectRef.current) {
-			window.location.href = selectRef.current.value;
-		}
-	}
+	const [localStorage, setLocalStorage] =
+		useLocalStorage<string>("lastSelectedSchool");
 
 	return (
 		<Container size={420} my={40} style={{ minWidth: 300 }}>
@@ -33,9 +30,10 @@ export function AuthWidget() {
 
 			<Paper withBorder shadow="sm" p={22} mt="md" radius="md">
 				<NativeSelect
-					ref={selectRef}
 					error={schoolFetchError ? t("auth.school.error") : undefined}
 					label={t("auth.school.select")}
+					value={localStorage}
+					onChange={(e) => setLocalStorage(e.currentTarget.value)}
 					data={
 						data ?
 							data.map((school) => {
@@ -59,7 +57,9 @@ export function AuthWidget() {
 					mt="md"
 					radius="md"
 					disabled={loading}
-					onClick={navigate}>
+					onClick={() => {
+						if (localStorage) window.location.href = localStorage;
+					}}>
 					Login
 				</Button>
 			</Paper>

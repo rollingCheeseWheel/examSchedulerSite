@@ -77,7 +77,6 @@ function createMapStore<K, V>(
 				for (const instance of data) {
 					temp.set(keySelector(instance), process(instance));
 				}
-				console.log(temp, Array.from(temp.values()));
 
 				return {
 					asMap: temp,

@@ -102,7 +102,6 @@ export function ScheduleCreateModal(props: {
 
 	useEffect(() => {
 		if (!selectedClassroomId) return;
-		console.log("fetching calendar");
 		setOccurances(new Map());
 		setSelectedWeek(floorDateToMonday(Date.now()));
 		return abortLessonFetch;
@@ -118,7 +117,6 @@ export function ScheduleCreateModal(props: {
 		floorDateToMonday(new Date(Date.now())),
 	);
 	const incrementDate = useCallback(() => {
-		console.log("fetching calendar");
 		setSelectedWeek(addDaysToDate(selectedWeek, 7));
 		resolveLessonPromise(
 			fetchLessons(selectedClassroomId, selectedWeek, getSignal()),
@@ -134,7 +132,6 @@ export function ScheduleCreateModal(props: {
 		if (selectedWeek.getTime() <= minDate.getTime()) {
 			return;
 		}
-		console.log("fetching calendar");
 		setSelectedWeek(addDaysToDate(selectedWeek, -7));
 		resolveLessonPromise(
 			fetchLessons(selectedClassroomId, selectedWeek, getSignal()),

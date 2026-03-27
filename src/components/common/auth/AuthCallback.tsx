@@ -63,7 +63,6 @@ export function AuthCallback(props: { disabled?: boolean }) {
 					data: { authCode, schoolId },
 					signal: s,
 				});
-				console.log("authenticating...", promise);
 				return promise;
 			});
 		}
@@ -142,8 +141,6 @@ export function AuthCallback(props: { disabled?: boolean }) {
 		setSchedule,
 		setUserProfile,
 	]);
-
-	console.log({ loading, data, error });
 
 	return <></>;
 }
