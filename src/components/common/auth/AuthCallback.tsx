@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { endpoints } from "../../../endpoints";
-import { useGenericError } from "../../../hooks/useGenericError";
-import { usePromise } from "../../../hooks/usePromise";
+import { useLoadingPromise } from "../../../hooks/useLoadingPromise";
+import { useLocalStorage } from "../../../hooks/useLocalStorage";
 import { useSignalRInit } from "../../../hooks/useSignalR";
 import {
 	useClassrooms,
@@ -11,136 +11,114 @@ import {
 	useUserProfile,
 } from "../../../hooks/zustand";
 import { api } from "../../../main";
-import { type Result } from "../../../models/result";
-import type { UserProfile } from "../../../models/user";
+import type { AuthResponse } from "../../../models/auth";
+import type { DateNumber } from "../../../models/brand";
 
-export function AuthCallback(props: { disabled?: boolean }) {
-	const [searchParams] = useSearchParams();
-	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
-	const setUserProfile = useUserProfile((s) => s.setData);
-	const { data, loading, resolve, abort, error } = usePromise<
-		Result<UserProfile>
-	>({
-		loadingCallbacks: setLoadingOverlayState,
-		errorCallbacks: useGenericError(),
-	});
+export function AuthCallback({ disabled }: { disabled?: boolean }) {
+	const setLoadingOverlay = useLoadingOverlay((s) => s.setState);
+	const [authExpires, setAuthExpires] = useLocalStorage<DateNumber>(
+		"sessionEnd",
+		Date.now() + 1000 * 60 * 5, // 5 minutes
+	);
 	const navigate = useNavigate();
-
-	const authenticatedRef = useRef(false);
-
-	const {
-		asMap: scheduleMap,
-		set: setSchedule,
-		asArray: schedulesAsArray,
-	} = useSchedules();
-	const {
-		asMap: classroomMap,
-		set: setClassroom,
-		asArray: classroomsAsArray,
-	} = useClassrooms();
-	const { resolve: resolveSignalRInit, abort: abortSignalRInit } =
-		usePromise<void>({
-			loadingCallbacks: setLoadingOverlayState,
-			errorCallbacks: useGenericError(),
-		});
+	const { resolve } = useLoadingPromise({
+		onLoading: setLoadingOverlay,
+		onError: () =>
+			navigate({ pathname: "/auth", search: "" }, { replace: true }),
+	});
 	const initSignalR = useSignalRInit();
-
-	useEffect(abort, [abort]);
-	useEffect(abortSignalRInit, [abortSignalRInit]);
-
-	useEffect(() => {
-		const authCode = searchParams.get("code");
-		const schoolId = searchParams.get("school_id");
-
-		if (!authCode || !schoolId || authenticatedRef.current) {
-			return;
-		} else if (!props.disabled) {
-			authenticatedRef.current = true;
-			resolve((s) =>
-				api<Result<UserProfile>>({
-					url: endpoints.auth.login,
-					method: "POST",
-					// @ts-expect-error type inference broken
-					body: { authCode, schoolId },
-					signal: s,
-				}),
-			);
-		}
-
-		return;
-	}, [props.disabled, resolve, searchParams]);
+	const { asArray: schedulesAsArray, set: setSchedule } = useSchedules();
+	const { asArray: classroomsAsArray, set: setClassroom } = useClassrooms();
+	const setUserProfile = useUserProfile((s) => s.setData);
 
 	useEffect(() => {
-		if (loading) {
+		if (disabled) {
+			console.log("login disabled");
+
 			return;
 		}
 
-		if (data?.data) {
-			navigate({ pathname: "/", search: "" }, { replace: true });
-		} else {
+		if (authExpires && new Date(authExpires).getTime() >= Date.now()) {
+			resolve(api(endpoints.auth.refresh, { method: "POST" }));
+			console.log("auth expired, atempting to reauthenticate");
+			return;
+		}
+
+		const queryParams = new URLSearchParams(window.location.search);
+		const authCode = queryParams.get("code");
+		const schoolId = queryParams.get("school_id");
+		if (!authCode || !schoolId) {
 			navigate({ pathname: "/auth", search: "" }, { replace: true });
+			console.log("auth code or school_id not present, redirecting to auth page", {
+				authCode,
+				schoolId,
+			});
+			return;
 		}
-	}, [data, error, loading, navigate]);
 
-	useEffect(() => {
-		if (data && data.data) {
-			setUserProfile(data.data);
+		console.log("logging in", { authCode, schoolId });
+		resolve(
+			api<AuthResponse>(endpoints.auth.login, {
+				method: "POST",
+				body: { authCode, schoolId },
+			}),
+			{
+				onSuccess: (res) => {
+					console.log("successfully logged in, initiating signalr", res);
+					setAuthExpires(new Date(res.expiration).getTime());
+					setUserProfile(res.user);
+					resolve(
+						initSignalR({
+							onReceiveInitialSchedules(schedules) {
+								console.debug("received initial schedules", schedules);
+								for (const schedule of schedules) {
+									setSchedule(schedule);
+								}
+							},
+							onUpdateSchedule(scheduleId, schedule) {
+								console.debug("updating schedule", schedule);
+								for (const iterSchedule of [
+									...schedulesAsArray.filter((s) => s.id !== scheduleId),
+									schedule,
+								]) {
+									setSchedule(iterSchedule);
+								}
+							},
+							onRemoveSchedule(scheduleId) {
+								console.debug("removing schedule", scheduleId);
+								for (const schedule of schedulesAsArray.filter(
+									(s) => s.id !== scheduleId,
+								)) {
+									setSchedule(schedule);
+								}
+							},
+							onReceiveInitialClassrooms(classrooms) {
+								console.debug("received initial classrooms", classrooms);
+								for (const classroom of classrooms) {
+									setClassroom(classroom);
+								}
+							},
+							onUpdateClassroom(classroom) {
+								console.debug("updating classroom", classroom);
+								for (const iterClassroom of [
+									...classroomsAsArray.filter((c) => c.id !== classroom.id),
+									classroom,
+								]) {
+									setClassroom(iterClassroom);
+								}
+							},
+						}),
+						{
+							onSuccess: () => console.log("initiated signalr")
+						}
+					);
+					navigate({ pathname: "/", search: "" }, { replace: true });
+				},
+			},
+		);
 
-			resolveSignalRInit(
-				initSignalR({
-					onReceiveInitialSchedules(schedules) {
-						console.debug("received initial schedules", schedules);
-						for (const schedule of schedules) {
-							setSchedule(schedule);
-						}
-					},
-					onUpdateSchedule(scheduleId, schedule) {
-						console.debug("updating schedule", schedule);
-						for (const iterSchedule of [
-							...schedulesAsArray.filter((s) => s.id !== scheduleId),
-							schedule,
-						]) {
-							setSchedule(iterSchedule);
-						}
-					},
-					onRemoveSchedule(scheduleId) {
-						console.debug("removing scheudule", scheduleId);
-						for (const schedule of schedulesAsArray.filter(
-							(s) => s.id !== scheduleId,
-						)) {
-							setSchedule(schedule);
-						}
-					},
-					onReceiveInitialClassrooms(classrooms) {
-						console.debug("received initial classrooms", classrooms);
-						for (const classroom of classrooms) {
-							setClassroom(classroom);
-						}
-					},
-					onUpdateClassroom(classroom) {
-						console.debug("updating classroom", classroom);
-						for (const iterClassroom of [
-							...classroomsAsArray.filter((c) => c.id !== classroom.id),
-							classroom,
-						]) {
-							setClassroom(iterClassroom);
-						}
-					},
-				}),
-			);
-		}
-	}, [
-		classroomMap,
-		classroomsAsArray,
-		data,
-		initSignalR,
-		resolveSignalRInit,
-		scheduleMap,
-		schedulesAsArray,
-		setClassroom,
-		setSchedule,
-		setUserProfile,
-	]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	return <></>;
 }

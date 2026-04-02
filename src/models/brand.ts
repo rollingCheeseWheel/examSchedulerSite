@@ -25,3 +25,4 @@ export type Guid = BrandedId<"guid">;
 
 export type DateString = BrandedString<"date">;
 export type DateOnlyString = BrandedString<"dateonly">;
+export type DateNumber = Brand<number, "date">;

@@ -22,22 +22,21 @@ import {
 	IconReplaceUser,
 	IconX,
 } from "@tabler/icons-react";
-import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useIgnoredSwapRequests } from "../../../hooks/useIgnoredSwapRequests";
 import { usePromise } from "../../../hooks/usePromise";
 import { useToggle } from "../../../hooks/useToggle";
-import type { Result } from "../../../models/result";
-import type { ExamSlot, ExamSlotId, Schedule } from "../../../models/schedule";
-import type { SwapRequest, SwapRequestId } from "../../../models/swapRequest";
-import type { UserProfile } from "../../../models/user";
-import { formatDateTime, sleep, type Action } from "../../../util";
 import {
 	useIsTeacher,
 	useLoadingOverlay,
 	useScheduleHubConnection,
 	useUserProfile,
 } from "../../../hooks/zustand";
+import type { Result } from "../../../models/result";
+import type { ExamSlot, ExamSlotId, Schedule } from "../../../models/schedule";
+import type { SwapRequest, SwapRequestId } from "../../../models/swapRequest";
+import type { UserProfile } from "../../../models/user";
+import { formatDateTime, sleep, type Action } from "../../../util";
 import { ReportStudentModal } from "../../teacher/report-actual-students/StudentReportModal";
 import { ScheduleProgress } from "./ExtendedProgessbar";
 
@@ -47,10 +46,8 @@ export function ExamSchedule(props: {
 	maxwidth?: StyleProp<string | number>;
 }) {
 	const hubConnection = useScheduleHubConnection((s) => s.data);
-	const { setState: setLoadingOverlayState, reset: resetLoadingOverlayState } =
-		useLoadingOverlay();
-	const { loading, resolve } = usePromise<Result<boolean>>({
-		loadingCallbacks: setLoadingOverlayState,
+	const { resolve } = usePromise<Result<boolean>>({
+		onLoading: useLoadingOverlay().setState,
 	});
 
 	const joinSlot = (id: ExamSlotId) =>
@@ -65,7 +62,12 @@ export function ExamSchedule(props: {
 		resolve(hubConnection?.deleteSwapRequest(id) ?? sleep(250));
 
 	return (
-		<Paper maw={props.maxwidth} withBorder radius="md" key={props.schedule.id}>
+		<Paper
+			maw={props.maxwidth}
+			withBorder
+			radius="md"
+			key={props.schedule.id}
+			id={props.schedule.id}>
 			<Box pos="relative" p="md">
 				<Group justify="space-between">
 					<Title order={2}>{props.schedule.subject.name}</Title>

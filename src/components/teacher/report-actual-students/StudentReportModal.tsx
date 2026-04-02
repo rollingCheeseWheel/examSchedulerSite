@@ -32,7 +32,7 @@ export function ReportStudentModal(props: {
 
 	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
 	const { resolve } = usePromise<Result<boolean>>({
-		loadingCallbacks: setLoadingOverlayState,
+		onLoading: setLoadingOverlayState,
 	});
 
 	const scheduleHub = useScheduleHubConnection((s) => s.data);

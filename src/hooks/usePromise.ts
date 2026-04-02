@@ -5,16 +5,15 @@ import {
 	type Func,
 	type SingleOrList,
 } from "../util";
-import type { ActionIconCssVariables } from "@mantine/core";
 
-interface UsePromiseCallbacks<TResult, TError = unknown> {
-	loadingCallbacks?: SingleOrList<Action<[boolean]>>;
-	errorCallbacks?: SingleOrList<Action<[TError]>>;
-	successCallbacks?: SingleOrList<Action<[TResult]>>;
+interface UsePromiseCallbacks<TResult, TError> {
+	readonly onLoading?: SingleOrList<Action<[boolean]>>;
+	readonly onError?: SingleOrList<Action<[TError]>>;
+	readonly onSuccess?: SingleOrList<Action<[TResult]>>;
 }
 
 export function usePromise<TResult, TError = unknown>(
-	callbacks?: UsePromiseCallbacks<TResult, TError>,
+	callbacks?: Readonly<UsePromiseCallbacks<TResult, TError>>,
 ) {
 	const [data, setData] = useState<TResult | undefined | null>();
 	const [error, setError] = useState<TError>();
@@ -82,31 +81,31 @@ export function usePromise<TResult, TError = unknown>(
 	);
 
 	useEffect(() => {
-		const loadingCallbacks = singleOrList(callbacks?.loadingCallbacks);
+		const loadingCallbacks = singleOrList(callbacks?.onLoading);
 		for (const callback of loadingCallbacks) {
 			callback(loading);
 		}
-	}, [callbacks?.loadingCallbacks, loading]);
+	}, [callbacks?.onLoading, loading]);
 
 	useEffect(() => {
 		if (!error) {
 			return;
 		}
-		const errorCallbacks = singleOrList(callbacks?.errorCallbacks);
+		const errorCallbacks = singleOrList(callbacks?.onError);
 		for (const callback of errorCallbacks) {
 			callback(error);
 		}
-	}, [callbacks?.errorCallbacks, error, loading]);
+	}, [callbacks?.onError, error, loading]);
 
 	useEffect(() => {
 		if (!data) {
 			return;
 		}
-		const successCallbacks = singleOrList(callbacks?.successCallbacks);
+		const successCallbacks = singleOrList(callbacks?.onSuccess);
 		for (const callback of successCallbacks) {
 			callback(data);
 		}
-	}, [callbacks?.successCallbacks, data, loading]);
+	}, [callbacks?.onSuccess, data, loading]);
 
 	return { data, error, loading, resolve, abort, getSignal };
 }

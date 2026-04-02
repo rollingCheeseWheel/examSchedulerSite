@@ -1,10 +1,10 @@
 import { Button, Container, NativeSelect, Paper, Title } from "@mantine/core";
 import { useFetch } from "@mantine/hooks";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { endpoints } from "../../../endpoints";
-import type { School } from "../../../models/school";
 import { useLocalStorage } from "../../../hooks/useLocalStorage";
+import type { School } from "../../../models/school";
 
 export function AuthWidget() {
 	const { t } = useTranslation();
