@@ -11,12 +11,10 @@ export function useCalendar() {
 				return;
 			}
 
-			return (
-				await api.get<Result<Lesson[]>>(
-					`api/calendar/${classroomId}/${date.getTime()}`,
-					{ signal },
-				)
-			).data.data;
+			return (await api<Result<Lesson[]>>(
+				`api/calendar/${classroomId}/${date.getTime()}`,
+				{ signal, method: "GET" },
+			)).data;
 		},
 		[],
 	);

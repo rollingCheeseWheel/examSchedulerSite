@@ -1,6 +1,4 @@
 import { createTheme, type MantineColor } from "@mantine/core";
-import type axios from "axios";
-import { type AxiosRequestConfig, type AxiosResponse } from "axios";
 import type { TimeTableSlot } from "./components/teacher/schedule-create/TimeTable";
 import type { AuditLog } from "./models/auditLog";
 import type { Lesson, Subject, SubjectName } from "./models/calendar";
@@ -249,44 +247,6 @@ export function sleep<TReturn = unknown>(millis: number, value?: TReturn) {
 			setTimeout(() => resolve(value), millis),
 		);
 	}
-}
-
-export function attachAxiosCache(
-	instance: ReturnType<typeof axios.create>,
-	match: RegExp,
-) {
-	const cache = new Map<string, AxiosResponse>();
-
-	const getKey = (config: AxiosRequestConfig) => {
-		const url = config.url || "";
-		const params = JSON.stringify(config.params || {});
-		const data = JSON.stringify(config.data || {});
-		return `${url}|${params}|${data}`;
-	};
-
-	instance.interceptors.request.use((config) => {
-		if (!config.url || !match.test(config.url)) return config;
-
-		const key = getKey(config);
-		const entry = cache.get(key);
-
-		if (entry) {
-			config.adapter = async () => entry.data;
-		}
-
-		return config;
-	});
-
-	instance.interceptors.response.use((response) => {
-		const config = response.config;
-		if (!config.url || !match.test(config.url)) return response;
-
-		const key = getKey(config);
-
-		cache.set(key, response);
-
-		return response;
-	});
 }
 
 export function generateCollection<T>(

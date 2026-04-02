@@ -1,4 +1,3 @@
-import { type AxiosResponse } from "axios";
 import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { endpoints } from "../../../endpoints";
@@ -11,7 +10,8 @@ import {
 	useSchedules,
 	useUserProfile,
 } from "../../../hooks/zustand";
-import { apiRequest, type Result } from "../../../models/result";
+import { api } from "../../../main";
+import { type Result } from "../../../models/result";
 import type { UserProfile } from "../../../models/user";
 
 export function AuthCallback(props: { disabled?: boolean }) {
@@ -19,7 +19,7 @@ export function AuthCallback(props: { disabled?: boolean }) {
 	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
 	const setUserProfile = useUserProfile((s) => s.setData);
 	const { data, loading, resolve, abort, error } = usePromise<
-		AxiosResponse<Result<UserProfile>>
+		Result<UserProfile>
 	>({
 		loadingCallbacks: setLoadingOverlayState,
 		errorCallbacks: useGenericError(),
@@ -56,15 +56,15 @@ export function AuthCallback(props: { disabled?: boolean }) {
 			return;
 		} else if (!props.disabled) {
 			authenticatedRef.current = true;
-			resolve((s) => {
-				const promise = apiRequest<UserProfile>({
+			resolve((s) =>
+				api<Result<UserProfile>>({
 					url: endpoints.auth.login,
 					method: "POST",
-					data: { authCode, schoolId },
+					// @ts-expect-error type inference broken
+					body: { authCode, schoolId },
 					signal: s,
-				});
-				return promise;
-			});
+				}),
+			);
 		}
 
 		return;
@@ -75,7 +75,7 @@ export function AuthCallback(props: { disabled?: boolean }) {
 			return;
 		}
 
-		if (data?.data.data) {
+		if (data?.data) {
 			navigate({ pathname: "/", search: "" }, { replace: true });
 		} else {
 			navigate({ pathname: "/auth", search: "" }, { replace: true });
@@ -83,8 +83,8 @@ export function AuthCallback(props: { disabled?: boolean }) {
 	}, [data, error, loading, navigate]);
 
 	useEffect(() => {
-		if (data && data.data && data.data.data) {
-			setUserProfile(data.data.data);
+		if (data && data.data) {
+			setUserProfile(data.data);
 
 			resolveSignalRInit(
 				initSignalR({

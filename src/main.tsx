@@ -1,6 +1,6 @@
 import { createTheme, MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
-import axios from "axios";
+import { ofetch } from "ofetch";
 import i18next from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { createRoot } from "react-dom/client";
@@ -11,7 +11,7 @@ import german from "./locales/de_translation.json";
 import english from "./locales/en_translation.json";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
-import { attachAxiosCache, jsonReviver } from "./util";
+import { jsonReviver } from "./util";
 import { AuthCallback } from "./components/common/auth/AuthCallback";
 
 // [{
@@ -34,35 +34,32 @@ import { AuthCallback } from "./components/common/auth/AuthCallback";
 // 	start: 3
 // }]
 
-export const api = axios.create({
-	withCredentials: true,
-	transformResponse: [
-		(data) => {
-			if (typeof data == "string") {
-				try {
-					return JSON.parse(data, jsonReviver);
-				} catch {
-					return data;
-				}
-			}
-			return data;
-		},
-	],
-});
-
-attachAxiosCache(api, /.*calendar/);
-
-api.interceptors.response.use(
-	(r) => r,
-	async (error) => {
-		if (error.response?.status === 401 && !error.config._retry) {
-			error.config._retry = true;
-			await refreshSession();
-			return api.request(error.config);
+export const api = ofetch.create({
+	credentials: "same-origin",
+	async onResponse({ response }) {
+		const text = await response.text();
+		try {
+			return JSON.parse(text, jsonReviver);
+		} catch {
+			return text;
 		}
-		return Promise.reject(error);
 	},
-);
+	async onResponseError({ response, request, options, error }) {
+		if (
+			response.status == 401 &&
+			!/auth/.test(response.url) &&
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			(request as any)._retry
+		) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			(request as any)._retry = true;
+
+			await refreshSession();
+			await api(request, options);
+		}
+		throw error;
+	},
+});
 
 i18next
 	.use(initReactI18next)
