@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { singleOrList, type Action, type SingleOrList } from "../util";
 
 export function useLoadingPromise(globalCallbacks?: {
@@ -75,6 +75,17 @@ export function useLoadingPromise(globalCallbacks?: {
 	const abort = useCallback(() => {
 		lastCallId.current++;
 	}, []);
+
+	useEffect(
+		() => () => {
+			abort();
+			setLoading(false);
+			for (const callback of singleOrList(globalCallbacks?.onLoading)) {
+				callback(false);
+			}
+		},
+		[abort, globalCallbacks?.onLoading],
+	);
 
 	return { loading, resolve, abort };
 }
