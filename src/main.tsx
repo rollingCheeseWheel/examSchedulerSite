@@ -36,26 +36,17 @@ import { AuthCallback } from "./components/common/auth/AuthCallback";
 
 export const api = ofetch.create({
 	credentials: "same-origin",
-	async onResponse({ response }) {
-		const text = await response.text();
-		try {
-			return JSON.parse(text, jsonReviver);
-		} catch {
-			return text;
-		}
-	},
-	async onResponseError({ response, request, options, error }) {
+	retryStatusCodes: [401, 408, 429, 500, 502, 503, 504],
+	async onResponseError({ response, request, error }) {
 		if (
 			response.status == 401 &&
 			!/auth/.test(response.url) &&
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			(request as any)._retry
+			!(request as any)._retry
 		) {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			(request as any)._retry = true;
-
 			await refreshSession();
-			await api(request, options);
 		}
 		throw error;
 	},

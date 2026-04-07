@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { endpoints } from "../../../endpoints";
 import { useLoadingPromise } from "../../../hooks/useLoadingPromise";
@@ -12,7 +12,8 @@ import {
 } from "../../../hooks/zustand";
 import { api } from "../../../main";
 import type { AuthResponse } from "../../../models/auth";
-import type { DateNumber } from "../../../models/brand";
+import { type DateString, type DateNumber } from "../../../models/brand";
+import type { Result } from "../../../models/result";
 
 export function AuthCallback({ disabled }: { disabled?: boolean }) {
 	const setLoadingOverlay = useLoadingOverlay((s) => s.setState);
@@ -38,8 +39,19 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 			return;
 		}
 
-		if (authExpires && new Date(authExpires).getTime() >= Date.now()) {
-			resolve(api(endpoints.auth.refresh, { method: "POST" }));
+		if (authExpires && authExpires >= Date.now()) {
+			resolve(
+				api<Result<DateString>>(endpoints.auth.refresh, { method: "POST" }),
+				{
+					onSuccess: (res) => {
+						if (!res.data)
+						{
+							return;
+						}
+						
+					}
+				}
+			);
 			console.log("auth expired, atempting to reauthenticate");
 			return;
 		}
@@ -49,24 +61,34 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 		const schoolId = queryParams.get("school_id");
 		if (!authCode || !schoolId) {
 			navigate({ pathname: "/auth", search: "" }, { replace: true });
-			console.log("auth code or school_id not present, redirecting to auth page", {
-				authCode,
-				schoolId,
-			});
+			console.log(
+				"auth code or school_id not present, redirecting to auth page",
+				{
+					authCode,
+					schoolId,
+				},
+			);
 			return;
 		}
 
 		console.log("logging in", { authCode, schoolId });
 		resolve(
-			api<AuthResponse>(endpoints.auth.login, {
+			api<Result<AuthResponse>>(endpoints.auth.login, {
 				method: "POST",
 				body: { authCode, schoolId },
 			}),
 			{
+				onError: () => {
+					console.error("error during authentication");
+				},
 				onSuccess: (res) => {
+					if (!res.data) {
+						console.warn("error during login");
+						return;
+					}
 					console.log("successfully logged in, initiating signalr", res);
-					setAuthExpires(new Date(res.expiration).getTime());
-					setUserProfile(res.user);
+					setAuthExpires(new Date(res.data.expiration).getTime());
+					setUserProfile(res.data.user);
 					resolve(
 						initSignalR({
 							onReceiveInitialSchedules(schedules) {
@@ -109,8 +131,9 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 							},
 						}),
 						{
-							onSuccess: () => console.log("initiated signalr")
-						}
+							onSuccess: () => console.log("initiated signalr"),
+							onError: () => console.error("error during signalr init"),
+						},
 					);
 					navigate({ pathname: "/", search: "" }, { replace: true });
 				},
