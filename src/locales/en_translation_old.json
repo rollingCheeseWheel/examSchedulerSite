@@ -1,16 +1,17 @@
 {
-	"navbar": {
-		"createforclassroom": "Create",
-		"overview": "Overview",
-		"swaprequests": "Swap Requests"
-	},
-	"schedule": {
-		"create": {
-			"calendar": {
-				"decrement": "Previous week",
-				"increment": "Next week"
-			},
-			"submit": "Create"
-		}
-	}
+    "navbar": {
+        "createforclassroom": "Create",
+        "overview": "Overview",
+        "swaprequests": "Swap Requests"
+    },
+    "schedule": {
+        "create": {
+            "calendar": {
+                "decrement": "Previous week",
+                "increment": "Next week"
+            },
+            "classroomselect": "MISSING",
+            "submit": "Create"
+        }
+    }
 }

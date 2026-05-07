@@ -1,38 +1,49 @@
 {
-	"auth": {
-		"school": {
-			"error": "Failed to load schools, please try again",
-			"select": "Select your school"
-		}
-	},
-	"common": {
-		"cancel": "MISSING",
-		"submit": "MISSING"
-	},
-	"schedule": {
-		"create": {
-			"classroomselect": "MISSING",
-			"createbutton": "MISSING",
-			"title": "MISSING"
-		},
-		"progess": {
-			"tooltip": "{{curr}} out of {{max}} - {{min}} needed"
-		},
-		"register": "Sign up",
-		"reportactual": "Confirm",
-		"swap": "Swap"
-	},
-	"studentmodal": {
-		"submit": "Confirm changes",
-		"title": "Report actual examinees",
-		"usage": "Confirm the examinees. Students that were enlisted for this day but weren't examined will be enlisted in future slots.",
-		"zerostudents": "No students found"
-	},
-	"swaprequest": {
-		"accept": "Accept request",
-		"delete": "Delete request"
-	},
-	"swaprequests": {
-		"title": "Swap requests"
-	}
+    "auth": {
+        "school": {
+            "error": "Failed to load schools, please try again",
+            "select": "Select your school"
+        }
+    },
+    "common": {
+        "cancel": "Cancel",
+        "submit": "Submit"
+    },
+    "notifications": {
+        "genericError": "Something went wrong"
+    },
+    "schedule": {
+        "create": {
+            "classroomSelect": "Select classroom",
+            "createbutton": "Create",
+            "error": {
+                "classroom": "MISSING",
+                "startdate": "MISSING"
+            },
+            "lockinOffset": "MISSING",
+            "scheduleDescription": "MISSING",
+            "startDatePicker": "MISSING",
+            "subjectSelect": "MISSING",
+            "title": "Title"
+        },
+        "progess": {
+            "tooltip": "{{curr}} out of {{max}} - {{min}} needed"
+        },
+        "register": "Sign up",
+        "reportactual": "Confirm",
+        "swap": "Swap"
+    },
+    "studentmodal": {
+        "submit": "Confirm changes",
+        "title": "Report actual examinees",
+        "usage": "Confirm the examinees. Students that were enlisted for this day but weren't examined will be enlisted in future slots.",
+        "zerostudents": "No students found"
+    },
+    "swaprequest": {
+        "accept": "Accept request",
+        "delete": "Delete request"
+    },
+    "swaprequests": {
+        "title": "Swap requests"
+    }
 }

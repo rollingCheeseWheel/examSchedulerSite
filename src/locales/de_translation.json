@@ -1,38 +1,49 @@
 {
-	"auth": {
-		"school": {
-			"error": "Fehler beim Laden, bitte versuche es erneut",
-			"select": "Wähle deine Schule aus"
-		}
-	},
-	"common": {
-		"cancel": "MISSING",
-		"submit": "MISSING"
-	},
-	"schedule": {
-		"create": {
-			"classroomselect": "MISSING",
-			"createbutton": "MISSING",
-			"title": "MISSING"
-		},
-		"progess": {
-			"tooltip": "{{curr}} von {{max}} - {{min}} benötigt"
-		},
-		"register": "Einschreiben",
-		"reportactual": "Bestätigen",
-		"swap": "Tauschen"
-	},
-	"studentmodal": {
-		"submit": "Änderungen bestätigen",
-		"title": "Tatsächlichen Prüflinge bestätigen",
-		"usage": "Bestätigen sie die tatsächlichen Prüflinge. Schüler die sich für diesen Termin eingeschrieben haben, aber nicht an die Reihe gekommen sind werden in einen zukünftigen Termin eingetragen.",
-		"zerostudents": "Keine Schüler zur Auswahl vorhanden"
-	},
-	"swaprequest": {
-		"accept": "Tausch annehmen",
-		"delete": "Tausch löschen"
-	},
-	"swaprequests": {
-		"title": "Tauschanfragen"
-	}
+    "auth": {
+        "school": {
+            "error": "Fehler beim Laden, bitte versuche es erneut",
+            "select": "Wähle deine Schule aus"
+        }
+    },
+    "common": {
+        "cancel": "Abbrechen",
+        "submit": "OK"
+    },
+    "notifications": {
+        "genericError": "Ein Fehler ist aufgetreten"
+    },
+    "schedule": {
+        "create": {
+            "classroomSelect": "MISSING",
+            "createbutton": "MISSING",
+            "error": {
+                "classroom": "MISSING",
+                "startdate": "MISSING"
+            },
+            "lockinOffset": "MISSING",
+            "scheduleDescription": "MISSING",
+            "startDatePicker": "MISSING",
+            "subjectSelect": "MISSING",
+            "title": "MISSING"
+        },
+        "progess": {
+            "tooltip": "{{curr}} von {{max}} - {{min}} benötigt"
+        },
+        "register": "Einschreiben",
+        "reportactual": "Bestätigen",
+        "swap": "Tauschen"
+    },
+    "studentmodal": {
+        "submit": "Änderungen bestätigen",
+        "title": "Tatsächlichen Prüflinge bestätigen",
+        "usage": "Bestätigen sie die tatsächlichen Prüflinge. Schüler die sich für diesen Termin eingeschrieben haben, aber nicht an die Reihe gekommen sind werden in einen zukünftigen Termin eingetragen.",
+        "zerostudents": "Keine Schüler zur Auswahl vorhanden"
+    },
+    "swaprequest": {
+        "accept": "Tausch annehmen",
+        "delete": "Tausch löschen"
+    },
+    "swaprequests": {
+        "title": "Tauschanfragen"
+    }
 }
