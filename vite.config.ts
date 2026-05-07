@@ -12,7 +12,7 @@ export default defineConfig({
 		}),
 		visualizer({
 			filename: "./stats.html",
-			open: true,
+			open: false,
 			brotliSize: true,
 			gzipSize: true,
 			openOptions: {
