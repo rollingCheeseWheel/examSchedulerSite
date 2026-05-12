@@ -39,7 +39,7 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 			return;
 		}
 
-		if (authExpires && authExpires >= Date.now()) {
+		/* if (authExpires && authExpires >= Date.now()) {
 			resolve(
 				api<Result<DateString>>(endpoints.auth.refresh, { method: "POST" }),
 				{
@@ -48,13 +48,13 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 						{
 							return;
 						}
-						
+						setAuthExpires(new Date(res.data).getTime());
 					}
 				}
 			);
 			console.log("auth expired, atempting to reauthenticate");
 			return;
-		}
+		} */
 
 		const queryParams = new URLSearchParams(window.location.search);
 		const authCode = queryParams.get("code");
