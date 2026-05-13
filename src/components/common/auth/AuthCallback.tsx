@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { endpoints } from "../../../endpoints";
 import { useLoadingPromise } from "../../../hooks/useLoadingPromise";
@@ -32,6 +32,51 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 	const { asArray: classroomsAsArray, set: setClassroom } = useClassrooms();
 	const setUserProfile = useUserProfile((s) => s.setData);
 
+	const boundInitSignalrR = useCallback(
+		() =>
+			initSignalR({
+				onReceiveInitialSchedules(schedules) {
+					console.debug("received initial schedules", schedules);
+					for (const schedule of schedules) {
+						setSchedule(schedule);
+					}
+				},
+				onUpdateSchedule(scheduleId, schedule) {
+					console.debug("updating schedule", schedule);
+					for (const iterSchedule of [
+						...schedulesAsArray.filter((s) => s.id !== scheduleId),
+						schedule,
+					]) {
+						setSchedule(iterSchedule);
+					}
+				},
+				onRemoveSchedule(scheduleId) {
+					console.debug("removing schedule", scheduleId);
+					for (const schedule of schedulesAsArray.filter(
+						(s) => s.id !== scheduleId,
+					)) {
+						setSchedule(schedule);
+					}
+				},
+				onReceiveInitialClassrooms(classrooms) {
+					console.debug("received initial classrooms", classrooms);
+					for (const classroom of classrooms) {
+						setClassroom(classroom);
+					}
+				},
+				onUpdateClassroom(classroom) {
+					console.debug("updating classroom", classroom);
+					for (const iterClassroom of [
+						...classroomsAsArray.filter((c) => c.id !== classroom.id),
+						classroom,
+					]) {
+						setClassroom(iterClassroom);
+					}
+				},
+			}),
+		[],
+	);
+
 	useEffect(() => {
 		if (disabled) {
 			console.log("login disabled");
@@ -39,40 +84,29 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 			return;
 		}
 
-		/* if (authExpires && authExpires <= Date.now()) {
+		if (authExpires && authExpires >= Date.now()) {
+			console.log("reauthenticating");
 			resolve(
-				api<Result<DateString>>(endpoints.auth.refresh, { method: "POST" }),
+				api<Result<UserProfile>>(endpoints.auth.me, {
+					method: "GET",
+				}),
 				{
 					onSuccess: (res) => {
-						if (!res.data)
-						{
-							return;
-						}
-						setAuthExpires(new Date(res.data).getTime());
-						resolve(
-							api<Result<UserProfile>>(endpoints.auth.me, {
-								method: "GET"
-							}),
-							{
-								onSuccess: (res) => {
-									setUserProfile(res.data);
-									console.log("successfully got userprofile");
-								},
-								onError: () => {
-									console.error("failed to get userprofile");
-									navigate("/auth");
-								}
-							}
-						)
+						setUserProfile(res.data);
+						console.log("successfully got userprofile");
 					},
 					onError: () => {
+						console.error("failed to get userprofile");
 						navigate("/auth");
-					}
-				}
+					},
+				},
 			);
-			console.log("auth expired, atempting to reauthenticate");
+			resolve(boundInitSignalrR(), {
+				onSuccess: () => console.log("initiated signalr"),
+				onError: () => console.error("error during signalr init"),
+			});
 			return;
-		} */
+		}
 
 		const queryParams = new URLSearchParams(window.location.search);
 		const authCode = queryParams.get("code");
@@ -108,7 +142,7 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 					setAuthExpires(new Date(res.data).getTime());
 					resolve(
 						api<Result<UserProfile>>(endpoints.auth.me, {
-							method: "GET"
+							method: "GET",
 						}),
 						{
 							onSuccess: (res) => {
@@ -118,55 +152,13 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 							onError: () => {
 								console.error("failed to get userprofile");
 								navigate("/auth");
-							}
-						}
-					)
-					resolve(
-						initSignalR({
-							onReceiveInitialSchedules(schedules) {
-								console.debug("received initial schedules", schedules);
-								for (const schedule of schedules) {
-									setSchedule(schedule);
-								}
 							},
-							onUpdateSchedule(scheduleId, schedule) {
-								console.debug("updating schedule", schedule);
-								for (const iterSchedule of [
-									...schedulesAsArray.filter((s) => s.id !== scheduleId),
-									schedule,
-								]) {
-									setSchedule(iterSchedule);
-								}
-							},
-							onRemoveSchedule(scheduleId) {
-								console.debug("removing schedule", scheduleId);
-								for (const schedule of schedulesAsArray.filter(
-									(s) => s.id !== scheduleId,
-								)) {
-									setSchedule(schedule);
-								}
-							},
-							onReceiveInitialClassrooms(classrooms) {
-								console.debug("received initial classrooms", classrooms);
-								for (const classroom of classrooms) {
-									setClassroom(classroom);
-								}
-							},
-							onUpdateClassroom(classroom) {
-								console.debug("updating classroom", classroom);
-								for (const iterClassroom of [
-									...classroomsAsArray.filter((c) => c.id !== classroom.id),
-									classroom,
-								]) {
-									setClassroom(iterClassroom);
-								}
-							},
-						}),
-						{
-							onSuccess: () => console.log("initiated signalr"),
-							onError: () => console.error("error during signalr init"),
 						},
 					);
+					resolve(boundInitSignalrR(), {
+						onSuccess: () => console.log("initiated signalr"),
+						onError: () => console.error("error during signalr init"),
+					});
 					navigate({ pathname: "/", search: "" }, { replace: true });
 				},
 			},
