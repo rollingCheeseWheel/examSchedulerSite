@@ -93,7 +93,7 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 				{
 					onSuccess: (res) => {
 						setUserProfile(res.data);
-						console.log("successfully got userprofile");
+						console.log("successfully got userprofile", res);
 					},
 					onError: () => {
 						console.error("failed to get userprofile");
@@ -147,7 +147,7 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 						{
 							onSuccess: (res) => {
 								setUserProfile(res.data);
-								console.log("successfully got user");
+								console.log("successfully got user", res);
 							},
 							onError: () => {
 								console.error("failed to get userprofile");
