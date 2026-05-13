@@ -74,7 +74,7 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 					}
 				},
 			}),
-		[],
+		[classroomsAsArray, initSignalR, schedulesAsArray, setClassroom, setSchedule],
 	);
 
 	useEffect(() => {

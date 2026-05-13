@@ -11,7 +11,7 @@ function join(...parts: string[]) {
 export const endpoints = {
 	schools: join("schools"),
 	auth: {
-		login: join("auth"),
+		login: join("auth", "login"),
 		refresh: join("auth", "refresh"),
 		me: join("auth", "me")
 	},
