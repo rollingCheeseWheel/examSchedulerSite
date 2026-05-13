@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { endpoints } from "../../../endpoints";
 import { useLoadingPromise } from "../../../hooks/useLoadingPromise";
@@ -11,9 +11,9 @@ import {
 	useUserProfile,
 } from "../../../hooks/zustand";
 import { api } from "../../../main";
-import type { AuthResponse } from "../../../models/auth";
 import { type DateString, type DateNumber } from "../../../models/brand";
 import type { Result } from "../../../models/result";
+import type { UserProfile } from "../../../models/user";
 
 export function AuthCallback({ disabled }: { disabled?: boolean }) {
 	const setLoadingOverlay = useLoadingOverlay((s) => s.setState);
@@ -39,7 +39,7 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 			return;
 		}
 
-		/* if (authExpires && authExpires >= Date.now()) {
+		/* if (authExpires && authExpires <= Date.now()) {
 			resolve(
 				api<Result<DateString>>(endpoints.auth.refresh, { method: "POST" }),
 				{
@@ -49,6 +49,24 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 							return;
 						}
 						setAuthExpires(new Date(res.data).getTime());
+						resolve(
+							api<Result<UserProfile>>(endpoints.auth.me, {
+								method: "GET"
+							}),
+							{
+								onSuccess: (res) => {
+									setUserProfile(res.data);
+									console.log("successfully got userprofile");
+								},
+								onError: () => {
+									console.error("failed to get userprofile");
+									navigate("/auth");
+								}
+							}
+						)
+					},
+					onError: () => {
+						navigate("/auth");
 					}
 				}
 			);
@@ -73,7 +91,7 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 
 		console.log("logging in", { authCode, schoolId });
 		resolve(
-			api<Result<AuthResponse>>(endpoints.auth.login, {
+			api<Result<DateString>>(endpoints.auth.login, {
 				method: "POST",
 				body: { authCode, schoolId },
 			}),
@@ -83,12 +101,26 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 				},
 				onSuccess: (res) => {
 					if (!res.data) {
-						console.warn("error during login");
+						console.error("error during login");
 						return;
 					}
 					console.log("successfully logged in, initiating signalr", res);
-					setAuthExpires(new Date(res.data.expiration).getTime());
-					setUserProfile(res.data.user);
+					setAuthExpires(new Date(res.data).getTime());
+					resolve(
+						api<Result<UserProfile>>(endpoints.auth.me, {
+							method: "GET"
+						}),
+						{
+							onSuccess: (res) => {
+								setUserProfile(res.data);
+								console.log("successfully got user");
+							},
+							onError: () => {
+								console.error("failed to get userprofile");
+								navigate("/auth");
+							}
+						}
+					)
 					resolve(
 						initSignalR({
 							onReceiveInitialSchedules(schedules) {
