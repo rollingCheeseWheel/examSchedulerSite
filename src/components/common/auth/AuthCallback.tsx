@@ -74,7 +74,13 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 					}
 				},
 			}),
-		[classroomsAsArray, initSignalR, schedulesAsArray, setClassroom, setSchedule],
+		[
+			classroomsAsArray,
+			initSignalR,
+			schedulesAsArray,
+			setClassroom,
+			setSchedule,
+		],
 	);
 
 	useEffect(() => {
@@ -84,7 +90,11 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 			return;
 		}
 
-		if (authExpires && authExpires >= Date.now()) {
+		const queryParams = new URLSearchParams(window.location.search);
+		const authCode = queryParams.get("code");
+		const schoolId = queryParams.get("school_id");
+
+		if (authExpires && authExpires >= Date.now() && !authCode && !schoolId) {
 			console.log("reauthenticating");
 			resolve(
 				api<Result<UserProfile>>(endpoints.auth.me, {
@@ -108,9 +118,6 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 			return;
 		}
 
-		const queryParams = new URLSearchParams(window.location.search);
-		const authCode = queryParams.get("code");
-		const schoolId = queryParams.get("school_id");
 		if (!authCode || !schoolId) {
 			navigate({ pathname: "/auth", search: "" }, { replace: true });
 			console.log(

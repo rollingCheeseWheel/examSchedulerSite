@@ -53,7 +53,6 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 			if (!connection) {
 				connectionRef.current = createConnection(hubUrl);
 				console.debug("Connecting to hub");
-				await connectionRef.current.start();
 				conn = {
 					acceptSwapRequest(swaprequestId) {
 						return (
@@ -112,6 +111,7 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 						);
 					},
 				};
+				await connectionRef.current.start();
 
 				setConnection(conn);
 			}

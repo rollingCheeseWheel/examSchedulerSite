@@ -33,6 +33,9 @@
         "reportactual": "Bestätigen",
         "swap": "Tauschen"
     },
+    "schedules": {
+        "empty": "Keine Prüfungspläne vorhanden"
+    },
     "studentmodal": {
         "submit": "Änderungen bestätigen",
         "title": "Tatsächlichen Prüflinge bestätigen",

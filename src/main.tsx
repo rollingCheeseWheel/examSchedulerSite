@@ -6,12 +6,10 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import { createRoot } from "react-dom/client";
 import { initReactI18next } from "react-i18next";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { refreshSession } from "./components/common/auth/refreshSession";
 import german from "./locales/de_translation.json";
 import english from "./locales/en_translation.json";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
-import { jsonReviver } from "./util";
 import { AuthCallback } from "./components/common/auth/AuthCallback";
 
 // [{
@@ -35,21 +33,7 @@ import { AuthCallback } from "./components/common/auth/AuthCallback";
 // }]
 
 export const api = ofetch.create({
-	credentials: "same-origin",
-	retryStatusCodes: [401, 408, 429, 500, 502, 503, 504],
-	async onResponseError({ response, request, error }) {
-		if (
-			response.status == 401 &&
-			!/auth/.test(response.url) &&
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			!(request as any)._retry
-		) {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			(request as any)._retry = true;
-			await refreshSession();
-		}
-		throw error;
-	},
+	credentials: "include",
 });
 
 i18next
