@@ -11,6 +11,8 @@ import english from "./locales/en_translation.json";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { AuthCallback } from "./components/common/auth/AuthCallback";
+import { setLocalStorage } from "./hooks/useLocalStorage";
+import type { DateNumber } from "./models/brand";
 
 // [{
 // 	color: "blue",
@@ -32,8 +34,22 @@ import { AuthCallback } from "./components/common/auth/AuthCallback";
 // 	start: 3
 // }]
 
+export const tokenExpirationInMillisecondsLocalStorageKey = "session_end";
+export let tokenDurationMillis = 0;
+export function setTokenDuration(millis: number) {
+	tokenDurationMillis = millis;
+}
+
 export const api = ofetch.create({
 	credentials: "include",
+	onResponse({ response }) {
+		if (response.status >= 200 && response.status <= 299) {
+			setLocalStorage<DateNumber>(
+				tokenExpirationInMillisecondsLocalStorageKey,
+				Date.now() + tokenDurationMillis,
+			);
+		}
+	},
 });
 
 i18next

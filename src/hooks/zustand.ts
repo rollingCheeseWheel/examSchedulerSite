@@ -134,6 +134,7 @@ function createSingletonStore<T>(
 }
 
 export const useLoadingOverlay = createDisclosureStore();
+export const useIsLoggedIn = createDisclosureStore();
 
 export const useClassrooms = createMapStore<ClassroomId, Classroom>(
 	(c) => c.id,
@@ -154,5 +155,5 @@ export const useUserProfile = createSingletonStore<UserProfile>();
 export const useIsTeacher = () =>
 	useUserProfile((s) => s.data)?.role === "teacher";
 
-export const useScheduleHubConnection = createSingletonStore<ScheduleHub>();
+export const useHubConnection = createSingletonStore<ScheduleHub>();
 export const useLoginError = createSingletonStore<string[]>();

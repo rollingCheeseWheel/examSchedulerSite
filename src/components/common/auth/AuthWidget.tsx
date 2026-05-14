@@ -32,7 +32,7 @@ export function AuthWidget() {
 				<NativeSelect
 					error={schoolFetchError ? t("auth.school.error") : undefined}
 					label={t("auth.school.select")}
-					value={localStorage}
+					value={localStorage ?? data?.at(1)?.name}
 					onChange={(e) => setLocalStorage(e.currentTarget.value)}
 					data={
 						data ?

@@ -6,20 +6,25 @@ import { useLocalStorage } from "../../../hooks/useLocalStorage";
 import { useSignalRInit } from "../../../hooks/useSignalR";
 import {
 	useClassrooms,
+	useIsLoggedIn,
 	useLoadingOverlay,
 	useSchedules,
 	useUserProfile,
 } from "../../../hooks/zustand";
-import { api } from "../../../main";
+import {
+	api,
+	tokenExpirationInMillisecondsLocalStorageKey,
+} from "../../../main";
 import { type DateString, type DateNumber } from "../../../models/brand";
 import type { Result } from "../../../models/result";
 import type { UserProfile } from "../../../models/user";
 
 export function AuthCallback({ disabled }: { disabled?: boolean }) {
 	const setLoadingOverlay = useLoadingOverlay((s) => s.setState);
+	const setIsLoggedIn = useIsLoggedIn((s) => s.setState);
 	const [authExpires, setAuthExpires] = useLocalStorage<DateNumber>(
-		"sessionEnd",
-		Date.now() + 1000 * 60 * 5, // 5 minutes
+		tokenExpirationInMillisecondsLocalStorageKey,
+		Date.now() + 1000 * 60 * 60, // 1 hour
 	);
 	const navigate = useNavigate();
 	const { resolve } = useLoadingPromise({
@@ -32,7 +37,7 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 	const { asArray: classroomsAsArray, set: setClassroom } = useClassrooms();
 	const setUserProfile = useUserProfile((s) => s.setData);
 
-	const boundInitSignalrR = useCallback(
+	const boundSignalRInit = useCallback(
 		() =>
 			initSignalR({
 				onReceiveInitialSchedules(schedules) {
@@ -103,17 +108,23 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 				{
 					onSuccess: (res) => {
 						setUserProfile(res.data);
+						setIsLoggedIn(true);
 						console.log("successfully got userprofile", res);
 					},
 					onError: () => {
 						console.error("failed to get userprofile");
+						setIsLoggedIn(false);
 						navigate("/auth");
 					},
 				},
 			);
-			resolve(boundInitSignalrR(), {
+			resolve(boundSignalRInit(), {
 				onSuccess: () => console.log("initiated signalr"),
-				onError: () => console.error("error during signalr init"),
+				onError: () => {
+					console.error("error during signalr init");
+					setIsLoggedIn(false);
+					navigate("/auth");
+				},
 			});
 			return;
 		}
@@ -154,17 +165,23 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 						{
 							onSuccess: (res) => {
 								setUserProfile(res.data);
+								setIsLoggedIn(true);
 								console.log("successfully got user", res);
 							},
 							onError: () => {
 								console.error("failed to get userprofile");
+								setIsLoggedIn(false);
 								navigate("/auth");
 							},
 						},
 					);
-					resolve(boundInitSignalrR(), {
+					resolve(boundSignalRInit(), {
 						onSuccess: () => console.log("initiated signalr"),
-						onError: () => console.error("error during signalr init"),
+						onError: () => {
+							console.error("error during signalr init");
+							setIsLoggedIn(false);
+							navigate("/auth");
+						},
 					});
 					navigate({ pathname: "/", search: "" }, { replace: true });
 				},

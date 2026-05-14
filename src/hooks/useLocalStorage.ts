@@ -8,61 +8,65 @@ interface LocalStorageEntry<T> {
 	expires: number;
 }
 
+export function getLocalStorage<T>(key: string): T | null | undefined {
+	try {
+		const raw = localStorage.getItem(key);
+		if (!raw) {
+			return undefined;
+		}
+		const parsed = JSON.parse(raw) as LocalStorageEntry<T>;
+		if (Date.now() > parsed.expires) {
+			localStorage.removeItem(key);
+			return undefined;
+		}
+		return parsed.value;
+	} catch {
+		localStorage.removeItem(key);
+		return undefined;
+	}
+}
+
+export function setLocalStorage<T>(
+	key: string,
+	value: T,
+	timeToLive: number = ttl,
+) {
+	const data: LocalStorageEntry<T> = {
+		value,
+		expires: Date.now() + timeToLive,
+	};
+	localStorage.setItem(key, JSON.stringify(data));
+}
+
 export function useLocalStorage<T>(
 	key: string,
 	defaultValue?: T,
 	timeToLive: number = ttl,
-): [T | undefined, Action<[T]>] {
-	const get = useCallback(() => {
-		try {
-			const raw = localStorage.getItem(key);
-			if (!raw) {
-				return undefined;
-			}
-			const parsed = JSON.parse(raw) as LocalStorageEntry<T>;
-			if (Date.now() > parsed.expires) {
-				localStorage.removeItem(key);
-				return undefined;
-			}
-			return parsed.value;
-		} catch {
-			localStorage.removeItem(key);
-			return undefined;
-		}
-	}, [key]);
-
-	const setLocalStorage = useCallback(
-		(value?: T) => {
-			const data: LocalStorageEntry<T> = {
-				value,
-				expires: Date.now() + timeToLive,
-			};
-			localStorage.setItem(key, JSON.stringify(data));
-		},
-		[key, timeToLive],
-	);
-
-	const [value, setValue] = useState<T | undefined>(
-		() => get() ?? setLocalStorage(defaultValue) ?? defaultValue,
+): [T | null | undefined, Action<[T]>] {
+	const [value, setValue] = useState<T | null | undefined>(
+		() =>
+			getLocalStorage<T>(key) ??
+			setLocalStorage(key, defaultValue, timeToLive) ??
+			defaultValue,
 	);
 
 	const set = useCallback(
 		(value: T) => {
-			setLocalStorage(value);
+			setLocalStorage(key, defaultValue, ttl);
 			setValue(value);
 		},
-		[setLocalStorage],
+		[defaultValue, key],
 	);
 
 	useEffect(() => {
 		function handler(e: StorageEvent) {
 			if (e.key == key) {
-				setValue(get());
+				setValue(getLocalStorage<T>(key));
 			}
 		}
 		window.addEventListener("storage", handler);
 		return () => window.removeEventListener("storage", handler);
-	}, [get, key]);
+	}, [key]);
 
 	return [value, set] as const;
 }

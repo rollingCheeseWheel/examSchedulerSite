@@ -29,7 +29,7 @@ import { useToggle } from "../../../hooks/useToggle";
 import {
 	useIsTeacher,
 	useLoadingOverlay,
-	useScheduleHubConnection,
+	useHubConnection,
 	useUserProfile,
 } from "../../../hooks/zustand";
 import type { Result } from "../../../models/result";
@@ -45,7 +45,7 @@ export function ExamSchedule(props: {
 	selectedSlotId?: ExamSlotId;
 	maxwidth?: StyleProp<string | number>;
 }) {
-	const hubConnection = useScheduleHubConnection((s) => s.data);
+	const hubConnection = useHubConnection((s) => s.data);
 	const { resolve } = usePromise<Result<boolean>>({
 		onLoading: useLoadingOverlay().setState,
 	});

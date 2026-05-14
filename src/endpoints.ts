@@ -12,7 +12,7 @@ export const endpoints = {
 	schools: join("schools"),
 	auth: {
 		login: join("auth", "login"),
-		refresh: join("auth", "refresh"),
+		logout: join("auth", "logout"),
 		me: join("auth", "me")
 	},
 	classrooms: join("classroom", "all"),

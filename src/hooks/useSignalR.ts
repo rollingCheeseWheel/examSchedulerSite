@@ -16,7 +16,7 @@ import type {
 import type { SwapRequestId } from "../models/swapRequest";
 import type { UserProfileId } from "../models/user";
 import { type Action, type Func } from "../util";
-import { useScheduleHubConnection } from "./zustand";
+import { useHubConnection } from "./zustand";
 
 export interface ScheduleClient {
 	onReceiveInitialSchedules: Action<[Schedule[]]>;
@@ -38,11 +38,11 @@ export interface ScheduleHub {
 	reportStudents: Func<[ExamSlotId, UserProfileId[]], Promise<Result<boolean>>>;
 
 	connect: Func<[], Promise<void>>;
+	disconnect: Func<[], Promise<void>>;
 }
 
 export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
-	const { data: connection, setData: setConnection } =
-		useScheduleHubConnection();
+	const { data: connection, setData: setConnection } = useHubConnection();
 	const handlersRef = useRef<ScheduleClient>(undefined);
 	const connectionRef = useRef<HubConnection>(undefined);
 
@@ -110,23 +110,49 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 							Promise.reject("Connection not initialized")
 						);
 					},
+					disconnect() {
+						return (
+							connectionRef.current?.stop() ??
+							Promise.reject("Connection not initialized")
+						);
+					},
 				};
+
+				if (handlersRef.current) {
+					Object.entries(handlersRef.current).forEach(
+						([eventName, handler]) => {
+							connectionRef.current?.off(eventName.toLowerCase().replace(/^on/, ""), handler);
+						},
+					);
+				}
+
+				Object.entries(handlers).forEach(([eventName, handler]) => {
+					connectionRef.current?.on(eventName.toLowerCase().replace(/^on/, ""), handler);
+				});
+
+				handlersRef.current = handlers;
+				console.debug("updated event handlers")
+
+				console.debug("Connecting to hub");
 				await connectionRef.current.start();
 
 				setConnection(conn);
-			}
+			} else {
+				if (handlersRef.current) {
+					Object.entries(handlersRef.current).forEach(
+						([eventName, handler]) => {
+							connectionRef.current?.off(eventName, handler);
+						},
+					);
+				}
 
-			if (handlersRef.current) {
-				Object.entries(handlersRef.current).forEach(([eventName, handler]) => {
-					connectionRef.current?.off(eventName, handler);
+				Object.entries(handlers).forEach(([eventName, handler]) => {
+					connectionRef.current?.on(eventName, handler);
 				});
+
+				handlersRef.current = handlers;
+				console.debug("updated event handlers")
 			}
-
-			Object.entries(handlers).forEach(([eventName, handler]) => {
-				connectionRef.current?.on(eventName, handler);
-			});
-
-			handlersRef.current = handlers;
 		},
 		[hubUrl, connection, setConnection],
 	);

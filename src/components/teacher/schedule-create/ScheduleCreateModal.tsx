@@ -21,7 +21,7 @@ import { useCalendar } from "../../../hooks/useCalendar";
 import { usePromise } from "../../../hooks/usePromise";
 import {
 	useClassrooms,
-	useScheduleHubConnection,
+	useHubConnection,
 	useUserProfile,
 } from "../../../hooks/zustand";
 import type {
@@ -69,7 +69,7 @@ export function ScheduleCreateModal(props: {
 	const [startDate, setStartDate] = useState<string | null>();
 	const [lockinOffset, setLockinOffset] = useState<string>();
 
-	const scheduleHub = useScheduleHubConnection((s) => s.data);
+	const scheduleHub = useHubConnection((s) => s.data);
 	const { resolve: resolveScheduleCreate } = usePromise<Result<boolean>>({
 		onLoading: setLoadingOverlayState,
 	});

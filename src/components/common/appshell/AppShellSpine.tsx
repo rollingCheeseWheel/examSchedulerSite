@@ -6,6 +6,7 @@ import { type ReactNode } from "react";
 import { useLoadingOverlay } from "../../../hooks/zustand";
 import { ThemeButton } from "../../common/ThemeButton";
 import classes from "./AppShellSpine.module.css";
+import { LogoutButton } from "../auth/LogoutButton";
 
 export function AppShellSpine(props: { children?: ReactNode | ReactNode[] }) {
 	const isLoadingOverlayOpen = useLoadingOverlay((s) => s.state);
@@ -20,6 +21,7 @@ export function AppShellSpine(props: { children?: ReactNode | ReactNode[] }) {
 							<Title className={classes.title}>Exam Scheduler</Title>
 						</Group>
 						<Group>
+							<LogoutButton />
 							<ThemeButton />
 						</Group>
 					</Group>

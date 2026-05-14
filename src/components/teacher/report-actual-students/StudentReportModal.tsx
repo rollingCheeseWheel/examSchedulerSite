@@ -19,7 +19,7 @@ import type { UserProfileId } from "../../../models/user";
 import { pointerCursorTheme, sleep, type Action } from "../../../util";
 import {
 	useLoadingOverlay,
-	useScheduleHubConnection,
+	useHubConnection,
 	useSchedules,
 } from "../../../hooks/zustand";
 
@@ -35,7 +35,7 @@ export function ReportStudentModal(props: {
 		onLoading: setLoadingOverlayState,
 	});
 
-	const scheduleHub = useScheduleHubConnection((s) => s.data);
+	const scheduleHub = useHubConnection((s) => s.data);
 	const [checkedStudents, setCheckedStudents] = useState<UserProfileId[]>([]);
 
 	const schedule = useSchedules((s) => s.asArray).find((s) =>

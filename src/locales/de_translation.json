@@ -9,6 +9,7 @@
         "cancel": "Abbrechen",
         "submit": "OK"
     },
+    "logout": "MISSING",
     "notifications": {
         "genericError": "Ein Fehler ist aufgetreten"
     },
