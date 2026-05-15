@@ -8,6 +8,7 @@ import { initReactI18next } from "react-i18next";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import german from "./locales/de_translation.json";
 import english from "./locales/en_translation.json";
+import italian from "./locales/it_translation.json";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { AuthCallback } from "./components/common/auth/AuthCallback";
@@ -68,6 +69,7 @@ i18next
 	});
 i18next.addResourceBundle("en", "translation", english, true);
 i18next.addResourceBundle("de", "translation", german, true);
+i18next.addResourceBundle("it", "translation", italian, true);
 
 const theme = createTheme({
 	colors: {

@@ -1,5 +1,5 @@
 export default {
-	locales: ["en", "de"],
+	locales: ["en", "de", "it"],
 	output: "src/locales/$LOCALE_$NAMESPACE.json",
 	input: ["src/**/*.{ts,tsx,js,jsx}"],
 	lexers: {

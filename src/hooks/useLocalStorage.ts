@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Action } from "../util";
 
+export class LocalStorageEvent extends CustomEvent<{ key: string }> {}
+const localStorageEventName = "local-storage";
+
+declare global {
+	interface WindowEventMap {
+		"local-storage": LocalStorageEvent;
+	}
+}
+
 const ttl = 1000 * 60 * 60 * 24 * 275; // 275 days
 
 interface LocalStorageEntry<T> {
@@ -36,6 +45,10 @@ export function setLocalStorage<T>(
 		expires: Date.now() + timeToLive,
 	};
 	localStorage.setItem(key, JSON.stringify(data));
+
+	window.dispatchEvent(
+		new LocalStorageEvent(localStorageEventName, { detail: { key } }),
+	);
 }
 
 export function useLocalStorage<T>(
@@ -52,20 +65,36 @@ export function useLocalStorage<T>(
 
 	const set = useCallback(
 		(value: T) => {
-			setLocalStorage(key, defaultValue, ttl);
+			setLocalStorage(key, value, timeToLive);
 			setValue(value);
 		},
-		[defaultValue, key],
+		[key, timeToLive],
 	);
 
 	useEffect(() => {
-		function handler(e: StorageEvent) {
+		function sync() {
+			setValue(getLocalStorage<T>(key));
+		}
+
+		function storageHandler(e: StorageEvent) {
 			if (e.key == key) {
-				setValue(getLocalStorage<T>(key));
+				sync();
 			}
 		}
-		window.addEventListener("storage", handler);
-		return () => window.removeEventListener("storage", handler);
+
+		function localHandler(e: LocalStorageEvent) {
+			if (e.detail.key == key) {
+				sync();
+			}
+		}
+
+		window.addEventListener("storage", storageHandler);
+		window.addEventListener("local-storage", localHandler);
+
+		return () => {
+			window.removeEventListener("storage", storageHandler);
+			window.removeEventListener("local-storage", localHandler);
+		};
 	}, [key]);
 
 	return [value, set] as const;

@@ -9,23 +9,23 @@
         "cancel": "Abbrechen",
         "submit": "OK"
     },
-    "logout": "MISSING",
+    "logout": "Abmelden",
     "notifications": {
         "genericError": "Ein Fehler ist aufgetreten"
     },
     "schedule": {
         "create": {
-            "classroomSelect": "MISSING",
-            "createbutton": "MISSING",
+            "classroomSelect": "Klassenraum auswählen",
+            "createbutton": "Prüfungsplan erstellen",
             "error": {
-                "classroom": "MISSING",
-                "startdate": "MISSING"
+                "classroom": "Ungültiger Klassenraum",
+                "startdate": "Ungültiges Startdatum"
             },
-            "lockinOffset": "MISSING",
-            "scheduleDescription": "MISSING",
-            "startDatePicker": "MISSING",
-            "subjectSelect": "MISSING",
-            "title": "MISSING"
+            "lockinOffset": "Anmeldeabschluss",
+            "scheduleDescription": "Beschreibung",
+            "startDatePicker": "Anfangsdatum auswählen",
+            "subjectSelect": "Fach auswählen",
+            "title": "Prüfungsplan erstellen"
         },
         "progess": {
             "tooltip": "{{curr}} von {{max}} - {{min}} benötigt"

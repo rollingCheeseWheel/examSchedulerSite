@@ -6,13 +6,13 @@ import { useLocalStorage } from "../../../hooks/useLocalStorage";
 import { useSignalRInit } from "../../../hooks/useSignalR";
 import {
 	useClassrooms,
-	useIsLoggedIn,
 	useLoadingOverlay,
 	useSchedules,
 	useUserProfile,
 } from "../../../hooks/zustand";
 import {
 	api,
+	setTokenDuration,
 	tokenExpirationInMillisecondsLocalStorageKey,
 } from "../../../main";
 import { type DateString, type DateNumber } from "../../../models/brand";
@@ -21,10 +21,8 @@ import type { UserProfile } from "../../../models/user";
 
 export function AuthCallback({ disabled }: { disabled?: boolean }) {
 	const setLoadingOverlay = useLoadingOverlay((s) => s.setState);
-	const setIsLoggedIn = useIsLoggedIn((s) => s.setState);
-	const [authExpires, setAuthExpires] = useLocalStorage<DateNumber>(
+	const [sessionEnd, setSessionEnd] = useLocalStorage<DateNumber>(
 		tokenExpirationInMillisecondsLocalStorageKey,
-		Date.now() + 1000 * 60 * 60, // 1 hour
 	);
 	const navigate = useNavigate();
 	const { resolve } = useLoadingPromise({
@@ -99,7 +97,7 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 		const authCode = queryParams.get("code");
 		const schoolId = queryParams.get("school_id");
 
-		if (authExpires && authExpires >= Date.now() && !authCode && !schoolId) {
+		if (sessionEnd && sessionEnd >= Date.now() && !authCode && !schoolId) {
 			console.log("reauthenticating");
 			resolve(
 				api<Result<UserProfile>>(endpoints.auth.me, {
@@ -108,12 +106,12 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 				{
 					onSuccess: (res) => {
 						setUserProfile(res.data);
-						setIsLoggedIn(true);
+						setSessionEnd(Date.now() + 1_000 * 60 * 60);
 						console.log("successfully got userprofile", res);
 					},
 					onError: () => {
 						console.error("failed to get userprofile");
-						setIsLoggedIn(false);
+						setSessionEnd(0);
 						navigate("/auth");
 					},
 				},
@@ -122,7 +120,7 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 				onSuccess: () => console.log("initiated signalr"),
 				onError: () => {
 					console.error("error during signalr init");
-					setIsLoggedIn(false);
+					setSessionEnd(0);
 					navigate("/auth");
 				},
 			});
@@ -156,8 +154,9 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 						console.error("error during login");
 						return;
 					}
+					setTokenDuration(new Date(res.data).getTime() - Date.now());
+					setSessionEnd(new Date(res.data).getTime());
 					console.log("successfully logged in, initiating signalr", res);
-					setAuthExpires(new Date(res.data).getTime());
 					resolve(
 						api<Result<UserProfile>>(endpoints.auth.me, {
 							method: "GET",
@@ -165,12 +164,11 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 						{
 							onSuccess: (res) => {
 								setUserProfile(res.data);
-								setIsLoggedIn(true);
 								console.log("successfully got user", res);
 							},
 							onError: () => {
 								console.error("failed to get userprofile");
-								setIsLoggedIn(false);
+								setSessionEnd(0);
 								navigate("/auth");
 							},
 						},
@@ -179,7 +177,7 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 						onSuccess: () => console.log("initiated signalr"),
 						onError: () => {
 							console.error("error during signalr init");
-							setIsLoggedIn(false);
+							setSessionEnd(0);
 							navigate("/auth");
 						},
 					});

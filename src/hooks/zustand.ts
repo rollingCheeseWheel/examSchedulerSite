@@ -134,7 +134,6 @@ function createSingletonStore<T>(
 }
 
 export const useLoadingOverlay = createDisclosureStore();
-export const useIsLoggedIn = createDisclosureStore();
 
 export const useClassrooms = createMapStore<ClassroomId, Classroom>(
 	(c) => c.id,

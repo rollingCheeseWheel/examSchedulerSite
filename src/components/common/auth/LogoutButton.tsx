@@ -1,45 +1,54 @@
 import { Button } from "@mantine/core";
 import { IconLogout2 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
-import { useLoadingOverlay, useHubConnection, useIsLoggedIn } from "../../../hooks/zustand";
+import {
+	useLoadingOverlay,
+	useHubConnection,
+} from "../../../hooks/zustand";
 import { useLoadingPromise } from "../../../hooks/useLoadingPromise";
 import { useNavigate } from "react-router-dom";
 import { endpoints } from "../../../endpoints";
-import {
-	api,
-} from "../../../main";
-import { useEffect } from "react";
+import { api, tokenExpirationInMillisecondsLocalStorageKey } from "../../../main";
+import { useCallback, useEffect } from "react";
+import { useLocalStorage } from "../../../hooks/useLocalStorage";
+import type { DateNumber } from "../../../models/brand";
 
 export function LogoutButton() {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
-	const signalr = useHubConnection(s => s.data);
-	const loggedIn = useIsLoggedIn(s => s.state);
+	const signalr = useHubConnection((s) => s.data);
+	const [sessionEnd, setSessionEnd] = useLocalStorage<DateNumber>(tokenExpirationInMillisecondsLocalStorageKey);
 	const setLoadingOverlay = useLoadingOverlay((s) => s.setState);
 	const { resolve, abort } = useLoadingPromise({
 		onLoading: setLoadingOverlay,
-		onSuccess: () => {
-			resolve(signalr?.disconnect());
-			navigate("/auth");
-		},
 	});
 
 	useEffect(() => abort, [abort]);
 
-	if (!loggedIn) {
+	const onClick = useCallback(
+		() =>
+			resolve(
+				api(endpoints.auth.logout, {
+					method: "GET",
+				}),
+				{
+					onSuccess: () => {
+						setSessionEnd(0);
+						resolve(signalr?.disconnect());
+						navigate("/auth");
+					},
+				},
+			),
+		[navigate, resolve, setSessionEnd, signalr],
+	);
+
+	if (!sessionEnd || sessionEnd < Date.now()) {
+		console.log("not displaying logout button", sessionEnd, Date.now());
 		return <></>;
 	}
 
 	return (
-		<Button
-			leftSection={<IconLogout2 />}
-			onClick={() =>
-				resolve(
-					api(endpoints.auth.logout, {
-						method: "GET",
-					}),
-				)
-			}>
+		<Button leftSection={<IconLogout2 />} onClick={onClick}>
 			{t("logout")}
 		</Button>
 	);

@@ -1,51 +1,51 @@
 {
     "auth": {
         "school": {
-            "error": "Failed to load schools, please try again",
+            "error": "Error loading, please try again",
             "select": "Select your school"
         }
     },
     "common": {
         "cancel": "Cancel",
-        "submit": "Submit"
+        "submit": "OK"
     },
-    "logout": "MISSING",
+    "logout": "Log out",
     "notifications": {
-        "genericError": "Something went wrong"
+        "genericError": "An error occurred"
     },
     "schedule": {
         "create": {
             "classroomSelect": "Select classroom",
-            "createbutton": "Create",
+            "createbutton": "Create exam schedule",
             "error": {
-                "classroom": "MISSING",
-                "startdate": "MISSING"
+                "classroom": "Invalid classroom",
+                "startdate": "Invalid start date"
             },
-            "lockinOffset": "MISSING",
-            "scheduleDescription": "MISSING",
-            "startDatePicker": "MISSING",
-            "subjectSelect": "MISSING",
-            "title": "Title"
+            "lockinOffset": "Registration deadline",
+            "scheduleDescription": "Description",
+            "startDatePicker": "Select start date",
+            "subjectSelect": "Select subject",
+            "title": "Create exam schedule"
         },
         "progess": {
-            "tooltip": "{{curr}} out of {{max}} - {{min}} needed"
+            "tooltip": "{{curr}} of {{max}} - {{min}} required"
         },
-        "register": "Sign up",
+        "register": "Register",
         "reportactual": "Confirm",
         "swap": "Swap"
     },
     "schedules": {
-        "empty": "No schedules available"
+        "empty": "No exam schedules available"
     },
     "studentmodal": {
         "submit": "Confirm changes",
-        "title": "Report actual examinees",
-        "usage": "Confirm the examinees. Students that were enlisted for this day but weren't examined will be enlisted in future slots.",
-        "zerostudents": "No students found"
+        "title": "Confirm actual examinees",
+        "usage": "Confirm the actual examinees. Students who registered for this appointment but did not get their turn will be assigned to a future appointment.",
+        "zerostudents": "No students available for selection"
     },
     "swaprequest": {
-        "accept": "Accept request",
-        "delete": "Delete request"
+        "accept": "Accept swap",
+        "delete": "Delete swap"
     },
     "swaprequests": {
         "title": "Swap requests"
