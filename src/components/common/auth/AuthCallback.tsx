@@ -39,13 +39,11 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 		() =>
 			initSignalR({
 				onReceiveInitialSchedules(schedules) {
-					console.debug("received initial schedules", schedules);
 					for (const schedule of schedules) {
 						setSchedule(schedule);
 					}
 				},
 				onUpdateSchedule(scheduleId, schedule) {
-					console.debug("updating schedule", schedule);
 					for (const iterSchedule of [
 						...schedulesAsArray.filter((s) => s.id !== scheduleId),
 						schedule,
@@ -54,7 +52,6 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 					}
 				},
 				onRemoveSchedule(scheduleId) {
-					console.debug("removing schedule", scheduleId);
 					for (const schedule of schedulesAsArray.filter(
 						(s) => s.id !== scheduleId,
 					)) {
@@ -62,13 +59,11 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 					}
 				},
 				onReceiveInitialClassrooms(classrooms) {
-					console.debug("received initial classrooms", classrooms);
 					for (const classroom of classrooms) {
 						setClassroom(classroom);
 					}
 				},
 				onUpdateClassroom(classroom) {
-					console.debug("updating classroom", classroom);
 					for (const iterClassroom of [
 						...classroomsAsArray.filter((c) => c.id !== classroom.id),
 						classroom,
@@ -88,8 +83,6 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 
 	useEffect(() => {
 		if (disabled) {
-			console.log("login disabled");
-
 			return;
 		}
 
@@ -98,7 +91,6 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 		const schoolId = queryParams.get("school_id");
 
 		if (sessionEnd && sessionEnd >= Date.now() && !authCode && !schoolId) {
-			console.log("reauthenticating");
 			resolve(
 				api<Result<UserProfile>>(endpoints.auth.me, {
 					method: "GET",
@@ -107,7 +99,6 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 					onSuccess: (res) => {
 						setUserProfile(res.data);
 						setSessionEnd(Date.now() + 1_000 * 60 * 60);
-						console.log("successfully got userprofile", res);
 					},
 					onError: () => {
 						console.error("failed to get userprofile");
@@ -117,7 +108,6 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 				},
 			);
 			resolve(boundSignalRInit(), {
-				onSuccess: () => console.log("initiated signalr"),
 				onError: () => {
 					console.error("error during signalr init");
 					setSessionEnd(0);
@@ -129,17 +119,9 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 
 		if (!authCode || !schoolId) {
 			navigate({ pathname: "/auth", search: "" }, { replace: true });
-			console.log(
-				"auth code or school_id not present, redirecting to auth page",
-				{
-					authCode,
-					schoolId,
-				},
-			);
 			return;
 		}
 
-		console.log("logging in", { authCode, schoolId });
 		resolve(
 			api<Result<DateString>>(endpoints.auth.login, {
 				method: "POST",
@@ -156,7 +138,6 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 					}
 					setTokenDuration(new Date(res.data).getTime() - Date.now());
 					setSessionEnd(new Date(res.data).getTime());
-					console.log("successfully logged in, initiating signalr", res);
 					resolve(
 						api<Result<UserProfile>>(endpoints.auth.me, {
 							method: "GET",
@@ -164,7 +145,6 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 						{
 							onSuccess: (res) => {
 								setUserProfile(res.data);
-								console.log("successfully got user", res);
 							},
 							onError: () => {
 								console.error("failed to get userprofile");
@@ -174,7 +154,6 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 						},
 					);
 					resolve(boundSignalRInit(), {
-						onSuccess: () => console.log("initiated signalr"),
 						onError: () => {
 							console.error("error during signalr init");
 							setSessionEnd(0);

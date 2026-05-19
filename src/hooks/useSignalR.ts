@@ -52,7 +52,6 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 
 			if (!connection) {
 				connectionRef.current = createConnection(hubUrl);
-				console.debug("Connecting to hub");
 				conn = {
 					acceptSwapRequest(swaprequestId) {
 						return (
@@ -131,9 +130,6 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 				});
 
 				handlersRef.current = handlers;
-				console.debug("updated event handlers")
-
-				console.debug("Connecting to hub");
 				await connectionRef.current.start();
 
 				setConnection(conn);
@@ -151,7 +147,6 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 				});
 
 				handlersRef.current = handlers;
-				console.debug("updated event handlers")
 			}
 		},
 		[hubUrl, connection, setConnection],

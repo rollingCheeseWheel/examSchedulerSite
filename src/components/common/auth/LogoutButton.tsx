@@ -43,7 +43,6 @@ export function LogoutButton() {
 	);
 
 	if (!sessionEnd || sessionEnd < Date.now()) {
-		console.log("not displaying logout button", sessionEnd, Date.now());
 		return <></>;
 	}
 
