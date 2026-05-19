@@ -145,8 +145,6 @@ export function ScheduleCreateModal(props: {
 		selectedWeek,
 	]);
 
-	console.debug("lessons", lessons);
-
 	function handleSubmit() {
 		if (
 			!selectedClassroomId ||
@@ -157,17 +155,22 @@ export function ScheduleCreateModal(props: {
 			return;
 		}
 
+		console.log("timetable", lessons);
+
 		resolveScheduleCreate(
 			scheduleHub?.createSchedule({
 				classroomId: selectedClassroomId,
 				subjectName: selectedSubject,
-				generatorSlots: Array.from(
-					mapKVPs(
-						occurances,
-						(v, k) =>
-							({ offset: k, maxParticipants: v }) as ScheduleGeneratorSlot,
-					).values(),
-				),
+				generator: {
+					slots: Array.from(
+						mapKVPs(
+							occurances,
+							(v, k) =>
+								({ offset: k, maxParticipants: v }) as ScheduleGeneratorSlot,
+						).values(),
+					),
+					blacklistedDays: [],
+				},
 				description: descriptionRef.current?.value,
 				startDate: new Date(startDate),
 				lockInOffset:

@@ -7,6 +7,7 @@ import { Routes } from "react-router-dom";
 import { useIsTeacher } from "../../../hooks/zustand";
 import { ScheduleCreateModal } from "../../teacher/schedule-create/ScheduleCreateModal";
 import { AppShellSpine } from "./AppShellSpine";
+import { TemporaryCreateModal } from "../../teacher/schedule-create/TemporaryCreateModal";
 
 export function DefaultAppShell(props: {
 	children: ReactNode;
@@ -23,7 +24,7 @@ export function DefaultAppShell(props: {
 			</AppShellSpine>
 			{isTeacher && (
 				<>
-					<ScheduleCreateModal opened={modalOpen} close={close} />
+					<TemporaryCreateModal opened={modalOpen} close={close} />
 					<Group onClick={open}>
 						<Button
 							leftSection={<IconPlus />}

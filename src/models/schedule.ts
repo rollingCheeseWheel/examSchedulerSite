@@ -41,12 +41,17 @@ export interface ExamSlot {
 }
 
 export interface ScheduleCreateRequest {
-	subjectName: string;
 	classroomId: ClassroomId;
+	subjectName: string;
+	description?: string;
 	startDate: Date;
 	lockInOffset: TimeSpan;
-	generatorSlots: ScheduleGeneratorSlot[];
-	description?: string;
+	generator: ScheduleGenerator;
+}
+
+export interface ScheduleGenerator {
+	slots: ScheduleGeneratorSlot[];
+	blacklistedDays: DateString[];
 }
 
 export interface ScheduleGeneratorSlot {
