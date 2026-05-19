@@ -170,7 +170,7 @@ function createConnection(hubUrl: string) {
 		.withUrl(hubUrl, {
 			withCredentials: true,
 		})
-		.configureLogging(LogLevel.Debug)
+		.configureLogging(LogLevel.Error)
 		.withAutomaticReconnect()
 		.build();
 }

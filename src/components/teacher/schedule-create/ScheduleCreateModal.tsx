@@ -145,6 +145,8 @@ export function ScheduleCreateModal(props: {
 		selectedWeek,
 	]);
 
+	console.debug("lessons", lessons);
+
 	function handleSubmit() {
 		if (
 			!selectedClassroomId ||

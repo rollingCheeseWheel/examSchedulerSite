@@ -39,37 +39,41 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 		() =>
 			initSignalR({
 				onReceiveInitialSchedules(schedules) {
-					for (const schedule of schedules) {
-						setSchedule(schedule);
-					}
+					console.debug("schedules", schedules);
+					setSchedule(...schedules);
 				},
 				onUpdateSchedule(scheduleId, schedule) {
-					for (const iterSchedule of [
+					console.debug("schedules", [
 						...schedulesAsArray.filter((s) => s.id !== scheduleId),
 						schedule,
-					]) {
-						setSchedule(iterSchedule);
-					}
+					]);
+					setSchedule(
+						...schedulesAsArray.filter((s) => s.id !== scheduleId),
+						schedule,
+					);
 				},
 				onRemoveSchedule(scheduleId) {
-					for (const schedule of schedulesAsArray.filter(
-						(s) => s.id !== scheduleId,
-					)) {
-						setSchedule(schedule);
-					}
+					console.debug(
+						"schedules",
+						schedulesAsArray.filter((s) => s.id !== scheduleId),
+					);
+					setSchedule(...schedulesAsArray.filter((s) => s.id !== scheduleId));
 				},
 				onReceiveInitialClassrooms(classrooms) {
-					for (const classroom of classrooms) {
-						setClassroom(classroom);
-					}
+					console.debug("classrooms", classrooms);
+					setClassroom(...classrooms);
 				},
 				onUpdateClassroom(classroom) {
-					for (const iterClassroom of [
+					console.debug("classrooms", [
 						...classroomsAsArray.filter((c) => c.id !== classroom.id),
 						classroom,
-					]) {
-						setClassroom(iterClassroom);
-					}
+					]);
+					setClassroom(
+						...[
+							...classroomsAsArray.filter((c) => c.id !== classroom.id),
+							classroom,
+						],
+					);
 				},
 			}),
 		[
