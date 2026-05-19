@@ -166,7 +166,7 @@ export function ScheduleCreateModal(props: {
 						mapKVPs(
 							occurances,
 							(v, k) =>
-								({ offset: k, maxParticipants: v }) as ScheduleGeneratorSlot,
+								({ dayOfWeek: k, maxParticipants: v }) as ScheduleGeneratorSlot,
 						).values(),
 					),
 					blacklistedDays: [],

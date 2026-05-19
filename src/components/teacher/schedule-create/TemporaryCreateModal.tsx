@@ -57,11 +57,11 @@ export function TemporaryCreateModal(props: {
 		generator: {
 			slots: [{
 				maxParticipants: 6,
-				offset: 0,
+				dayOfWeek: 2,
 			},
 			{
 				maxParticipants: 7,
-				offset: 1,
+				dayOfWeek: 3,
 			},],
 			blacklistedDays: []
 		},

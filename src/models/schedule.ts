@@ -55,6 +55,6 @@ export interface ScheduleGenerator {
 }
 
 export interface ScheduleGeneratorSlot {
-	offset: DayOfWeek;
+	dayOfWeek: DayOfWeek;
 	maxParticipants: Maximum;
 }
