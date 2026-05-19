@@ -7,6 +7,5 @@ export type ClassroomName = BrandedString<"classroomname">;
 export interface Classroom {
 	id: ClassroomId;
 	name: ClassroomName;
-	studentCount: number;
 	teachers: TeacherWithSubjects[];
 }

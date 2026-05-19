@@ -161,7 +161,6 @@ export const auditLogSorter = compoundSort<AuditLog>(
 
 export const classroomSorter = compoundSort<Classroom>(
 	sort((x) => x.name),
-	sort((x) => x.studentCount),
 	sort((x) => x.id),
 );
 
