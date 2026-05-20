@@ -10,7 +10,21 @@ export type LessonName = BrandedString<"lessonname">;
 export type FromHour = Brand<number, "fromhour">;
 export type ToHour = Brand<number, "tohour">;
 
-export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+export type DayOfWeek =
+	| 0
+	| 1
+	| 2
+	| 3
+	| 4
+	| 5
+	| 6
+	| "Monday"
+	| "Tuesday"
+	| "Wednesday"
+	| "Thursday"
+	| "Friday"
+	| "Saturday"
+	| "Sunday";
 
 export interface Lesson {
 	id: LessonId;
@@ -23,11 +37,11 @@ export interface Lesson {
 }
 
 export interface TeacherOnly {
-	name: TeacherName
+	name: TeacherName;
 }
 
 export interface TeacherWithSubjects extends TeacherOnly {
-	subjects: Subject[]
+	subjects: Subject[];
 }
 
 export interface Subject {

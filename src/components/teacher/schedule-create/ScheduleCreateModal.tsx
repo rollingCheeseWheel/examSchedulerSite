@@ -172,7 +172,7 @@ export function ScheduleCreateModal(props: {
 					blacklistedDays: [],
 				},
 				description: descriptionRef.current?.value,
-				startDate: new Date(startDate),
+				startDate: startDate, // BUG need to fix, ensure its in yyyy-MM-dd format
 				lockInOffset:
 					!lockinOffset || isNaN(new Date(lockinOffset).getTime()) ?
 						new Date(0)

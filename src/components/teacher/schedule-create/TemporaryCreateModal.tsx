@@ -25,6 +25,7 @@ export function TemporaryCreateModal(props: {
 	const userProfile = useUserProfile((s) => s.data);
 	const { resolve, abort } = useLoadingPromise({
 		onLoading: setLoadingOverlayState,
+		onError: console.error,
 	});
 	const fetchTimeTable = useCalendar();
 
@@ -55,19 +56,21 @@ export function TemporaryCreateModal(props: {
 	const request: ScheduleCreateRequest = {
 		classroomId: selectedClassroomId ?? "",
 		generator: {
-			slots: [{
-				maxParticipants: 6,
-				dayOfWeek: 2,
-			},
-			{
-				maxParticipants: 7,
-				dayOfWeek: 3,
-			},],
-			blacklistedDays: []
+			slots: [
+				{
+					maxParticipants: 6,
+					dayOfWeek: 2,
+				},
+				{
+					maxParticipants: 7,
+					dayOfWeek: 3,
+				},
+			],
+			blacklistedDays: [],
 		},
 		subjectName: selectedSubject,
 		description: "Anlagenbuchhaltung",
-		startDate: new Date(2026, 4, 19),
+		startDate: "2026-05-19",
 		lockInOffset: new Date(0),
 	};
 
@@ -122,7 +125,15 @@ export function TemporaryCreateModal(props: {
 					onClick={() => {
 						console.log("sent request", connection);
 						resolve(connection?.createSchedule(request), {
-							onSuccess: (res) => console.log("create schedule result", res),
+							onSuccess: (res) => {
+								if (res.data)
+								{
+									console.log("successfully created schedule");
+									props.close();
+								} else {
+									console.error("failed to create schedule");
+								}
+							},
 						});
 					}}>
 					{t("submit")}
