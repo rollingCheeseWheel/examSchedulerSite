@@ -35,6 +35,7 @@ export interface ScheduleHub {
 	deleteSwapRequest: Func<[SwapRequestId], Promise<Result<boolean>>>;
 
 	createSchedule: Func<[ScheduleCreateRequest], Promise<Result<boolean>>>;
+	deleteSchedule: Func<[ScheduleId], Promise<Result<boolean>>>;
 	reportStudents: Func<[ExamSlotId, UserProfileId[]], Promise<Result<boolean>>>;
 
 	connect: Func<[], Promise<void>>;
@@ -66,6 +67,14 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 							connectionRef.current?.invoke<Result<boolean>>(
 								"CreateSchedule",
 								request,
+							) ?? Promise.reject(new Error("Connection not initialized"))
+						);
+					},
+					deleteSchedule(scheduleId) {
+						return (
+							connectionRef.current?.invoke<Result<boolean>>(
+								"DeleteSchedule",
+								scheduleId,
 							) ?? Promise.reject(new Error("Connection not initialized"))
 						);
 					},
@@ -120,13 +129,19 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 				if (handlersRef.current) {
 					Object.entries(handlersRef.current).forEach(
 						([eventName, handler]) => {
-							connectionRef.current?.off(eventName.toLowerCase().replace(/^on/, ""), handler);
+							connectionRef.current?.off(
+								eventName.toLowerCase().replace(/^on/, ""),
+								handler,
+							);
 						},
 					);
 				}
 
 				Object.entries(handlers).forEach(([eventName, handler]) => {
-					connectionRef.current?.on(eventName.toLowerCase().replace(/^on/, ""), handler);
+					connectionRef.current?.on(
+						eventName.toLowerCase().replace(/^on/, ""),
+						handler,
+					);
 				});
 
 				handlersRef.current = handlers;
@@ -170,7 +185,7 @@ function createConnection(hubUrl: string) {
 		.withUrl(hubUrl, {
 			withCredentials: true,
 		})
-		.configureLogging(LogLevel.Trace)
+		.configureLogging(LogLevel.Warning)
 		.withAutomaticReconnect()
 		.build();
 }

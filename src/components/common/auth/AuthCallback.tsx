@@ -1,8 +1,8 @@
 import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { endpoints } from "../../../endpoints";
+import { useIsLoggedIn } from "../../../hooks/useIsLoggedIn";
 import { useLoadingPromise } from "../../../hooks/useLoadingPromise";
-import { useLocalStorage } from "../../../hooks/useLocalStorage";
 import { useSignalRInit } from "../../../hooks/useSignalR";
 import {
 	useClassrooms,
@@ -12,18 +12,15 @@ import {
 } from "../../../hooks/zustand";
 import {
 	api,
-	setTokenDuration,
-	tokenExpirationInMillisecondsLocalStorageKey,
+	setTokenDuration
 } from "../../../main";
-import { type DateString, type DateNumber } from "../../../models/brand";
+import { type DateString } from "../../../models/brand";
 import type { Result } from "../../../models/result";
 import type { UserProfile } from "../../../models/user";
 
 export function AuthCallback({ disabled }: { disabled?: boolean }) {
 	const setLoadingOverlay = useLoadingOverlay((s) => s.setState);
-	const [sessionEnd, setSessionEnd] = useLocalStorage<DateNumber>(
-		tokenExpirationInMillisecondsLocalStorageKey,
-	);
+	const [isLoggedIn, setSessionEnd] = useIsLoggedIn();
 	const navigate = useNavigate();
 	const { resolve } = useLoadingPromise({
 		onLoading: setLoadingOverlay,
@@ -94,7 +91,7 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 		const authCode = queryParams.get("code");
 		const schoolId = queryParams.get("school_id");
 
-		if (sessionEnd && sessionEnd >= Date.now() && !authCode && !schoolId) {
+		if (isLoggedIn && !authCode && !schoolId) {
 			resolve(
 				api<Result<UserProfile>>(endpoints.auth.me, {
 					method: "GET",

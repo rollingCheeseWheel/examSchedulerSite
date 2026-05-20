@@ -1,23 +1,22 @@
 import { Button } from "@mantine/core";
 import { IconLogout2 } from "@tabler/icons-react";
+import { useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import {
-	useLoadingOverlay,
-	useHubConnection,
-} from "../../../hooks/zustand";
-import { useLoadingPromise } from "../../../hooks/useLoadingPromise";
 import { useNavigate } from "react-router-dom";
 import { endpoints } from "../../../endpoints";
-import { api, tokenExpirationInMillisecondsLocalStorageKey } from "../../../main";
-import { useCallback, useEffect } from "react";
-import { useLocalStorage } from "../../../hooks/useLocalStorage";
-import type { DateNumber } from "../../../models/brand";
+import { useIsLoggedIn } from "../../../hooks/useIsLoggedIn";
+import { useLoadingPromise } from "../../../hooks/useLoadingPromise";
+import {
+	useHubConnection,
+	useLoadingOverlay,
+} from "../../../hooks/zustand";
+import { api } from "../../../main";
 
 export function LogoutButton() {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const signalr = useHubConnection((s) => s.data);
-	const [sessionEnd, setSessionEnd] = useLocalStorage<DateNumber>(tokenExpirationInMillisecondsLocalStorageKey);
+	const [isLoggedIn, setSessionEnd] = useIsLoggedIn();
 	const setLoadingOverlay = useLoadingOverlay((s) => s.setState);
 	const { resolve, abort } = useLoadingPromise({
 		onLoading: setLoadingOverlay,
@@ -42,7 +41,7 @@ export function LogoutButton() {
 		[navigate, resolve, setSessionEnd, signalr],
 	);
 
-	if (!sessionEnd || sessionEnd < Date.now()) {
+	if (!isLoggedIn) {
 		return <></>;
 	}
 

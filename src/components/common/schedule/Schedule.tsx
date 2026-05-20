@@ -1,4 +1,5 @@
 import {
+	ActionIcon,
 	Box,
 	Button,
 	Center,
@@ -7,6 +8,7 @@ import {
 	Flex,
 	Grid,
 	Group,
+	HoverCard,
 	Kbd,
 	Notification,
 	Paper,
@@ -20,6 +22,7 @@ import {
 	IconCheck,
 	IconChevronRight,
 	IconReplaceUser,
+	IconTrashFilled,
 	IconX,
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
@@ -39,27 +42,37 @@ import type { UserProfile } from "../../../models/user";
 import { formatDateTime, sleep, type Action } from "../../../util";
 import { ReportStudentModal } from "../../teacher/report-actual-students/StudentReportModal";
 import { ScheduleProgress } from "./ExtendedProgessbar";
+import { notifications } from "@mantine/notifications";
 
 export function ExamSchedule(props: {
 	schedule: Schedule;
 	selectedSlotId?: ExamSlotId;
 	maxwidth?: StyleProp<string | number>;
 }) {
-	const hubConnection = useHubConnection((s) => s.data);
+	const { t } = useTranslation();
+	const connection = useHubConnection((s) => s.data);
 	const { resolve } = usePromise<Result<boolean>>({
-		onLoading: useLoadingOverlay().setState,
+		onLoading: useLoadingOverlay((s) => s.setState),
+		onError: [
+			() =>
+				notifications.show({
+					message: t("common.error"),
+				}),
+			console.error,
+		],
+		onSuccess: () =>
+			notifications.show({
+				message: t("common.success"),
+			}),
 	});
 
-	const joinSlot = (id: ExamSlotId) =>
-		resolve(hubConnection?.registerForSlot(id) ?? sleep(250));
+	const joinSlot = (id: ExamSlotId) => resolve(connection?.registerForSlot(id));
 	const createSwapRequest = (id: ExamSlotId) =>
-		resolve(
-			hubConnection?.createSwapRequest(props.schedule.id, id) ?? sleep(250),
-		);
+		resolve(connection?.createSwapRequest(props.schedule.id, id));
 	const acceptSwapRequest = (id: SwapRequestId) =>
-		resolve(hubConnection?.acceptSwapRequest(id) ?? sleep(250));
+		resolve(connection?.acceptSwapRequest(id));
 	const deleteSwapRequest = (id: SwapRequestId) =>
-		resolve(hubConnection?.deleteSwapRequest(id) ?? sleep(250));
+		resolve(connection?.deleteSwapRequest(id));
 
 	return (
 		<Paper
@@ -70,9 +83,24 @@ export function ExamSchedule(props: {
 			id={props.schedule.id}>
 			<Box pos="relative" p="md">
 				<Group justify="space-between">
-					<Title order={2}>{props.schedule.subject.name}</Title>
-					{props.schedule.description && (
-						<Text ta="right">{props.schedule.description}</Text>
+					<Stack>
+						<Title order={2}>{props.schedule.subject.name}</Title>
+						{props.schedule.description && (
+							<Text ta="right">{props.schedule.description}</Text>
+						)}
+					</Stack>
+					{useIsTeacher() && (
+						<HoverCard>
+							<HoverCard.Target>
+								<ActionIcon
+									onClick={() => {
+										resolve(connection?.deleteSchedule(props.schedule.id));
+									}}>
+									<IconTrashFilled />
+								</ActionIcon>
+							</HoverCard.Target>
+							<HoverCard.Dropdown>{t("schedule.delete")}</HoverCard.Dropdown>
+						</HoverCard>
 					)}
 				</Group>
 

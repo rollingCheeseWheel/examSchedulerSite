@@ -13,5 +13,8 @@
             "classroomselect": "MISSING",
             "submit": "Erstellen"
         }
+    },
+    "schedules": {
+        "empty": "Keine Prüfungspläne vorhanden"
     }
 }

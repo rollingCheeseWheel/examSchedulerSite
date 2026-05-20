@@ -46,8 +46,7 @@ export function ScheduleProgress(props: ExtendedProgressbarProps) {
 	return (
 		<Tooltip
 			label={t("schedule.progess.tooltip", {
-				// {{curr}} out of {{max}} - {{min}} needed
-				min: min,
+				// {{curr}} out of {{max}}
 				max: max,
 				curr: curr,
 			})}>

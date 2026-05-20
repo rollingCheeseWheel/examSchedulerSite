@@ -13,5 +13,8 @@
             "classroomselect": "MISSING",
             "submit": "Create"
         }
+    },
+    "schedules": {
+        "empty": "No exam schedules available"
     }
 }

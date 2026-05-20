@@ -14,7 +14,8 @@ import {
 import { useLoadingPromise } from "../../../hooks/useLoadingPromise";
 import { useCalendar } from "../../../hooks/useCalendar";
 import type { ClassroomId } from "../../../models/classroom";
-import type { ScheduleCreateRequest } from "../../../models/schedule";
+import type { ExamSlotId, ScheduleCreateRequest } from "../../../models/schedule";
+import { notifications } from "@mantine/notifications";
 
 export function TemporaryCreateModal(props: {
 	opened: boolean;
@@ -126,17 +127,29 @@ export function TemporaryCreateModal(props: {
 						console.log("sent request", connection);
 						resolve(connection?.createSchedule(request), {
 							onSuccess: (res) => {
-								if (res.data)
-								{
-									console.log("successfully created schedule");
+								if (res.data) {
+									notifications.show({
+										message: t("schedule.create.success"),
+									});
 									props.close();
 								} else {
-									console.error("failed to create schedule");
+									notifications.show({
+										message: t("schedule.create.fail"),
+									});
 								}
 							},
 						});
 					}}>
 					{t("submit")}
+				</Button>
+				<Button
+					onClick={() =>
+						resolve(connection?.registerForSlot((selectedClassroomId ?? "") as ExamSlotId), {
+							onSuccess: console.log,
+							onError: console.log,
+						})
+					}>
+					test
 				</Button>
 			</Stack>
 		</Modal>

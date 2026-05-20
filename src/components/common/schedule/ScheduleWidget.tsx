@@ -15,7 +15,7 @@ export function ScheduleWidget(props: ScheduleWidgetProps) {
 	if (schedules.length == 0) {
 		return (
 			<Center>
-				<Title>{t("schedules.empty")}</Title>
+				<Title>{t("schedule.empty")}</Title>
 			</Center>
 		);
 	}
