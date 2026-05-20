@@ -24,6 +24,7 @@ export function ScheduleWidget(props: ScheduleWidgetProps) {
 		<Grid grow gutter={0}>
 			{...schedules.map((schedule) => (
 				<ExamSchedule
+					key={schedule.id}
 					schedule={schedule}
 					selectedSlotId={
 						schedule.examSlots.find((slot) =>

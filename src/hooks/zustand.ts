@@ -72,17 +72,14 @@ function createMapStore<K, V>(
 		hasChanged: false,
 		keySelector,
 		set(...data) {
-			set((prev) => {
-				const temp = new Map(prev.asMap);
-				for (const instance of data) {
-					temp.set(keySelector(instance), process(instance));
-				}
-
-				return {
-					asMap: temp,
-					asArray: Array.from(temp.values()),
-					hasChanged: true,
-				};
+			const temp = new Map(get().asMap);
+			for (const instance of data) {
+				temp.set(keySelector(instance), process(instance));
+			}
+			set({
+				asMap: temp,
+				asArray: Array.from(temp.values()),
+				hasChanged: true,
 			});
 		},
 		get(key) {

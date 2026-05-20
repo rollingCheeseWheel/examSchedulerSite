@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Action } from "../util";
 
-export class LocalStorageEvent extends CustomEvent<{ key: string }> {}
+class LocalStorageEvent extends CustomEvent<{ key: string }> {}
 const localStorageEventName = "local-storage";
 
 declare global {
