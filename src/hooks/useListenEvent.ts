@@ -6,14 +6,25 @@
 	}
 */
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Action } from "../util";
 
 export function useListenEvent<K extends keyof WindowEventMap>(
 	eventName: K,
 	listener?: Action<[WindowEventMap[K]]>,
 ) {
-	const [increment, setIncrement] = useState(0);
+	const [_, setIncrement] = useState(0);
+
+	const emit = useCallback(
+		(event?: WindowEventMap[K]) => {
+			if (!event) {
+				window.dispatchEvent(new CustomEvent(eventName));
+			} else {
+				window.dispatchEvent(event);
+			}
+		},
+		[eventName],
+	);
 
 	useEffect(() => {
 		function handler() {
@@ -33,5 +44,5 @@ export function useListenEvent<K extends keyof WindowEventMap>(
 		};
 	}, [eventName, listener]);
 
-	return increment;
+	return emit;
 }

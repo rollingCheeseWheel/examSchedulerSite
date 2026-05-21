@@ -5,15 +5,13 @@ import { useIsLoggedIn } from "../../../hooks/useIsLoggedIn";
 import { useLoadingPromise } from "../../../hooks/useLoadingPromise";
 import { useSignalRInit } from "../../../hooks/useSignalR";
 import {
-	useClassrooms,
-	useLoadingOverlay,
-	useSchedules,
-	useUserProfile,
+    useClassrooms,
+    useHubConnection,
+    useLoadingOverlay,
+    useSchedules,
+    useUserProfile,
 } from "../../../hooks/zustand";
-import {
-	api,
-	setTokenDuration
-} from "../../../main";
+import { api, setTokenDuration } from "../../../main";
 import { type DateString } from "../../../models/brand";
 import type { Result } from "../../../models/result";
 import type { UserProfile } from "../../../models/user";
@@ -28,8 +26,10 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 			navigate({ pathname: "/auth", search: "" }, { replace: true }),
 	});
 	const initSignalR = useSignalRInit();
-	const { asArray: schedulesAsArray, set: setSchedule } = useSchedules();
-	const { asArray: classroomsAsArray, set: setClassroom } = useClassrooms();
+	const connection = useHubConnection(s => s.data);
+	const setSchedule = useSchedules((s) => s.set);
+	const removeSchedule = useSchedules((s) => s.removeKey);
+	const setClassroom = useClassrooms((s) => s.set);
 	const setUserProfile = useUserProfile((s) => s.setData);
 
 	const boundSignalRInit = useCallback(
@@ -39,46 +39,32 @@ export function AuthCallback({ disabled }: { disabled?: boolean }) {
 					console.debug("schedules", schedules);
 					setSchedule(...schedules);
 				},
-				onUpdateSchedule(scheduleId, schedule) {
-					console.debug("schedules", [
-						...schedulesAsArray.filter((s) => s.id !== scheduleId),
-						schedule,
-					]);
-					setSchedule(
-						...schedulesAsArray.filter((s) => s.id !== scheduleId),
-						schedule,
-					);
+				onScheduleCreated(scheduleId) {
+					console.debug("schedule created", scheduleId)
+					resolve(connection?.subscribeSchedule(scheduleId) ?? Promise.reject(new Error("connection not initialized")));
+				},
+				onUpdateSchedule(schedule) {
+					console.debug("schedule update", schedule);
+					setSchedule(schedule);
 				},
 				onRemoveSchedule(scheduleId) {
-					console.debug(
-						"schedules",
-						schedulesAsArray.filter((s) => s.id !== scheduleId),
-					);
-					setSchedule(...schedulesAsArray.filter((s) => s.id !== scheduleId));
+					console.debug("removing schedule", scheduleId);
+					removeSchedule(scheduleId);
 				},
 				onReceiveInitialClassrooms(classrooms) {
 					console.debug("classrooms", classrooms);
 					setClassroom(...classrooms);
 				},
 				onUpdateClassroom(classroom) {
-					console.debug("classrooms", [
-						...classroomsAsArray.filter((c) => c.id !== classroom.id),
-						classroom,
-					]);
-					setClassroom(
-						...[
-							...classroomsAsArray.filter((c) => c.id !== classroom.id),
-							classroom,
-						],
-					);
+					console.debug("classroom updated", classroom);
+					setClassroom(classroom);
 				},
 			}),
 		[
-			classroomsAsArray,
 			initSignalR,
-			schedulesAsArray,
 			setClassroom,
 			setSchedule,
+			connection
 		],
 	);
 

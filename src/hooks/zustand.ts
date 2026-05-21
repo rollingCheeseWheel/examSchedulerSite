@@ -1,12 +1,9 @@
 import { create } from "zustand";
-import type { Lesson, SubjectName } from "../models/calendar";
 import type { Classroom, ClassroomId } from "../models/classroom";
 import type { Schedule, ScheduleId } from "../models/schedule";
-import type { Username, UserProfile } from "../models/user";
+import type { UserProfile } from "../models/user";
 import {
-	equals,
 	examSlotSorter,
-	lessonSorter,
 	swapRequestSorter,
 	userProfileSorter,
 	type Action,
@@ -55,6 +52,8 @@ interface MapStore<K, V> {
 	get: Func<[K], V | undefined>;
 	reset: Action<[]>;
 	clear: Action<[]>;
+	removeKey: Action<[K]>;
+	remove: Action<[V]>;
 }
 
 function createMapStore<K, V>(
@@ -85,7 +84,6 @@ function createMapStore<K, V>(
 		get(key) {
 			return get().asMap.get(key);
 		},
-
 		clear() {
 			set({
 				hasChanged: true,
@@ -95,6 +93,19 @@ function createMapStore<K, V>(
 		},
 		reset() {
 			set({ hasChanged: true, asMap: new Map(), asArray: [] });
+		},
+		removeKey(key) {
+			var temp = new Map(get().asMap);
+			temp.delete(key);
+			set({
+				hasChanged: true,
+				asMap: temp,
+				asArray: Array.from(temp.values()),
+			});
+		},
+		remove(value) {
+			var key = keySelector(value);
+			get().removeKey(key);
 		},
 	}));
 }

@@ -1,48 +1,48 @@
 import {
-	ActionIcon,
-	Box,
-	Button,
-	Center,
-	Collapse,
-	Divider,
-	Flex,
-	Grid,
-	Group,
-	HoverCard,
-	Kbd,
-	Notification,
-	Paper,
-	Stack,
-	Text,
-	Title,
-	type StyleProp,
+    ActionIcon,
+    Box,
+    Button,
+    Center,
+    Collapse,
+    Divider,
+    Flex,
+    Grid,
+    Group,
+    HoverCard,
+    Kbd,
+    Notification,
+    Paper,
+    Stack,
+    Text,
+    Title,
+    type StyleProp,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import {
-	IconCheck,
-	IconChevronRight,
-	IconReplaceUser,
-	IconTrashFilled,
-	IconX,
+    IconCheck,
+    IconChevronRight,
+    IconReplaceUser,
+    IconTrashFilled,
+    IconX,
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { useIgnoredSwapRequests } from "../../../hooks/useIgnoredSwapRequests";
 import { usePromise } from "../../../hooks/usePromise";
 import { useToggle } from "../../../hooks/useToggle";
 import {
-	useIsTeacher,
-	useLoadingOverlay,
-	useHubConnection,
-	useUserProfile,
+    useHubConnection,
+    useIsTeacher,
+    useLoadingOverlay,
+    useUserProfile,
 } from "../../../hooks/zustand";
 import type { Result } from "../../../models/result";
 import type { ExamSlot, ExamSlotId, Schedule } from "../../../models/schedule";
 import type { SwapRequest, SwapRequestId } from "../../../models/swapRequest";
 import type { UserProfile } from "../../../models/user";
-import { formatDateTime, sleep, type Action } from "../../../util";
+import { formatDateTime, type Action } from "../../../util";
 import { ReportStudentModal } from "../../teacher/report-actual-students/StudentReportModal";
 import { ScheduleProgress } from "./ExtendedProgessbar";
-import { notifications } from "@mantine/notifications";
 
 export function ExamSchedule(props: {
 	schedule: Schedule;

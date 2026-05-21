@@ -1,7 +1,7 @@
 import { Center, Grid, Title, type StyleProp } from "@mantine/core";
+import { useTranslation } from "react-i18next";
 import { useSchedules, useUserProfile } from "../../../hooks/zustand";
 import { ExamSchedule } from "./Schedule";
-import { useTranslation } from "react-i18next";
 
 interface ScheduleWidgetProps {
 	maxwidth?: StyleProp<string | number>;

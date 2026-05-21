@@ -124,7 +124,6 @@ export function TemporaryCreateModal(props: {
 				<CodeHighlight code={JSON.stringify(request, null, 2)} lang="json" />
 				<Button
 					onClick={() => {
-						console.log("sent request", connection);
 						resolve(connection?.createSchedule(request), {
 							onSuccess: (res) => {
 								if (res.data) {

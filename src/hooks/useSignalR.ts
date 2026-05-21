@@ -20,7 +20,8 @@ import { useHubConnection } from "./zustand";
 
 export interface ScheduleClient {
 	onReceiveInitialSchedules: Action<[Schedule[]]>;
-	onUpdateSchedule: Action<[ScheduleId, Schedule]>;
+	onScheduleCreated: Action<[ScheduleId]>;
+	onUpdateSchedule: Action<[Schedule]>;
 	onRemoveSchedule: Action<[ScheduleId]>;
 
 	onReceiveInitialClassrooms: Action<[Classroom[]]>;
@@ -35,6 +36,7 @@ export interface ScheduleHub {
 	deleteSwapRequest: Func<[SwapRequestId], Promise<Result<boolean>>>;
 
 	createSchedule: Func<[ScheduleCreateRequest], Promise<Result<boolean>>>;
+	subscribeSchedule: Func<[ScheduleId], Promise<Result<boolean>>>;
 	deleteSchedule: Func<[ScheduleId], Promise<Result<boolean>>>;
 	reportStudents: Func<[ExamSlotId, UserProfileId[]], Promise<Result<boolean>>>;
 
@@ -46,6 +48,26 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 	const { data: connection, setData: setConnection } = useHubConnection();
 	const handlersRef = useRef<ScheduleClient>(undefined);
 	const connectionRef = useRef<HubConnection>(undefined);
+
+	const updateHandlers = useCallback((handlers: ScheduleClient) => {
+		if (handlersRef.current) {
+			Object.entries(handlersRef.current).forEach(([eventName, handler]) => {
+				connectionRef.current?.off(
+					eventName.toLowerCase().replace(/^on/, ""),
+					handler,
+				);
+			});
+		}
+
+		Object.entries(handlers).forEach(([eventName, handler]) => {
+			connectionRef.current?.on(
+				eventName.toLowerCase().replace(/^on/, ""),
+				handler,
+			);
+		});
+
+		handlersRef.current = handlers;
+	}, []);
 
 	const init = useCallback(
 		async (handlers: ScheduleClient) => {
@@ -84,6 +106,14 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 								"CreateSwapRequest",
 								scheduleId,
 								userId,
+							) ?? Promise.reject(new Error("Connection not initialized"))
+						);
+					},
+					subscribeSchedule(scheduleId) {
+						return (
+							connectionRef.current?.invoke<Result<boolean>>(
+								"SubscribeSchedule",
+								scheduleId,
 							) ?? Promise.reject(new Error("Connection not initialized"))
 						);
 					},
@@ -126,42 +156,13 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 					},
 				};
 
-				if (handlersRef.current) {
-					Object.entries(handlersRef.current).forEach(
-						([eventName, handler]) => {
-							connectionRef.current?.off(
-								eventName.toLowerCase().replace(/^on/, ""),
-								handler,
-							);
-						},
-					);
-				}
+				updateHandlers(handlers);
 
-				Object.entries(handlers).forEach(([eventName, handler]) => {
-					connectionRef.current?.on(
-						eventName.toLowerCase().replace(/^on/, ""),
-						handler,
-					);
-				});
-
-				handlersRef.current = handlers;
 				await connectionRef.current.start();
 
 				setConnection(conn);
 			} else {
-				if (handlersRef.current) {
-					Object.entries(handlersRef.current).forEach(
-						([eventName, handler]) => {
-							connectionRef.current?.off(eventName, handler);
-						},
-					);
-				}
-
-				Object.entries(handlers).forEach(([eventName, handler]) => {
-					connectionRef.current?.on(eventName, handler);
-				});
-
-				handlersRef.current = handlers;
+				updateHandlers(handlers);
 			}
 		},
 		[hubUrl, connection, setConnection],
@@ -171,7 +172,10 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 		return () => {
 			if (!connection || !handlersRef.current) return;
 			Object.entries(handlersRef.current).forEach(([eventName, handler]) => {
-				connectionRef.current?.off(eventName, handler);
+				connectionRef.current?.off(
+					eventName.toLowerCase().replace(/^on/, ""),
+					handler,
+				);
 			});
 			handlersRef.current = undefined;
 		};
