@@ -70,7 +70,7 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 	}, []);
 
 	const init = useCallback(
-		async (handlers: ScheduleClient) => {
+		(handlers: ScheduleClient) => {
 			let conn = connection;
 
 			if (!connection) {
@@ -157,15 +157,12 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 				};
 
 				updateHandlers(handlers);
-
-				await connectionRef.current.start();
-
 				setConnection(conn);
 			} else {
 				updateHandlers(handlers);
 			}
 		},
-		[hubUrl, connection, setConnection],
+		[connection, hubUrl, updateHandlers, setConnection],
 	);
 
 	useEffect(() => {

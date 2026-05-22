@@ -95,7 +95,7 @@ function createMapStore<K, V>(
 			set({ hasChanged: true, asMap: new Map(), asArray: [] });
 		},
 		removeKey(key) {
-			var temp = new Map(get().asMap);
+			const temp = new Map(get().asMap);
 			temp.delete(key);
 			set({
 				hasChanged: true,
@@ -104,7 +104,7 @@ function createMapStore<K, V>(
 			});
 		},
 		remove(value) {
-			var key = keySelector(value);
+			const key = keySelector(value);
 			get().removeKey(key);
 		},
 	}));

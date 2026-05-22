@@ -3,5 +3,13 @@
 	"experimentalTernaries": true,
 	"quoteProps": "consistent",
 	"tabWidth": 2,
-	"useTabs": true
+	"useTabs": true,
+	"arrowParens": "always",
+	"bracketSpacing": true,
+	"checkIgnorePragma": true,
+	"experimentalOperatorPosition": "end",
+	"jsxSingleQuote": false,
+	"semi": true,
+	"singleQuote": false,
+	"trailingComma": "all"
 }

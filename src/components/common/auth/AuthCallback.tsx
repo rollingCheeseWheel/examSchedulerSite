@@ -17,62 +17,65 @@ import type { Result } from "../../../models/result";
 import type { UserProfile } from "../../../models/user";
 
 export function AuthCallback() {
-	const setLoadingOverlay = useLoadingOverlay((s) => s.setState);
 	const [isLoggedIn, setSessionEnd] = useIsLoggedIn();
 	const navigate = useNavigate();
 	const { resolve } = useLoadingPromise({
-		onLoading: setLoadingOverlay,
-		onError: () =>
-			navigate({ pathname: "/auth", search: "" }, { replace: true }),
+		onLoading: useLoadingOverlay((s) => s.setState),
+		onError: () => {
+			setSessionEnd(0);
+			navigate({ pathname: "/auth", search: "" }, { replace: true });
+		},
+		onSuccess: () => navigate({ pathname: "/", search: "" }, { replace: true }),
 	});
 	const initSignalR = useSignalRInit();
 	const connection = useHubConnection((s) => s.data);
+
 	const setSchedule = useSchedules((s) => s.set);
 	const removeSchedule = useSchedules((s) => s.removeKey);
 	const setClassroom = useClassrooms((s) => s.set);
+
 	const setUserProfile = useUserProfile((s) => s.setData);
 	const userprofileHasChanged = useUserProfile((s) => s.hasChanged);
 
-	const boundSignalRInit = useCallback(
-		() =>
-			initSignalR({
-				onReceiveInitialSchedules(schedules) {
-					console.debug("schedules", schedules);
-					setSchedule(...schedules);
-				},
-				onScheduleCreated(scheduleId) {
-					console.debug("schedule created", scheduleId);
-					resolve(
-						connection?.subscribeSchedule(scheduleId) ??
-							Promise.reject(new Error("connection not initialized")),
-					);
-				},
-				onUpdateSchedule(schedule) {
-					console.debug("schedule update", schedule);
-					setSchedule(schedule);
-				},
-				onRemoveSchedule(scheduleId) {
-					console.debug("removing schedule", scheduleId);
-					removeSchedule(scheduleId);
-				},
-				onReceiveInitialClassrooms(classrooms) {
-					console.debug("classrooms", classrooms);
-					setClassroom(...classrooms);
-				},
-				onUpdateClassroom(classroom) {
-					console.debug("classroom updated", classroom);
-					setClassroom(classroom);
-				},
-			}),
-		[
-			initSignalR,
-			setSchedule,
-			resolve,
-			connection,
-			removeSchedule,
-			setClassroom,
-		],
-	);
+	useEffect(() => {
+		initSignalR({
+			onReceiveInitialSchedules(schedules) {
+				console.debug("schedules", schedules);
+				setSchedule(...schedules);
+			},
+			onScheduleCreated(scheduleId) {
+				console.debug("schedule created", scheduleId);
+				resolve(
+					connection?.subscribeSchedule(scheduleId) ??
+						Promise.reject(new Error("connection not initialized")),
+				);
+			},
+			onUpdateSchedule(schedule) {
+				console.debug("schedule update", schedule);
+				setSchedule(schedule);
+			},
+			onRemoveSchedule(scheduleId) {
+				console.debug("removing schedule", scheduleId);
+				removeSchedule(scheduleId);
+			},
+			onReceiveInitialClassrooms(classrooms) {
+				console.debug("classrooms", classrooms);
+				setClassroom(...classrooms);
+			},
+			onUpdateClassroom(classroom) {
+				console.debug("classroom updated", classroom);
+				setClassroom(classroom);
+			},
+		});
+		return () => resolve(connection?.disconnect());
+	}, [
+		initSignalR,
+		setSchedule,
+		resolve,
+		connection,
+		removeSchedule,
+		setClassroom,
+	]);
 
 	useEffect(() => {
 		const queryParams = new URLSearchParams(window.location.search);
@@ -80,7 +83,7 @@ export function AuthCallback() {
 		const schoolId = queryParams.get("school_id");
 
 		if ((!authCode || !schoolId) && !isLoggedIn) {
-			navigate({ pathname: "/auth", search: "" }, { replace: true });
+			resolve(Promise.reject());
 			return;
 		}
 
@@ -93,21 +96,12 @@ export function AuthCallback() {
 					onSuccess: (res) => {
 						setUserProfile(res.data);
 						setSessionEnd(Date.now() + 1_000 * 60 * 60);
-					},
-					onError: () => {
-						console.error("failed to get userprofile");
-						setSessionEnd(0);
-						navigate({ pathname: "/auth", search: "" }, { replace: true });
+						resolve(connection?.connect(), {
+							onError: () => navigate({ pathname: "/auth" }, { replace: true }),
+						});
 					},
 				},
 			);
-			resolve(boundSignalRInit(), {
-				onError: () => {
-					console.error("error during signalr init");
-					setSessionEnd(0);
-					navigate({ pathname: "/auth", search: "" }, { replace: true });
-				},
-			});
 			return;
 		}
 
@@ -118,8 +112,6 @@ export function AuthCallback() {
 					body: { authCode, schoolId },
 				}),
 				{
-					onError: () =>
-						navigate({ pathname: "/auth", search: "" }, { replace: true }),
 					onSuccess: (res) => {
 						if (!res.data) {
 							console.error("error during login");
@@ -134,38 +126,17 @@ export function AuthCallback() {
 							{
 								onSuccess: (res) => {
 									setUserProfile(res.data);
-								},
-								onError: () => {
-									console.error("failed to get userprofile");
-									setSessionEnd(0);
-									navigate(
-										{ pathname: "/auth", search: "" },
-										{ replace: true },
-									);
+									resolve(connection?.connect() ?? Promise.reject());
 								},
 							},
 						);
-						resolve(boundSignalRInit(), {
-							onError: () => {
-								setSessionEnd(0);
-								navigate({ pathname: "/auth", search: "" }, { replace: true });
-							},
-						});
-						navigate({ pathname: "/", search: "" }, { replace: true });
 					},
 				},
 			);
 			return;
 		}
-
-		resolve(boundSignalRInit(), {
-			onError: () => {
-				setSessionEnd(0);
-				navigate({ pathname: "/auth", search: "" }, { replace: true });
-			},
-		});
 	}, [
-		boundSignalRInit,
+		connection,
 		isLoggedIn,
 		navigate,
 		resolve,

@@ -4,7 +4,7 @@ import { singleOrList, type Action, type SingleOrList } from "../util";
 export function useLoadingPromise(globalCallbacks?: {
 	onLoading?: SingleOrList<Action<[boolean]>>;
 	onSuccess?: SingleOrList<Action<[]>>;
-	onError?: SingleOrList<Action<[any]>>;
+	onError?: SingleOrList<Action<[unknown]>>;
 }) {
 	const [loading, setLoading] = useState(false);
 	const lastCallId = useRef(0);
@@ -15,7 +15,7 @@ export function useLoadingPromise(globalCallbacks?: {
 			callbacks?: {
 				onLoading?: SingleOrList<Action<[boolean]>>;
 				onSuccess?: SingleOrList<Action<[T]>>;
-				onError?: SingleOrList<Action<[any]>>;
+				onError?: SingleOrList<Action<[unknown]>>;
 			},
 		) => {
 			if (!promise) {
