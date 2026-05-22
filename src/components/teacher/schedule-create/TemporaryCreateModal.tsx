@@ -14,7 +14,10 @@ import {
 import { useLoadingPromise } from "../../../hooks/useLoadingPromise";
 import { useCalendar } from "../../../hooks/useCalendar";
 import type { ClassroomId } from "../../../models/classroom";
-import type { ExamSlotId, ScheduleCreateRequest } from "../../../models/schedule";
+import type {
+	ExamSlotId,
+	ScheduleCreateRequest,
+} from "../../../models/schedule";
 import { notifications } from "@mantine/notifications";
 
 export function TemporaryCreateModal(props: {
@@ -143,10 +146,15 @@ export function TemporaryCreateModal(props: {
 				</Button>
 				<Button
 					onClick={() =>
-						resolve(connection?.registerForSlot((selectedClassroomId ?? "") as ExamSlotId), {
-							onSuccess: console.log,
-							onError: console.log,
-						})
+						resolve(
+							connection?.registerForSlot(
+								(selectedClassroomId ?? "") as ExamSlotId,
+							),
+							{
+								onSuccess: console.log,
+								onError: console.log,
+							},
+						)
 					}>
 					test
 				</Button>

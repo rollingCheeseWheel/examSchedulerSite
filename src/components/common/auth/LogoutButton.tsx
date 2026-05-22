@@ -6,10 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { endpoints } from "../../../endpoints";
 import { useIsLoggedIn } from "../../../hooks/useIsLoggedIn";
 import { useLoadingPromise } from "../../../hooks/useLoadingPromise";
-import {
-	useHubConnection,
-	useLoadingOverlay,
-} from "../../../hooks/zustand";
+import { useHubConnection, useLoadingOverlay } from "../../../hooks/zustand";
 import { api } from "../../../main";
 
 export function LogoutButton() {

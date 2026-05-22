@@ -13,7 +13,7 @@ export const endpoints = {
 	auth: {
 		login: join("auth", "login"),
 		logout: join("auth", "logout"),
-		me: join("auth", "me")
+		me: join("auth", "me"),
 	},
 	classrooms: join("classroom", "all"),
 	scheduleHub: join("hubs", "schedule"),

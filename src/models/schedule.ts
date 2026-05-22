@@ -1,5 +1,11 @@
 import type { AuditLog } from "./auditLog";
-import type { Brand, BrandedId, BrandedString, DateOnlyString, DateString } from "./brand";
+import type {
+	Brand,
+	BrandedId,
+	BrandedString,
+	DateOnlyString,
+	DateString,
+} from "./brand";
 import type { DayOfWeek, Subject, TeacherWithSubjects } from "./calendar";
 import type { ClassroomId } from "./classroom";
 import type { AutoLockIn, SlotFillingBehaviour, SlotLockState } from "./enums";

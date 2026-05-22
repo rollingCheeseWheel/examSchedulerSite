@@ -1,40 +1,40 @@
 import {
-    ActionIcon,
-    Box,
-    Button,
-    Center,
-    Collapse,
-    Divider,
-    Flex,
-    Grid,
-    Group,
-    HoverCard,
-    Kbd,
-    Notification,
-    Paper,
-    Stack,
-    Text,
-    Title,
-    type StyleProp,
+	ActionIcon,
+	Box,
+	Button,
+	Center,
+	Collapse,
+	Divider,
+	Flex,
+	Grid,
+	Group,
+	HoverCard,
+	Kbd,
+	Notification,
+	Paper,
+	Stack,
+	Text,
+	Title,
+	type StyleProp,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import {
-    IconCheck,
-    IconChevronRight,
-    IconReplaceUser,
-    IconTrashFilled,
-    IconX,
+	IconCheck,
+	IconChevronRight,
+	IconReplaceUser,
+	IconTrashFilled,
+	IconX,
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { useIgnoredSwapRequests } from "../../../hooks/useIgnoredSwapRequests";
 import { usePromise } from "../../../hooks/usePromise";
 import { useToggle } from "../../../hooks/useToggle";
 import {
-    useHubConnection,
-    useIsTeacher,
-    useLoadingOverlay,
-    useUserProfile,
+	useHubConnection,
+	useIsTeacher,
+	useLoadingOverlay,
+	useUserProfile,
 } from "../../../hooks/zustand";
 import type { Result } from "../../../models/result";
 import type { ExamSlot, ExamSlotId, Schedule } from "../../../models/schedule";
