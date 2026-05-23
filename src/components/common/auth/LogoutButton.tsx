@@ -1,6 +1,6 @@
 import { Button } from "@mantine/core";
 import { IconLogout2 } from "@tabler/icons-react";
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { endpoints } from "../../../endpoints";
@@ -12,9 +12,16 @@ import { api } from "../../../main";
 export function LogoutButton() {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
-	const signalr = useHubConnection((s) => s.data);
+	const _connection = useHubConnection((s) => s.data);
+	const connectionRef = useRef(_connection);
+	useEffect(() => {
+		connectionRef.current = _connection;
+	}, [_connection]);
+
 	const [isLoggedIn, setSessionEnd] = useIsLoggedIn();
-	const { resolve } = usePromise();
+	const { resolve } = usePromise({
+		onSuccess: () => setSessionEnd(0),
+	});
 
 	const onClick = useCallback(
 		() =>
@@ -24,13 +31,14 @@ export function LogoutButton() {
 				}),
 				{
 					onSuccess: () => {
-						setSessionEnd(0);
-						resolve(signalr?.disconnect());
-						navigate({ pathname: "/auth" }, { replace: true });
+						resolve(connectionRef.current?.disconnect(), {
+							onSuccess: () =>
+								navigate({ pathname: "/auth" }, { replace: true }),
+						});
 					},
 				},
 			),
-		[navigate, resolve, setSessionEnd, signalr],
+		[navigate, resolve],
 	);
 
 	if (!isLoggedIn) {

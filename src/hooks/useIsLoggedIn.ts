@@ -9,21 +9,21 @@ export function useIsLoggedIn(): [boolean, Action<[DateNumber]>] {
 		tokenExpirationInMillisecondsLocalStorageKey,
 	);
 
-	const [isLoggedIn, setIsLoggedIn] = useState((expiration ?? 0) > Date.now());
+	const [now, setNow] = useState(Date.now());
 
 	useEffect(() => {
-		const loggedIn = (expiration ?? 0) > Date.now();
+		if (!((expiration ?? 0) > now)) return;
 
-		setIsLoggedIn(loggedIn);
+		const remaining = (expiration ?? 0) - now;
+		if (remaining <= 0) {
+			setNow(Date.now());
+			return;
+		}
 
-		if (!loggedIn) return;
-
-		const timeout = setTimeout(() => {
-			setIsLoggedIn(false);
-		}, expiration! - Date.now());
+		const timeout = setTimeout(() => setNow(Date.now()), remaining);
 
 		return () => clearTimeout(timeout);
-	}, [expiration]);
+	}, [expiration, now]);
 
-	return [isLoggedIn, setSessionExpiration];
+	return [(expiration ?? 0) > now, setSessionExpiration];
 }

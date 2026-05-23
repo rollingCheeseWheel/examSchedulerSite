@@ -56,12 +56,18 @@ export function useLocalStorage<T>(
 	defaultValue?: T,
 	timeToLive: number = ttl,
 ): [T | null | undefined, Action<[T]>] {
-	const [value, setValue] = useState<T | null | undefined>(
-		() =>
-			getLocalStorage<T>(key) ??
-			setLocalStorage(key, defaultValue, timeToLive) ??
-			defaultValue,
-	);
+	const [value, setValue] = useState<T | null | undefined>(() => {
+		const existing = getLocalStorage<T>(key);
+		if (existing !== undefined) {
+			return existing;
+		}
+
+		if (defaultValue !== undefined) {
+			setLocalStorage(key, defaultValue, timeToLive);
+		}
+
+		return defaultValue;
+	});
 
 	const set = useCallback(
 		(value: T) => {
