@@ -1,58 +1,58 @@
 {
-    "auth": {
-        "school": {
-            "error": "Errore durante il caricamento, riprova",
-            "select": "Seleziona la tua scuola"
-        }
-    },
-    "common": {
-        "cancel": "Annulla",
-        "error": "Errore",
-        "submit": "OK",
-        "success": "Successo"
-    },
-    "login": "Login",
-    "logout": "Logout",
-    "notifications": {
-        "genericError": "Si è verificato un errore"
-    },
-    "schedule": {
-        "create": {
-            "classroomSelect": "Seleziona aula",
-            "createbutton": "Crea piano d'esame",
-            "error": {
-                "classroom": "Aula non valida",
-                "startdate": "Data di inizio non valida"
-            },
-            "fail": "Errore durante la creazione del piano d'esame",
-            "lockinOffset": "Scadenza iscrizione",
-            "scheduleDescription": "Descrizione",
-            "startDatePicker": "Seleziona data di inizio",
-            "subjectSelect": "Seleziona materia",
-            "success": "Piano d'esame creato con successo",
-            "title": "Crea piano d'esame"
-        },
-        "delete": "Elimina",
-        "empty": "Nessun piano d'esame disponibile",
-        "progess": {
-            "tooltip": "{{curr}} di {{max}}"
-        },
-        "register": "Iscriviti",
-        "reportactual": "Conferma",
-        "swap": "Scambia"
-    },
-    "studentmodal": {
-        "submit": "Conferma modifiche",
-        "title": "Conferma gli esaminandi effettivi",
-        "usage": "Conferma gli esaminandi effettivi. Gli studenti che si sono iscritti a questo appuntamento ma non sono stati chiamati verranno assegnati a un appuntamento futuro.",
-        "zerostudents": "Nessuno studente disponibile per la selezione"
-    },
-    "submit": "Conferma",
-    "swaprequest": {
-        "accept": "Accetta scambio",
-        "delete": "Elimina scambio"
-    },
-    "swaprequests": {
-        "title": "Richieste di scambio"
-    }
+	"auth": {
+		"school": {
+			"error": "Errore durante il caricamento, riprova",
+			"select": "Seleziona la tua scuola"
+		}
+	},
+	"common": {
+		"cancel": "Annulla",
+		"error": "Errore",
+		"submit": "OK",
+		"success": "Successo"
+	},
+	"login": "Login",
+	"logout": "Logout",
+	"notifications": {
+		"genericError": "Si è verificato un errore"
+	},
+	"schedule": {
+		"create": {
+			"classroomSelect": "Seleziona aula",
+			"createbutton": "Crea piano d'esame",
+			"error": {
+				"classroom": "Aula non valida",
+				"startdate": "Data di inizio non valida"
+			},
+			"fail": "Errore durante la creazione del piano d'esame",
+			"lockinOffset": "Scadenza iscrizione",
+			"scheduleDescription": "Descrizione",
+			"startDatePicker": "Seleziona data di inizio",
+			"subjectSelect": "Seleziona materia",
+			"success": "Piano d'esame creato con successo",
+			"title": "Crea piano d'esame"
+		},
+		"delete": "Elimina",
+		"empty": "Nessun piano d'esame disponibile",
+		"progess": {
+			"tooltip": "{{curr}} di {{max}}"
+		},
+		"register": "Iscriviti",
+		"reportactual": "Conferma",
+		"swap": "Scambia"
+	},
+	"studentmodal": {
+		"submit": "Conferma modifiche",
+		"title": "Conferma gli esaminandi effettivi",
+		"usage": "Conferma gli esaminandi effettivi. Gli studenti che si sono iscritti a questo appuntamento ma non sono stati chiamati verranno assegnati a un appuntamento futuro.",
+		"zerostudents": "Nessuno studente disponibile per la selezione"
+	},
+	"submit": "Conferma",
+	"swaprequest": {
+		"accept": "Accetta scambio",
+		"delete": "Elimina scambio"
+	},
+	"swaprequests": {
+		"title": "Richieste di scambio"
+	}
 }

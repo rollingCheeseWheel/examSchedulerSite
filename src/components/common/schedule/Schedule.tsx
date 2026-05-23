@@ -34,7 +34,7 @@ import { useToggle } from "../../../hooks/useToggle";
 import {
 	useHubConnection,
 	useIsTeacher,
-	useUserProfile
+	useUserProfile,
 } from "../../../hooks/zustand";
 import type { ExamSlot, ExamSlotId, Schedule } from "../../../models/schedule";
 import type { SwapRequest, SwapRequestId } from "../../../models/swapRequest";
