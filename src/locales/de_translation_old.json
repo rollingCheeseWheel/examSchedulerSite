@@ -1,20 +1,20 @@
 {
-	"navbar": {
-		"createforclassroom": "Erstellen",
-		"overview": "Übersicht",
-		"swaprequests": "Tauschanfragen"
-	},
-	"schedule": {
-		"create": {
-			"calendar": {
-				"decrement": "Vorherige Woche",
-				"increment": "Nächste Woche"
-			},
-			"classroomselect": "MISSING",
-			"submit": "Erstellen"
-		}
-	},
-	"schedules": {
-		"empty": "Keine Prüfungspläne vorhanden"
-	}
+    "navbar": {
+        "createforclassroom": "Erstellen",
+        "overview": "Übersicht",
+        "swaprequests": "Tauschanfragen"
+    },
+    "schedule": {
+        "create": {
+            "calendar": {
+                "decrement": "Vorherige Woche",
+                "increment": "Nächste Woche"
+            },
+            "classroomselect": "MISSING",
+            "submit": "Erstellen"
+        }
+    },
+    "schedules": {
+        "empty": "Keine Prüfungspläne vorhanden"
+    }
 }

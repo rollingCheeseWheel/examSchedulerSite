@@ -1,13 +1,12 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { endpoints } from "../../../endpoints";
 import { useIsLoggedIn } from "../../../hooks/useIsLoggedIn";
-import { useLoadingPromise } from "../../../hooks/useLoadingPromise";
-import { useSignalRInit } from "../../../hooks/useSignalR";
+import { usePromise } from "../../../hooks/usePromise";
+import { useSignalRInit, type ScheduleClient } from "../../../hooks/useSignalR";
 import {
 	useClassrooms,
 	useHubConnection,
-	useLoadingOverlay,
 	useSchedules,
 	useUserProfile,
 } from "../../../hooks/zustand";
@@ -19,98 +18,101 @@ import type { UserProfile } from "../../../models/user";
 export function AuthCallback() {
 	const [isLoggedIn, setSessionEnd] = useIsLoggedIn();
 	const navigate = useNavigate();
-	const { resolve } = useLoadingPromise({
-		onLoading: useLoadingOverlay((s) => s.setState),
-		onError: () => {
+	const { resolve: resolveDisconnect } = usePromise();
+	const { init, updateHandlers } = useSignalRInit();
+	const _connection = useHubConnection((s) => s.data);
+	const connectionRef = useRef(_connection);
+	const { resolve } = usePromise({
+		onError: useCallback(() => {
 			setSessionEnd(0);
 			navigate({ pathname: "/auth", search: "" }, { replace: true });
-		},
-		onSuccess: () => navigate({ pathname: "/", search: "" }, { replace: true }),
+			resolveDisconnect(connectionRef.current?.disconnect());
+		}, [navigate, resolveDisconnect, setSessionEnd]),
+		onSuccess: useCallback(
+			() => navigate({ pathname: "/", search: "" }, { replace: true }),
+			[navigate],
+		),
 	});
-	const initSignalR = useSignalRInit();
-	const connection = useHubConnection((s) => s.data);
+
+	useEffect(() => {
+		connectionRef.current = _connection;
+	}, [_connection]);
 
 	const setSchedule = useSchedules((s) => s.set);
 	const removeSchedule = useSchedules((s) => s.removeKey);
 	const setClassroom = useClassrooms((s) => s.set);
 
 	const setUserProfile = useUserProfile((s) => s.setData);
-	const userprofileHasChanged = useUserProfile((s) => s.hasChanged);
 
-	useEffect(() => {
-		initSignalR({
-			onReceiveInitialSchedules(schedules) {
+	const handlers = useMemo<ScheduleClient>(
+		() => ({
+			InitialSchedules(schedules) {
 				console.debug("schedules", schedules);
 				setSchedule(...schedules);
 			},
-			onScheduleCreated(scheduleId) {
+			ScheduleCreated(scheduleId) {
 				console.debug("schedule created", scheduleId);
-				resolve(
-					connection?.subscribeSchedule(scheduleId) ??
-						Promise.reject(new Error("connection not initialized")),
-				);
+				resolve(connectionRef.current?.subscribeSchedule(scheduleId));
 			},
-			onUpdateSchedule(schedule) {
+			ScheduleUpdated(schedule) {
 				console.debug("schedule update", schedule);
 				setSchedule(schedule);
 			},
-			onRemoveSchedule(scheduleId) {
+			ScheduleRemoved(scheduleId) {
 				console.debug("removing schedule", scheduleId);
 				removeSchedule(scheduleId);
 			},
-			onReceiveInitialClassrooms(classrooms) {
+			InitialClassrooms(classrooms) {
 				console.debug("classrooms", classrooms);
 				setClassroom(...classrooms);
 			},
-			onUpdateClassroom(classroom) {
+			ClassroomUpdated(classroom) {
 				console.debug("classroom updated", classroom);
 				setClassroom(classroom);
 			},
-		});
-		return () => resolve(connection?.disconnect());
-	}, [
-		initSignalR,
-		setSchedule,
-		resolve,
-		connection,
-		removeSchedule,
-		setClassroom,
-	]);
+		}),
+		[connectionRef, removeSchedule, resolve, setClassroom, setSchedule],
+	);
 
-	useEffect(() => {
-		const queryParams = new URLSearchParams(window.location.search);
-		const authCode = queryParams.get("code");
-		const schoolId = queryParams.get("school_id");
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	useEffect(() => init(handlers), []);
 
-		if ((!authCode || !schoolId) && !isLoggedIn) {
-			resolve(Promise.reject());
-			return;
-		}
+	useEffect(
+		() => {
+			const queryParams = new URLSearchParams(window.location.search);
+			const authCode = queryParams.get("code");
+			const schoolId = queryParams.get("school_id");
 
-		if (!userprofileHasChanged && isLoggedIn && !authCode && !schoolId) {
-			resolve(
-				api<Result<UserProfile>>(endpoints.auth.me, {
-					method: "GET",
-				}),
-				{
-					onSuccess: (res) => {
-						setUserProfile(res.data);
-						setSessionEnd(Date.now() + 1_000 * 60 * 60);
-						resolve(connection?.connect(), {
-							onError: () => navigate({ pathname: "/auth" }, { replace: true }),
-						});
+			if (!authCode && !schoolId && !isLoggedIn) {
+				resolve(Promise.reject());
+				return;
+			}
+
+			if (isLoggedIn) {
+				resolve(
+					(signal) =>
+						api<Result<UserProfile>>(endpoints.auth.me, {
+							method: "GET",
+							signal,
+						}),
+					{
+						onSuccess: (res) => {
+							setUserProfile(res.data);
+							setSessionEnd(Date.now() + 1_000 * 60 * 60);
+							resolve(connectionRef.current?.connect() ?? Promise.reject());
+						},
 					},
-				},
-			);
-			return;
-		}
+				);
+				return;
+			}
 
-		if (!isLoggedIn) {
 			resolve(
-				api<Result<DateString>>(endpoints.auth.login, {
-					method: "POST",
-					body: { authCode, schoolId },
-				}),
+				(signal) =>
+					api<Result<DateString>>(endpoints.auth.login, {
+						method: "POST",
+						body: { authCode, schoolId },
+						signal,
+					}),
 				{
 					onSuccess: (res) => {
 						if (!res.data) {
@@ -120,30 +122,29 @@ export function AuthCallback() {
 						setTokenDuration(new Date(res.data).getTime() - Date.now());
 						setSessionEnd(new Date(res.data).getTime());
 						resolve(
-							api<Result<UserProfile>>(endpoints.auth.me, {
-								method: "GET",
-							}),
+							(signal) =>
+								api<Result<UserProfile>>(endpoints.auth.me, {
+									method: "GET",
+									signal,
+								}),
 							{
 								onSuccess: (res) => {
 									setUserProfile(res.data);
-									resolve(connection?.connect() ?? Promise.reject());
+									resolve(connectionRef.current?.connect() ?? Promise.reject());
 								},
 							},
 						);
 					},
 				},
 			);
-			return;
-		}
-	}, [
-		connection,
-		isLoggedIn,
-		navigate,
-		resolve,
-		setSessionEnd,
-		setUserProfile,
-		userprofileHasChanged,
-	]);
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[
+			/* isLoggedIn, resolve, setSessionEnd, setUserProfile */
+		],
+	);
+
+	useEffect(() => updateHandlers(handlers), [handlers, updateHandlers]);
 
 	return <></>;
 }

@@ -13,15 +13,10 @@ import {
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePromise } from "../../../hooks/usePromise";
-import type { Result } from "../../../models/result";
+import { useHubConnection, useSchedules } from "../../../hooks/zustand";
 import type { ExamSlotId } from "../../../models/schedule";
 import type { UserProfileId } from "../../../models/user";
 import { pointerCursorTheme, sleep, type Action } from "../../../util";
-import {
-	useLoadingOverlay,
-	useHubConnection,
-	useSchedules,
-} from "../../../hooks/zustand";
 
 export function ReportStudentModal(props: {
 	slotId: ExamSlotId;
@@ -29,11 +24,7 @@ export function ReportStudentModal(props: {
 	onClose: Action<[]>;
 }) {
 	const { t } = useTranslation();
-
-	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
-	const { resolve } = usePromise<Result<boolean>>({
-		onLoading: setLoadingOverlayState,
-	});
+	const { resolve } = usePromise();
 
 	const scheduleHub = useHubConnection((s) => s.data);
 	const [checkedStudents, setCheckedStudents] = useState<UserProfileId[]>([]);

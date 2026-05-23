@@ -1,40 +1,53 @@
-import { Button, Modal, NativeSelect, Stack, Text } from "@mantine/core";
-import "@mantine/code-highlight/styles.css";
 import { CodeHighlight } from "@mantine/code-highlight";
-import { equals, type Action } from "../../../util";
-import { useEffect, useState } from "react";
-import type { SubjectName, TeacherName } from "../../../models/calendar";
+import "@mantine/code-highlight/styles.css";
+import { Button, Modal, NativeSelect, Stack, Text } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { usePromise } from "../../../hooks/usePromise";
 import {
 	useClassrooms,
 	useHubConnection,
-	useLoadingOverlay,
 	useUserProfile,
 } from "../../../hooks/zustand";
-import { useLoadingPromise } from "../../../hooks/useLoadingPromise";
-import { useCalendar } from "../../../hooks/useCalendar";
+import { api } from "../../../main";
+import type { Lesson, TeacherName } from "../../../models/calendar";
 import type { ClassroomId } from "../../../models/classroom";
+import type { Result } from "../../../models/result";
 import type {
 	ExamSlotId,
 	ScheduleCreateRequest,
 } from "../../../models/schedule";
-import { notifications } from "@mantine/notifications";
+import { equals, type Action } from "../../../util";
 
 export function TemporaryCreateModal(props: {
 	opened: boolean;
 	close: Action<[]>;
 }) {
 	const { t } = useTranslation();
-	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
 	const userProfile = useUserProfile((s) => s.data);
-	const { resolve, abort } = useLoadingPromise({
-		onLoading: setLoadingOverlayState,
+	const { resolve } = usePromise({
 		onError: console.error,
+		onSuccess: console.log,
 	});
-	const fetchTimeTable = useCalendar();
 
-	const [selectedClassroomId, setSelectedClassroom] = useState<ClassroomId>();
+	const fetchLessons = useCallback(
+		(classroomId?: ClassroomId, date?: Date, signal?: AbortSignal) => {
+			if (!classroomId || !date) {
+				return;
+			}
+			return api<Result<Lesson[]>>(
+				`api/calendar/${classroomId}/${date.getTime()}`,
+				{ signal, method: "GET" },
+			);
+		},
+		[],
+	);
+
 	const classrooms = useClassrooms((s) => s.asArray);
+	const [selectedClassroomId, setSelectedClassroom] = useState<ClassroomId>(
+		classrooms.at(0)?.id ?? "",
+	);
 	const selectedClassroom = classrooms.find(
 		equals((c) => c.id, selectedClassroomId),
 	);
@@ -46,16 +59,9 @@ export function TemporaryCreateModal(props: {
 
 	const connection = useHubConnection((s) => s.data);
 
-	useEffect(
-		() => {
-			resolve(fetchTimeTable(selectedClassroomId, new Date(2026, 4, 19)), {
-				onSuccess: (res) => console.log("lessons", res),
-			});
-			return abort;
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[],
-	);
+	useEffect(() => {
+		resolve(fetchLessons(selectedClassroomId, new Date()));
+	}, [fetchLessons, resolve, selectedClassroomId]);
 
 	const request: ScheduleCreateRequest = {
 		classroomId: selectedClassroomId ?? "",
@@ -93,7 +99,7 @@ export function TemporaryCreateModal(props: {
 				<NativeSelect
 					required
 					label={t("schedule.create.classroomSelect")}
-					value={selectedClassroomId}
+					value={selectedClassroomId ?? classrooms.at(0)?.id}
 					onChange={(e) => setSelectedClassroom(e.currentTarget.value)}
 					data={[
 						{
@@ -106,23 +112,6 @@ export function TemporaryCreateModal(props: {
 						})),
 					]}
 				/>
-				{/* <NativeSelect
-					required
-					label={t("schedule.create.subjectSelect")}
-					value={selectedSubject}
-					onChange={(e) => setSelectedSubject(e.currentTarget.value)}
-					data={(selectedClassroom?.teachers ?? [])
-						.find(
-							equals(
-								(t) => t.name,
-								userProfile?.name as TeacherName | undefined,
-							),
-						)
-						?.subjects.map((s) => ({
-							label: s.name,
-							value: s.name,
-						}))}
-				/> */}
 
 				<CodeHighlight code={JSON.stringify(request, null, 2)} lang="json" />
 				<Button
@@ -150,10 +139,6 @@ export function TemporaryCreateModal(props: {
 							connection?.registerForSlot(
 								(selectedClassroomId ?? "") as ExamSlotId,
 							),
-							{
-								onSuccess: console.log,
-								onError: console.log,
-							},
 						)
 					}>
 					test

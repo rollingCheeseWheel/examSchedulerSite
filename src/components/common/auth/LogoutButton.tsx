@@ -1,12 +1,12 @@
 import { Button } from "@mantine/core";
 import { IconLogout2 } from "@tabler/icons-react";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { endpoints } from "../../../endpoints";
 import { useIsLoggedIn } from "../../../hooks/useIsLoggedIn";
-import { useLoadingPromise } from "../../../hooks/useLoadingPromise";
-import { useHubConnection, useLoadingOverlay } from "../../../hooks/zustand";
+import { usePromise } from "../../../hooks/usePromise";
+import { useHubConnection } from "../../../hooks/zustand";
 import { api } from "../../../main";
 
 export function LogoutButton() {
@@ -14,12 +14,7 @@ export function LogoutButton() {
 	const navigate = useNavigate();
 	const signalr = useHubConnection((s) => s.data);
 	const [isLoggedIn, setSessionEnd] = useIsLoggedIn();
-	const setLoadingOverlay = useLoadingOverlay((s) => s.setState);
-	const { resolve, abort } = useLoadingPromise({
-		onLoading: setLoadingOverlay,
-	});
-
-	useEffect(() => abort, [abort]);
+	const { resolve } = usePromise();
 
 	const onClick = useCallback(
 		() =>
@@ -31,7 +26,7 @@ export function LogoutButton() {
 					onSuccess: () => {
 						setSessionEnd(0);
 						resolve(signalr?.disconnect());
-						navigate("/auth");
+						navigate({ pathname: "/auth" }, { replace: true });
 					},
 				},
 			),

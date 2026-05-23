@@ -19,13 +19,13 @@ import { type Action, type Func } from "../util";
 import { useHubConnection } from "./zustand";
 
 export interface ScheduleClient {
-	onReceiveInitialSchedules: Action<[Schedule[]]>;
-	onScheduleCreated: Action<[ScheduleId]>;
-	onUpdateSchedule: Action<[Schedule]>;
-	onRemoveSchedule: Action<[ScheduleId]>;
+	InitialSchedules: Action<[Schedule[]]>;
+	ScheduleCreated: Action<[ScheduleId]>;
+	ScheduleUpdated: Action<[Schedule]>;
+	ScheduleRemoved: Action<[ScheduleId]>;
 
-	onReceiveInitialClassrooms: Action<[Classroom[]]>;
-	onUpdateClassroom: Action<[Classroom]>;
+	InitialClassrooms: Action<[Classroom[]]>;
+	ClassroomUpdated: Action<[Classroom]>;
 }
 
 export interface ScheduleHub {
@@ -52,18 +52,12 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 	const updateHandlers = useCallback((handlers: ScheduleClient) => {
 		if (handlersRef.current) {
 			Object.entries(handlersRef.current).forEach(([eventName, handler]) => {
-				connectionRef.current?.off(
-					eventName.toLowerCase().replace(/^on/, ""),
-					handler,
-				);
+				connectionRef.current?.off(eventName, handler);
 			});
 		}
 
 		Object.entries(handlers).forEach(([eventName, handler]) => {
-			connectionRef.current?.on(
-				eventName.toLowerCase().replace(/^on/, ""),
-				handler,
-			);
+			connectionRef.current?.on(eventName, handler);
 		});
 
 		handlersRef.current = handlers;
@@ -178,7 +172,7 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 		};
 	}, [connection]);
 
-	return init;
+	return { init, updateHandlers };
 }
 
 function createConnection(hubUrl: string) {

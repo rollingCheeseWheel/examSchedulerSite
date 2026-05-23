@@ -6,8 +6,7 @@
 	"scripts": {
 		"dev": "vite",
 		"devhost": "vite --host",
-		"build": "echo FIX usePromise.tsx PLEAAAASSSEEEEEE && tsc -b && vite build --emptyOutDir",
-		"buildlocal": "echo FIX usePromise.tsx PLEAAAASSSEEEEEE && tsc -b && vite build ",
+		"build": "tsc -b && vite build --emptyOutDir",
 		"lint": "eslint .",
 		"preview": "vite preview",
 		"check": "tsc -b --noEmit",

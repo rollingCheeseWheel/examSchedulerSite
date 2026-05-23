@@ -5,107 +5,152 @@ import {
 	type Func,
 	type SingleOrList,
 } from "../util";
+import { useLoadingOverlay } from "./zustand";
 
-interface UsePromiseCallbacks<TResult, TError> {
-	readonly onLoading?: SingleOrList<Action<[boolean]>>;
-	readonly onError?: SingleOrList<Action<[TError]>>;
-	readonly onSuccess?: SingleOrList<Action<[TResult]>>;
+export interface GlobalCallbacks {
+	suppressDefaultLoad?: boolean;
+	onLoading?: SingleOrList<Action<[boolean]>>;
+	onSuccess?: SingleOrList<Action<[unknown]>>;
+	onError?: SingleOrList<Action<[unknown]>>;
+
+	onCleanup?: SingleOrList<Action<[]>>;
 }
 
-export function usePromise<TResult, TError = unknown>(
-	callbacks?: Readonly<UsePromiseCallbacks<TResult, TError>>,
-) {
-	const [data, setData] = useState<TResult | undefined | null>();
-	const [error, setError] = useState<TError>();
+export interface LocalCallbacks<T> extends Omit<
+	GlobalCallbacks,
+	"onSuccess" | "onCleanup"
+> {
+	onSuccess?: SingleOrList<Action<[T]>>;
+
+	ignoreGlobalLoading?: boolean;
+	ignoreGlobalSuccess?: boolean;
+	ignoreGobalError?: boolean;
+}
+
+export function usePromise(globalCallbacks?: GlobalCallbacks) {
+	const setLoadingOverlayState = useLoadingOverlay((s) => s.setState);
 	const [loading, setLoading] = useState(false);
-
-	const callIdRef = useRef(0);
-	const mountedRef = useRef(true);
-	const abortControllersRef = useRef<AbortController[]>([]);
-
-	useEffect(() => {
-		return () => {
-			// WARNING + TODO: uncomment when in prod, only prevents un and remount issues from strictmode
-			mountedRef.current = false;
-			setLoading(false);
-		};
-	}, []);
-
-	const abort = useCallback(() => {
-		mountedRef.current = false;
-		callIdRef.current++;
-		setLoading(false);
-		const localCopy = abortControllersRef.current;
-		abortControllersRef.current = [];
-		for (const abortController of localCopy) {
-			abortController.abort();
-		}
-	}, []);
-
-	const getSignal = useCallback(() => {
-		const controller = new AbortController();
-		abortControllersRef.current.push(controller);
-		return controller.signal;
-	}, []);
+	const lastCallId = useRef(0);
+	const abortControllerRef = useRef(new AbortController());
 
 	const resolve = useCallback(
-		(
-			promise?:
-				| Promise<TResult | undefined>
-				| Func<[AbortSignal], Promise<TResult>>,
+		<T>(
+			promise?: Promise<T> | Func<[AbortSignal], Promise<T> | undefined>,
+			localCallbacks?: LocalCallbacks<T>,
 		) => {
+			if (typeof promise == "function") {
+				promise = promise(abortControllerRef.current.signal);
+			}
+
 			if (!promise) {
 				return;
 			}
-			if (typeof promise === "function") {
-				promise = promise(getSignal());
-			}
-
-			setData(undefined);
-			setError(undefined);
+			const callId = ++lastCallId.current;
 			setLoading(true);
 
+			if (
+				!(
+					localCallbacks?.suppressDefaultLoad ||
+					globalCallbacks?.suppressDefaultLoad
+				)
+			) {
+				setLoadingOverlayState(true);
+			}
+
+			if (!localCallbacks?.ignoreGlobalLoading) {
+				for (const callback of singleOrList(globalCallbacks?.onLoading)) {
+					callback(true);
+				}
+			}
+
+			for (const callback of singleOrList(localCallbacks?.onLoading)) {
+				callback(true);
+			}
+
 			promise
-				.then((result) => {
-					setData(result);
+				.then((res) => {
+					if (
+						callId == lastCallId.current &&
+						!localCallbacks?.ignoreGlobalSuccess
+					) {
+						for (const callback of singleOrList(globalCallbacks?.onSuccess)) {
+							callback(res);
+						}
+					}
+					for (const callback of singleOrList(localCallbacks?.onSuccess)) {
+						callback(res);
+					}
 				})
-				.catch((err) => {
-					setError(err);
-					setData(undefined);
+				.catch((reason) => {
+					if (
+						callId == lastCallId.current &&
+						!localCallbacks?.ignoreGobalError
+					) {
+						for (const callback of singleOrList(globalCallbacks?.onError)) {
+							callback(reason);
+						}
+					}
+
+					for (const callback of singleOrList(localCallbacks?.onError)) {
+						callback(reason);
+					}
 				})
 				.finally(() => {
-					setLoading(false);
+					if (callId == lastCallId.current) {
+						setLoading(false);
+
+						if (
+							!(
+								localCallbacks?.suppressDefaultLoad ||
+								globalCallbacks?.suppressDefaultLoad
+							)
+						) {
+							setLoadingOverlayState(false);
+						}
+
+						if (!localCallbacks?.ignoreGlobalLoading) {
+							for (const callback of singleOrList(globalCallbacks?.onLoading)) {
+								callback(false);
+							}
+						}
+					}
+					for (const callback of singleOrList(localCallbacks?.onLoading)) {
+						callback(false);
+					}
 				});
 		},
-		[setLoading, getSignal],
+		[
+			globalCallbacks?.suppressDefaultLoad,
+			globalCallbacks?.onError,
+			globalCallbacks?.onLoading,
+			globalCallbacks?.onSuccess,
+			setLoadingOverlayState,
+		],
 	);
 
-	useEffect(() => {
-		const loadingCallbacks = singleOrList(callbacks?.onLoading);
-		for (const callback of loadingCallbacks) {
-			callback(loading);
-		}
-	}, [callbacks?.onLoading, loading]);
+	const abort = useCallback(() => {
+		lastCallId.current++;
+		abortControllerRef.current.abort();
+	}, []);
 
-	useEffect(() => {
-		if (!error) {
-			return;
-		}
-		const errorCallbacks = singleOrList(callbacks?.onError);
-		for (const callback of errorCallbacks) {
-			callback(error);
-		}
-	}, [callbacks?.onError, error, loading]);
+	useEffect(
+		() => () => {
+			abort();
+			setLoading(false);
+			for (const callback of singleOrList(globalCallbacks?.onLoading)) {
+				callback(false);
+			}
+			for (const callback of singleOrList(globalCallbacks?.onCleanup)) {
+				callback();
+			}
+		},
+		[abort, globalCallbacks?.onCleanup, globalCallbacks?.onLoading],
+	);
 
-	useEffect(() => {
-		if (!data) {
-			return;
-		}
-		const successCallbacks = singleOrList(callbacks?.onSuccess);
-		for (const callback of successCallbacks) {
-			callback(data);
-		}
-	}, [callbacks?.onSuccess, data, loading]);
-
-	return { data, error, loading, resolve, abort, getSignal };
+	return {
+		loading,
+		resolve,
+		abort,
+		signal: abortControllerRef.current.signal,
+	} as const;
 }

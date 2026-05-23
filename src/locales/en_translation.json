@@ -1,57 +1,58 @@
 {
-	"auth": {
-		"school": {
-			"error": "Error loading, please try again",
-			"select": "Select your school"
-		}
-	},
-	"common": {
-		"cancel": "Cancel",
-		"error": "Error",
-		"submit": "OK",
-		"success": "Success"
-	},
-	"logout": "Log out",
-	"notifications": {
-		"genericError": "An error occurred"
-	},
-	"schedule": {
-		"create": {
-			"classroomSelect": "Select classroom",
-			"createbutton": "Create exam schedule",
-			"error": {
-				"classroom": "Invalid classroom",
-				"startdate": "Invalid start date"
-			},
-			"fail": "Failed to create exam schedule",
-			"lockinOffset": "Registration deadline",
-			"scheduleDescription": "Description",
-			"startDatePicker": "Select start date",
-			"subjectSelect": "Select subject",
-			"success": "Exam schedule created successfully",
-			"title": "Create exam schedule"
-		},
-		"delete": "Delete",
-		"empty": "No schedules available",
-		"progess": {
-			"tooltip": "{{curr}} of {{max}}"
-		},
-		"register": "Register",
-		"reportactual": "Confirm",
-		"swap": "Swap"
-	},
-	"studentmodal": {
-		"submit": "Confirm changes",
-		"title": "Confirm actual examinees",
-		"usage": "Confirm the actual examinees. Students who registered for this appointment but did not get their turn will be assigned to a future appointment.",
-		"zerostudents": "No students available for selection"
-	},
-	"submit": "Submit",
-	"swaprequest": {
-		"accept": "Accept swap",
-		"delete": "Delete swap"
-	},
-	"swaprequests": {
-		"title": "Swap requests"
-	}
+    "auth": {
+        "school": {
+            "error": "Error loading, please try again",
+            "select": "Select your school"
+        }
+    },
+    "common": {
+        "cancel": "Cancel",
+        "error": "Error",
+        "submit": "OK",
+        "success": "Success"
+    },
+    "login": "Login",
+    "logout": "Logout",
+    "notifications": {
+        "genericError": "An error occurred"
+    },
+    "schedule": {
+        "create": {
+            "classroomSelect": "Select classroom",
+            "createbutton": "Create exam schedule",
+            "error": {
+                "classroom": "Invalid classroom",
+                "startdate": "Invalid start date"
+            },
+            "fail": "Failed to create exam schedule",
+            "lockinOffset": "Registration deadline",
+            "scheduleDescription": "Description",
+            "startDatePicker": "Select start date",
+            "subjectSelect": "Select subject",
+            "success": "Exam schedule created successfully",
+            "title": "Create exam schedule"
+        },
+        "delete": "Delete",
+        "empty": "No schedules available",
+        "progess": {
+            "tooltip": "{{curr}} of {{max}}"
+        },
+        "register": "Register",
+        "reportactual": "Confirm",
+        "swap": "Swap"
+    },
+    "studentmodal": {
+        "submit": "Confirm changes",
+        "title": "Confirm actual examinees",
+        "usage": "Confirm the actual examinees. Students who registered for this appointment but did not get their turn will be assigned to a future appointment.",
+        "zerostudents": "No students available for selection"
+    },
+    "submit": "Submit",
+    "swaprequest": {
+        "accept": "Accept swap",
+        "delete": "Delete swap"
+    },
+    "swaprequests": {
+        "title": "Swap requests"
+    }
 }

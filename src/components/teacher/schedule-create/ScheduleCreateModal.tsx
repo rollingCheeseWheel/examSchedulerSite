@@ -3,7 +3,6 @@ import {
 	Button,
 	Flex,
 	Group,
-	LoadingOverlay,
 	Modal,
 	NativeSelect,
 	Stack,
@@ -17,13 +16,13 @@ import { isNotEmpty, useForm } from "@mantine/form";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useCalendar } from "../../../hooks/useCalendar";
 import { usePromise } from "../../../hooks/usePromise";
 import {
 	useClassrooms,
 	useHubConnection,
 	useUserProfile,
 } from "../../../hooks/zustand";
+import { api } from "../../../main";
 import type {
 	DayOfWeek,
 	Lesson,
@@ -49,7 +48,10 @@ export function ScheduleCreateModal(props: {
 }) {
 	const { t } = useTranslation();
 	const userProfile = useUserProfile((s) => s.data);
-	const [loadingOverlayState, setLoadingOverlayState] = useState(false);
+
+	const { resolve } = usePromise();
+
+	const connection = useHubConnection((s) => s.data);
 
 	const form = useForm({
 		mode: "controlled",
@@ -69,11 +71,6 @@ export function ScheduleCreateModal(props: {
 	const [startDate, setStartDate] = useState<string | null>();
 	const [lockinOffset, setLockinOffset] = useState<string>();
 
-	const scheduleHub = useHubConnection((s) => s.data);
-	const { resolve: resolveScheduleCreate } = usePromise<Result<boolean>>({
-		onLoading: setLoadingOverlayState,
-	});
-
 	const classrooms = useClassrooms((s) => s.asArray);
 	const [selectedClassroomId, setSelectedClassroom] = useState<ClassroomId>();
 	const selectedClassroom = classrooms.find(
@@ -92,58 +89,47 @@ export function ScheduleCreateModal(props: {
 		[setOccurances],
 	);
 
-	const fetchLessons = useCalendar();
-	const {
-		resolve: resolveLessonPromise,
-		abort: abortLessonFetch,
-		getSignal,
-		data: lessons,
-	} = usePromise<Lesson[]>({ onLoading: setLoadingOverlayState });
+	const [lessons, setLessons] = useState<Lesson[]>();
+	const fetchLessons = useCallback(
+		(classroomId?: ClassroomId, date?: Date, signal?: AbortSignal) => {
+			if (!classroomId || !date) {
+				return;
+			}
+			return api<Result<Lesson[]>>(
+				`api/calendar/${classroomId}/${date.getTime()}`,
+				{ signal, method: "GET" },
+			);
+		},
+		[],
+	);
 
 	useEffect(() => {
 		if (!selectedClassroomId) return;
 		setOccurances(new Map());
 		setSelectedWeek(floorDateToMonday(Date.now()));
-		return abortLessonFetch;
-	}, [
-		abortLessonFetch,
-		fetchLessons,
-		resolveLessonPromise,
-		selectedClassroomId,
-	]);
+	}, [selectedClassroomId]);
 
 	const minDate = floorDateToMonday(new Date(Date.now()));
 	const [selectedWeek, setSelectedWeek] = useState<Date>(
 		floorDateToMonday(new Date(Date.now())),
 	);
+
 	const incrementDate = useCallback(() => {
 		setSelectedWeek(addDaysToDate(selectedWeek, 7));
-		resolveLessonPromise(
-			fetchLessons(selectedClassroomId, selectedWeek, getSignal()),
-		);
-	}, [
-		fetchLessons,
-		getSignal,
-		resolveLessonPromise,
-		selectedClassroomId,
-		selectedWeek,
-	]);
+		resolve((sig) => fetchLessons(selectedClassroomId, selectedWeek, sig), {
+			onSuccess: (res) => setLessons(res.data),
+		});
+	}, [fetchLessons, resolve, selectedClassroomId, selectedWeek]);
+
 	const decrementDate = useCallback(() => {
 		if (selectedWeek.getTime() <= minDate.getTime()) {
 			return;
 		}
 		setSelectedWeek(addDaysToDate(selectedWeek, -7));
-		resolveLessonPromise(
-			fetchLessons(selectedClassroomId, selectedWeek, getSignal()),
-		);
-	}, [
-		fetchLessons,
-		getSignal,
-		minDate,
-		resolveLessonPromise,
-		selectedClassroomId,
-		selectedWeek,
-	]);
+		resolve((sig) => fetchLessons(selectedClassroomId, selectedWeek, sig), {
+			onSuccess: (res) => setLessons(res.data),
+		});
+	}, [fetchLessons, minDate, resolve, selectedClassroomId, selectedWeek]);
 
 	function handleSubmit() {
 		if (
@@ -155,10 +141,8 @@ export function ScheduleCreateModal(props: {
 			return;
 		}
 
-		console.log("timetable", lessons);
-
-		resolveScheduleCreate(
-			scheduleHub?.createSchedule({
+		resolve(
+			connection?.createSchedule({
 				classroomId: selectedClassroomId,
 				subjectName: selectedSubject,
 				generator: {
@@ -192,7 +176,6 @@ export function ScheduleCreateModal(props: {
 					{t("schedule.create.title")}
 				</Text>
 			}>
-			<LoadingOverlay visible={loadingOverlayState} zIndex={6767} />
 			<form>
 				<Stack>
 					<NativeSelect

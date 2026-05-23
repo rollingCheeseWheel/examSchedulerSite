@@ -1,57 +1,58 @@
 {
-	"auth": {
-		"school": {
-			"error": "Fehler beim Laden, bitte versuche es erneut",
-			"select": "Wähle deine Schule aus"
-		}
-	},
-	"common": {
-		"cancel": "Abbrechen",
-		"error": "Fehler",
-		"submit": "OK",
-		"success": "Erfolg"
-	},
-	"logout": "Abmelden",
-	"notifications": {
-		"genericError": "Ein Fehler ist aufgetreten"
-	},
-	"schedule": {
-		"create": {
-			"classroomSelect": "Klassenraum auswählen",
-			"createbutton": "Prüfungsplan erstellen",
-			"error": {
-				"classroom": "Ungültiger Klassenraum",
-				"startdate": "Ungültiges Startdatum"
-			},
-			"fail": "Fehler beim Erstellen des Prüfungsplans",
-			"lockinOffset": "Anmeldeabschluss",
-			"scheduleDescription": "Beschreibung",
-			"startDatePicker": "Anfangsdatum auswählen",
-			"subjectSelect": "Fach auswählen",
-			"success": "Prüfungsplan erfolgreich erstellt",
-			"title": "Prüfungsplan erstellen"
-		},
-		"delete": "Löschen",
-		"empty": "Keine Prüfungspläne vorhanden",
-		"progess": {
-			"tooltip": "{{curr}} von {{max}}"
-		},
-		"register": "Einschreiben",
-		"reportactual": "Bestätigen",
-		"swap": "Tauschen"
-	},
-	"studentmodal": {
-		"submit": "Änderungen bestätigen",
-		"title": "Tatsächlichen Prüflinge bestätigen",
-		"usage": "Bestätigen sie die tatsächlichen Prüflinge. Schüler die sich für diesen Termin eingeschrieben haben, aber nicht an die Reihe gekommen sind werden in einen zukünftigen Termin eingetragen.",
-		"zerostudents": "Keine Schüler zur Auswahl vorhanden"
-	},
-	"submit": "Bestätigen",
-	"swaprequest": {
-		"accept": "Tausch annehmen",
-		"delete": "Tausch löschen"
-	},
-	"swaprequests": {
-		"title": "Tauschanfragen"
-	}
+    "auth": {
+        "school": {
+            "error": "Fehler beim Laden, bitte versuche es erneut",
+            "select": "Wähle deine Schule aus"
+        }
+    },
+    "common": {
+        "cancel": "Abbrechen",
+        "error": "Fehler",
+        "submit": "OK",
+        "success": "Erfolg"
+    },
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "notifications": {
+        "genericError": "Ein Fehler ist aufgetreten"
+    },
+    "schedule": {
+        "create": {
+            "classroomSelect": "Klassenraum auswählen",
+            "createbutton": "Prüfungsplan erstellen",
+            "error": {
+                "classroom": "Ungültiger Klassenraum",
+                "startdate": "Ungültiges Startdatum"
+            },
+            "fail": "Fehler beim Erstellen des Prüfungsplans",
+            "lockinOffset": "Anmeldeabschluss",
+            "scheduleDescription": "Beschreibung",
+            "startDatePicker": "Anfangsdatum auswählen",
+            "subjectSelect": "Fach auswählen",
+            "success": "Prüfungsplan erfolgreich erstellt",
+            "title": "Prüfungsplan erstellen"
+        },
+        "delete": "Löschen",
+        "empty": "Keine Prüfungspläne vorhanden",
+        "progess": {
+            "tooltip": "{{curr}} von {{max}}"
+        },
+        "register": "Einschreiben",
+        "reportactual": "Bestätigen",
+        "swap": "Tauschen"
+    },
+    "studentmodal": {
+        "submit": "Änderungen bestätigen",
+        "title": "Tatsächlichen Prüflinge bestätigen",
+        "usage": "Bestätigen sie die tatsächlichen Prüflinge. Schüler die sich für diesen Termin eingeschrieben haben, aber nicht an die Reihe gekommen sind werden in einen zukünftigen Termin eingetragen.",
+        "zerostudents": "Keine Schüler zur Auswahl vorhanden"
+    },
+    "submit": "Bestätigen",
+    "swaprequest": {
+        "accept": "Tausch annehmen",
+        "delete": "Tausch löschen"
+    },
+    "swaprequests": {
+        "title": "Tauschanfragen"
+    }
 }

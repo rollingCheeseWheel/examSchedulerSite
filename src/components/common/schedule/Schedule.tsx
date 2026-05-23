@@ -26,6 +26,7 @@ import {
 	IconTrashFilled,
 	IconX,
 } from "@tabler/icons-react";
+import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useIgnoredSwapRequests } from "../../../hooks/useIgnoredSwapRequests";
 import { usePromise } from "../../../hooks/usePromise";
@@ -33,10 +34,8 @@ import { useToggle } from "../../../hooks/useToggle";
 import {
 	useHubConnection,
 	useIsTeacher,
-	useLoadingOverlay,
-	useUserProfile,
+	useUserProfile
 } from "../../../hooks/zustand";
-import type { Result } from "../../../models/result";
 import type { ExamSlot, ExamSlotId, Schedule } from "../../../models/schedule";
 import type { SwapRequest, SwapRequestId } from "../../../models/swapRequest";
 import type { UserProfile } from "../../../models/user";
@@ -51,28 +50,46 @@ export function ExamSchedule(props: {
 }) {
 	const { t } = useTranslation();
 	const connection = useHubConnection((s) => s.data);
-	const { resolve } = usePromise<Result<boolean>>({
-		onLoading: useLoadingOverlay((s) => s.setState),
-		onError: [
-			() =>
-				notifications.show({
-					message: t("common.error"),
-				}),
-			console.error,
-		],
-		onSuccess: () =>
-			notifications.show({
-				message: t("common.success"),
-			}),
+	const { resolve } = usePromise({
+		onError: useMemo(
+			() => [
+				() =>
+					notifications.show({
+						message: t("common.error"),
+					}),
+				console.error,
+			],
+			[t],
+		),
+		onSuccess: useMemo(
+			() => [
+				() =>
+					notifications.show({
+						message: t("common.success"),
+					}),
+				console.log,
+			],
+			[t],
+		),
 	});
 
-	const joinSlot = (id: ExamSlotId) => resolve(connection?.registerForSlot(id));
-	const createSwapRequest = (id: ExamSlotId) =>
-		resolve(connection?.createSwapRequest(props.schedule.id, id));
-	const acceptSwapRequest = (id: SwapRequestId) =>
-		resolve(connection?.acceptSwapRequest(id));
-	const deleteSwapRequest = (id: SwapRequestId) =>
-		resolve(connection?.deleteSwapRequest(id));
+	const joinSlot = useCallback(
+		(id: ExamSlotId) => resolve(connection?.registerForSlot(id)),
+		[connection, resolve],
+	);
+	const createSwapRequest = useCallback(
+		(id: ExamSlotId) =>
+			resolve(connection?.createSwapRequest(props.schedule.id, id)),
+		[connection, props.schedule.id, resolve],
+	);
+	const acceptSwapRequest = useCallback(
+		(id: SwapRequestId) => resolve(connection?.acceptSwapRequest(id)),
+		[connection, resolve],
+	);
+	const deleteSwapRequest = useCallback(
+		(id: SwapRequestId) => resolve(connection?.deleteSwapRequest(id)),
+		[connection, resolve],
+	);
 
 	return (
 		<Paper

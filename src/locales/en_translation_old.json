@@ -1,20 +1,20 @@
 {
-	"navbar": {
-		"createforclassroom": "Create",
-		"overview": "Overview",
-		"swaprequests": "Swap Requests"
-	},
-	"schedule": {
-		"create": {
-			"calendar": {
-				"decrement": "Previous week",
-				"increment": "Next week"
-			},
-			"classroomselect": "MISSING",
-			"submit": "Create"
-		}
-	},
-	"schedules": {
-		"empty": "No exam schedules available"
-	}
+    "navbar": {
+        "createforclassroom": "Create",
+        "overview": "Overview",
+        "swaprequests": "Swap Requests"
+    },
+    "schedule": {
+        "create": {
+            "calendar": {
+                "decrement": "Previous week",
+                "increment": "Next week"
+            },
+            "classroomselect": "MISSING",
+            "submit": "Create"
+        }
+    },
+    "schedules": {
+        "empty": "No exam schedules available"
+    }
 }
