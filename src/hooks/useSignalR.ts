@@ -6,7 +6,7 @@ import {
 import { useCallback, useEffect, useRef } from "react";
 import { endpoints } from "../endpoints";
 import type { Classroom } from "../models/classroom";
-import type { Result } from "../models/result";
+import type { Result, SimpleResult } from "../models/result";
 import type {
 	ExamSlotId,
 	Schedule,
@@ -15,7 +15,7 @@ import type {
 } from "../models/schedule";
 import type { SwapRequestId } from "../models/swapRequest";
 import type { UserProfileId } from "../models/user";
-import { type Action, type Func } from "../util";
+import { ensureSuccessCode, type Action, type Func } from "../util";
 import { useHubConnection } from "./zustand";
 
 export interface ScheduleClient {
@@ -29,16 +29,16 @@ export interface ScheduleClient {
 }
 
 export interface ScheduleHub {
-	registerForSlot: Func<[ExamSlotId], Promise<Result<boolean>>>;
+	registerForSlot: Func<[ExamSlotId], Promise<SimpleResult>>;
 
-	createSwapRequest: Func<[ScheduleId, ExamSlotId], Promise<Result<boolean>>>;
-	acceptSwapRequest: Func<[SwapRequestId], Promise<Result<boolean>>>;
-	deleteSwapRequest: Func<[SwapRequestId], Promise<Result<boolean>>>;
+	createSwapRequest: Func<[ScheduleId, ExamSlotId], Promise<SimpleResult>>;
+	acceptSwapRequest: Func<[SwapRequestId], Promise<SimpleResult>>;
+	deleteSwapRequest: Func<[SwapRequestId], Promise<SimpleResult>>;
 
-	createSchedule: Func<[ScheduleCreateRequest], Promise<Result<boolean>>>;
-	subscribeSchedule: Func<[ScheduleId], Promise<Result<boolean>>>;
-	deleteSchedule: Func<[ScheduleId], Promise<Result<boolean>>>;
-	reportStudents: Func<[ExamSlotId, UserProfileId[]], Promise<Result<boolean>>>;
+	createSchedule: Func<[ScheduleCreateRequest], Promise<SimpleResult>>;
+	subscribeSchedule: Func<[ScheduleId], Promise<SimpleResult>>;
+	deleteSchedule: Func<[ScheduleId], Promise<SimpleResult>>;
+	reportStudents: Func<[ExamSlotId, UserProfileId[]], Promise<SimpleResult>>;
 
 	connect: Func<[], Promise<void>>;
 	disconnect: Func<[], Promise<void>>;
@@ -71,32 +71,32 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 				connectionRef.current = createConnection(hubUrl);
 				conn = {
 					acceptSwapRequest(swaprequestId) {
-						return (
-							connectionRef.current?.invoke<Result<boolean>>(
+						return ensureSuccessCode(
+							connectionRef.current?.invoke<SimpleResult>(
 								"AcceptSwapRequest",
 								swaprequestId,
 							) ?? Promise.reject(new Error("Connection not initialized"))
-						);
+						)
 					},
 					createSchedule(request) {
-						return (
-							connectionRef.current?.invoke<Result<boolean>>(
+						return ensureSuccessCode(
+							connectionRef.current?.invoke<SimpleResult>(
 								"CreateSchedule",
 								request,
 							) ?? Promise.reject(new Error("Connection not initialized"))
 						);
 					},
 					deleteSchedule(scheduleId) {
-						return (
-							connectionRef.current?.invoke<Result<boolean>>(
+						return ensureSuccessCode(
+							connectionRef.current?.invoke<SimpleResult>(
 								"DeleteSchedule",
 								scheduleId,
 							) ?? Promise.reject(new Error("Connection not initialized"))
 						);
 					},
 					createSwapRequest(scheduleId, userId) {
-						return (
-							connectionRef.current?.invoke<Result<boolean>>(
+						return ensureSuccessCode(
+							connectionRef.current?.invoke<SimpleResult>(
 								"CreateSwapRequest",
 								scheduleId,
 								userId,
@@ -104,32 +104,32 @@ export function useSignalRInit(hubUrl: string = endpoints.scheduleHub) {
 						);
 					},
 					subscribeSchedule(scheduleId) {
-						return (
-							connectionRef.current?.invoke<Result<boolean>>(
+						return ensureSuccessCode(
+							connectionRef.current?.invoke<SimpleResult>(
 								"SubscribeSchedule",
 								scheduleId,
 							) ?? Promise.reject(new Error("Connection not initialized"))
 						);
 					},
 					deleteSwapRequest(swaprequestId) {
-						return (
-							connectionRef.current?.invoke<Result<boolean>>(
+						return ensureSuccessCode(
+							connectionRef.current?.invoke<SimpleResult>(
 								"DeleteSwapRequest",
 								swaprequestId,
 							) ?? Promise.reject(new Error("Connection not initialized"))
 						);
 					},
 					registerForSlot(slotId) {
-						return (
-							connectionRef.current?.invoke<Result<boolean>>(
+						return ensureSuccessCode(
+							connectionRef.current?.invoke<SimpleResult>(
 								"RegisterForSlot",
 								slotId,
 							) ?? Promise.reject(new Error("Connection not initialized"))
 						);
 					},
 					reportStudents(slotId, actualParticipants) {
-						return (
-							connectionRef.current?.invoke<Result<boolean>>(
+						return ensureSuccessCode(
+							connectionRef.current?.invoke<SimpleResult>(
 								"ReportStudents",
 								slotId,
 								actualParticipants,

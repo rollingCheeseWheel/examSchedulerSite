@@ -80,7 +80,7 @@ export function TemporaryCreateModal(props: {
 		},
 		subjectName: selectedSubject,
 		description: "Anlagenbuchhaltung",
-		startDate: "2026-05-19",
+		startDate: "2026-05-10",
 		lockInOffset: new Date(0),
 	};
 
@@ -117,17 +117,11 @@ export function TemporaryCreateModal(props: {
 				<Button
 					onClick={() => {
 						resolve(connection?.createSchedule(request), {
-							onSuccess: (res) => {
-								if (res.data) {
+							onSuccess: () => {
 									notifications.show({
 										message: t("schedule.create.success"),
 									});
 									props.close();
-								} else {
-									notifications.show({
-										message: t("schedule.create.fail"),
-									});
-								}
 							},
 						});
 					}}>

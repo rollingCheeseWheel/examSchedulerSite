@@ -8,7 +8,7 @@ import type {
 } from "./brand";
 import type { DayOfWeek, Subject, TeacherWithSubjects } from "./calendar";
 import type { ClassroomId } from "./classroom";
-import type { AutoLockIn, SlotFillingBehaviour, SlotLockState } from "./enums";
+import type { AutoLockIn, SlotLockState } from "./enums";
 import type { SwapRequest } from "./swapRequest";
 import type { UserProfile } from "./user";
 
@@ -25,6 +25,7 @@ export type Maximum = Brand<number, "max">;
 
 export interface Schedule {
 	id: ScheduleId;
+	classroomId: ClassroomId;
 	startDate: DateString;
 	endDate: DateString;
 	autoLockIn: AutoLockIn;

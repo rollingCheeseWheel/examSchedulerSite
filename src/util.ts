@@ -6,6 +6,7 @@ import type { Classroom } from "./models/classroom";
 import type { ExamSlot, Schedule } from "./models/schedule";
 import type { SwapRequest } from "./models/swapRequest";
 import type { UserProfile } from "./models/user";
+import type { SimpleResult } from "./models/result";
 
 export type Primitive =
 	| string
@@ -311,4 +312,15 @@ export function singleOrList<T>(
 		}
 	}
 	return res;
+}
+
+export function ensureSuccessCode(promise: Promise<SimpleResult>) {
+	return promise.then((r) => {
+		if (!r.success || r.errors) {
+			throw new Error(r.errors?.join(", "));
+		} else
+		{
+			return r;
+		}
+	});
 }

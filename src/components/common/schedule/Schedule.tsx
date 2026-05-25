@@ -26,7 +26,7 @@ import {
 	IconTrashFilled,
 	IconX,
 } from "@tabler/icons-react";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useIgnoredSwapRequests } from "../../../hooks/useIgnoredSwapRequests";
 import { usePromise } from "../../../hooks/usePromise";
@@ -73,23 +73,13 @@ export function ExamSchedule(props: {
 		),
 	});
 
-	const joinSlot = useCallback(
-		(id: ExamSlotId) => resolve(connection?.registerForSlot(id)),
-		[connection, resolve],
-	);
-	const createSwapRequest = useCallback(
-		(id: ExamSlotId) =>
-			resolve(connection?.createSwapRequest(props.schedule.id, id)),
-		[connection, props.schedule.id, resolve],
-	);
-	const acceptSwapRequest = useCallback(
-		(id: SwapRequestId) => resolve(connection?.acceptSwapRequest(id)),
-		[connection, resolve],
-	);
-	const deleteSwapRequest = useCallback(
-		(id: SwapRequestId) => resolve(connection?.deleteSwapRequest(id)),
-		[connection, resolve],
-	);
+	const joinSlot = (id: ExamSlotId) => resolve(connection?.registerForSlot(id));
+	const createSwapRequest = (id: ExamSlotId) =>
+		resolve(connection?.createSwapRequest(props.schedule.id, id));
+	const acceptSwapRequest = (id: SwapRequestId) =>
+		resolve(connection?.acceptSwapRequest(id));
+	const deleteSwapRequest = (id: SwapRequestId) =>
+		resolve(connection?.deleteSwapRequest(id));
 
 	return (
 		<Paper
@@ -220,31 +210,39 @@ function SlotSelectButton(props: {
 	const isInSwapState =
 		props.slot.participants.length >= props.slot.maxParticipants;
 
-	if (isTeacher && props.slot.lockState === "locked") {
-		return (
-			<>
-				<ReportStudentModal
-					slotId={props.slot.id}
-					opened={studentModalOpen}
-					onClose={closeStudentModal}
-				/>
-				<Button onClick={openStudentModal}>{t("schedule.reportactual")}</Button>
-			</>
-		);
-	} else if (isTeacher || props.slot.lockState === "definite") {
-		return;
+	if (isTeacher) {
+		if (props.slot.lockState == "locked") {
+			return (
+				<>
+					<ReportStudentModal
+						slotId={props.slot.id}
+						opened={studentModalOpen}
+						onClose={closeStudentModal}
+					/>
+					<Button onClick={openStudentModal}>
+						{t("schedule.reportactual")}
+					</Button>
+				</>
+			);
+		} else {
+			return <></>;
+		}
+	} else {
+		if (props.slot.lockState == "open") {
+			return (
+				<Button
+					onClick={() =>
+						(isInSwapState ? props.createSwap : props.select)(props.slot.id)
+					}
+					rightSection={isInSwapState ? <IconReplaceUser /> : <IconCheck />}
+					variant={isInSwapState ? "light" : "filled"}>
+					{isInSwapState ? t("schedule.swap") : t("schedule.register")}
+				</Button>
+			);
+		} else {
+			return <></>;
+		}
 	}
-
-	return (
-		<Button
-			onClick={() =>
-				(isInSwapState ? props.createSwap : props.select)(props.slot.id)
-			}
-			rightSection={isInSwapState ? <IconReplaceUser /> : <IconCheck />}
-			variant={isInSwapState ? "light" : "filled"}>
-			{isInSwapState ? t("schedule.swap") : t("schedule.register")}
-		</Button>
-	);
 }
 
 function SwapRequestDrawer(props: {

@@ -10,13 +10,17 @@ import {
 	Stack,
 	Text,
 } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePromise } from "../../../hooks/usePromise";
-import { useHubConnection, useSchedules } from "../../../hooks/zustand";
+import {
+	useClassrooms,
+	useHubConnection,
+	useSchedules,
+} from "../../../hooks/zustand";
 import type { ExamSlotId } from "../../../models/schedule";
 import type { UserProfileId } from "../../../models/user";
-import { pointerCursorTheme, sleep, type Action } from "../../../util";
+import { pointerCursorTheme, type Action } from "../../../util";
 
 export function ReportStudentModal(props: {
 	slotId: ExamSlotId;
@@ -24,27 +28,37 @@ export function ReportStudentModal(props: {
 	onClose: Action<[]>;
 }) {
 	const { t } = useTranslation();
-	const { resolve } = usePromise();
+	const { resolve } = usePromise({
+		onError: console.error,
+		onSuccess: console.log,
+	});
 
-	const scheduleHub = useHubConnection((s) => s.data);
-	const [checkedStudents, setCheckedStudents] = useState<UserProfileId[]>([]);
+	const _connection = useHubConnection((s) => s.data);
+	const connectionRef = useRef(_connection);
+	useEffect(() => {
+		connectionRef.current = _connection;
+	}, [_connection]);
 
 	const schedule = useSchedules((s) => s.asArray).find((s) =>
 		s.examSlots.some((s) => s.id == props.slotId),
 	);
+	const takenStudentIds = schedule?.examSlots
+		.filter((s) => s.lockState == "definite")
+		.map((s) => s.participants)
+		.flat()
+		.map((s) => s.id);
+	const classroomsMap = useClassrooms((s) => s.asMap);
+	const availableStudents = classroomsMap
+		.get(schedule?.classroomId ?? "")
+		?.students.filter((s) => !takenStudentIds?.includes(s.id));
+
+	const [checkedStudents, setCheckedStudents] = useState<UserProfileId[]>([]);
+
 	const examslot = schedule?.examSlots.find((s) => s.id == props.slotId);
 
 	useEffect(() => {
 		setCheckedStudents(examslot?.participants.map((p) => p.id) ?? []);
 	}, [examslot?.participants]);
-
-	const studentsInLockedSlots = schedule?.examSlots
-		.filter((s) => s.lockState === "definite")
-		.flatMap((s) => s.participants);
-	const availableStudents = schedule?.examSlots
-		.flatMap((s) => s.participants)
-		.filter((p) => !examslot?.participants?.map((x) => x.id).includes(p.id))
-		.filter((p) => !studentsInLockedSlots?.map((x) => x.id).includes(p.id));
 
 	if (!schedule || !examslot || !availableStudents) {
 		return;
@@ -86,10 +100,14 @@ export function ReportStudentModal(props: {
 							onChange={setCheckedStudents}
 							defaultValue={examslot.participants.map((p) => p.id)}>
 							<Stack>
-								{...examslot.participants.map((p) => (
-									<Checkbox value={p.id} label={p.name} />
-								))}
-								{examslot.participants.length && <Divider />}
+								{examslot.participants.length && (
+									<>
+										{...examslot.participants.map((p) => (
+											<Checkbox value={p.id} label={p.name} />
+										))}
+										{examslot.participants.length && <Divider />}
+									</>
+								)}
 								{...availableStudents.map((p) => (
 									<Checkbox value={p.id} label={p.name} />
 								))}
@@ -102,8 +120,10 @@ export function ReportStudentModal(props: {
 					<Button
 						onClick={() =>
 							resolve(
-								scheduleHub?.reportStudents(props.slotId, checkedStudents) ??
-									sleep(250),
+								connectionRef.current?.reportStudents(
+									props.slotId,
+									checkedStudents,
+								) ?? Promise.reject(),
 							)
 						}>
 						<Text>{t("studentmodal.submit")}</Text>
