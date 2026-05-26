@@ -19,6 +19,7 @@ import type {
 	ScheduleCreateRequest,
 } from "../../../models/schedule";
 import { equals, type Action } from "../../../util";
+import { DatePickerInput } from "@mantine/dates";
 
 export function TemporaryCreateModal(props: {
 	opened: boolean;
@@ -44,6 +45,8 @@ export function TemporaryCreateModal(props: {
 		[],
 	);
 
+	const [date, setDate] = useState<string | null>(new Date().toISOString());
+
 	const classrooms = useClassrooms((s) => s.asArray);
 	const [selectedClassroomId, setSelectedClassroom] = useState<ClassroomId>(
 		classrooms.at(0)?.id ?? "",
@@ -60,8 +63,8 @@ export function TemporaryCreateModal(props: {
 	const connection = useHubConnection((s) => s.data);
 
 	useEffect(() => {
-		resolve(fetchLessons(selectedClassroomId, new Date()));
-	}, [fetchLessons, resolve, selectedClassroomId]);
+		resolve(fetchLessons(selectedClassroomId, new Date(date ?? "")));
+	}, [date, fetchLessons, resolve, selectedClassroomId]);
 
 	const request: ScheduleCreateRequest = {
 		classroomId: selectedClassroomId ?? "",
@@ -80,7 +83,7 @@ export function TemporaryCreateModal(props: {
 		},
 		subjectName: selectedSubject,
 		description: "Anlagenbuchhaltung",
-		startDate: "2026-05-10",
+		startDate: new Date(date ?? Date.now()).toISOString(),
 		lockInOffset: new Date(0),
 	};
 
@@ -96,6 +99,7 @@ export function TemporaryCreateModal(props: {
 				</Text>
 			}>
 			<Stack>
+				<DatePickerInput value={date} onChange={setDate}/>
 				<NativeSelect
 					required
 					label={t("schedule.create.classroomSelect")}
@@ -118,10 +122,10 @@ export function TemporaryCreateModal(props: {
 					onClick={() => {
 						resolve(connection?.createSchedule(request), {
 							onSuccess: () => {
-									notifications.show({
-										message: t("schedule.create.success"),
-									});
-									props.close();
+								notifications.show({
+									message: t("schedule.create.success"),
+								});
+								props.close();
 							},
 						});
 					}}>
